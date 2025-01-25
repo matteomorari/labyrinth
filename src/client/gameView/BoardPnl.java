@@ -102,7 +102,7 @@ public class BoardPnl extends JPanel implements MouseListener {
 
     for (Shape arrowBounds : arrowBoundsList) {
       if (arrowBounds.contains(e.getPoint())) {
-        System.out.println("Arrow clicked!: " + (int)Math.abs(col) + ", " + (int)Math.abs(row));
+        System.out.println("Arrow clicked!: " + (int) Math.abs(col) + ", " + (int) Math.abs(row));
         break;
       }
     }
