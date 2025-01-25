@@ -27,12 +27,12 @@ public class BoardPnl extends JPanel implements MouseListener {
     Graphics2D g2 = (Graphics2D) g;
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-    g2.setColor(Color.LIGHT_GRAY);
+    g2.setColor(Color.LIGHT_GRAY); // bg color
     int size = Math.min(getWidth(), getHeight());
     // center the board
     int x = (getWidth() - size) / 2;
     int y = (getHeight() - size) / 2;
-    g2.fillRoundRect(x, y, size, size, BOARD_ARC_RADIUS, BOARD_ARC_RADIUS); // Adjust the arc width and height as needed
+    g2.fillRoundRect(x, y, size, size, BOARD_ARC_RADIUS, BOARD_ARC_RADIUS);
 
     // Draw the board
     int cellSize = (size - PADDING * 2) / BOARD_DIMENSION;
@@ -55,7 +55,6 @@ public class BoardPnl extends JPanel implements MouseListener {
         }
 
         Card card = new Card(imageCntrl).rotate(randomAngle);
-        // card.draw(g2, x + i * cellSize, y + j * cellSize, cellSize);
         card.paintComponent(g2, x + i * cellSize, y + j * cellSize, cellSize, cellSize);
         this.add(card);
 
@@ -104,7 +103,6 @@ public class BoardPnl extends JPanel implements MouseListener {
     for (Shape arrowBounds : arrowBoundsList) {
       if (arrowBounds.contains(e.getPoint())) {
         System.out.println("Arrow clicked!: " + (int)Math.abs(col) + ", " + (int)Math.abs(row));
-        // Handle arrow click
         break;
       }
     }
@@ -131,7 +129,6 @@ public class BoardPnl extends JPanel implements MouseListener {
     int[] yPoints = { 2, -2, -2, 2 };
     int nPoints = xPoints.length;
 
-    // Create the Polygon object
     Polygon arrow = new Polygon(xPoints, yPoints, nPoints);
     Shape shape = new Area(arrow);
 

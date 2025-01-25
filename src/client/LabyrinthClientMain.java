@@ -41,19 +41,11 @@ public class LabyrinthClientMain {
     frame.setBounds(20, 20, 1400, 800);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     // frame.setResizable(false);
-    frame.getContentPane().setLayout(new BorderLayout(10, 100));
+    frame.setLayout(new BorderLayout(10, 10));
 
-    // Set BorderLayout for the frame
-    frame.setLayout(new BorderLayout(10, 10)); // Add spacing between components
-
-    // Crete game panel
     JPanel gamePanel = new GamePnl();
-
-    // Add the outer panel to the frame
     frame.add(gamePanel);
 
-    // Make the frame visible
     frame.setVisible(true);
-
   }
 }
