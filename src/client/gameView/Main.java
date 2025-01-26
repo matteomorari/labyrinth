@@ -12,7 +12,7 @@ public class Main {
     frame.setSize(400, 400);
 
     ImageCntrl imageCntrl = ImageCntrl.CARD_I; // Assuming ImageCntrl is properly defined
-    Card card = new Card(imageCntrl);
+    CardImage card = new CardImage(imageCntrl);
     // card.paintComponent(frame.getGraphics(), 0, 0, 100, 100);
 
     frame.setLayout(new BorderLayout());

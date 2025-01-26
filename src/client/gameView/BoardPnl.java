@@ -1,6 +1,12 @@
 package client.gameView;
 
 import javax.swing.*;
+
+import core.CardType;
+import core.Labyrinth;
+import core.Player;
+import core.Card;
+
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -11,14 +17,22 @@ import java.util.ArrayList;
 public class BoardPnl extends JPanel implements MouseListener {
   private static final int BOARD_ARC_RADIUS = 30;
   private static final int PADDING = 40;
-
   private static final int BOARD_DIMENSION = 7; // TODO: move to model
+
   private ArrayList<Shape> arrowBoundsList;
+  // TODO: use controller
+  private Labyrinth model;
+  private ArrayList<ArrayList<Card>> board;
 
   public BoardPnl() {
     setLayout(null);
     addMouseListener(this);
     arrowBoundsList = new ArrayList<Shape>();
+    this.model = new Labyrinth();
+    this.model.addPlayer(new Player());
+    this.model.addPlayer(new Player());
+    model.initGame();
+    this.board = model.getBoard();
   }
 
   @Override
@@ -40,28 +54,19 @@ public class BoardPnl extends JPanel implements MouseListener {
     y += PADDING;
     for (int i = 0; i < BOARD_DIMENSION; i++) {
       for (int j = 0; j < BOARD_DIMENSION; j++) {
-        int[] angles = { 0, 90, 180, 270 };
-        int randomAngle = angles[(int) (Math.random() * angles.length)];
+        Card card = board.get(i).get(j);
+        ImageCntrl imageCntrl = ImageCntrl.valueOf("CARD_" + card.getType().name());
+        int angles = card.getOrientation().ordinal() * 90;
+        CardImage cardImage = new CardImage(imageCntrl).rotate(angles);
+        cardImage.paintComponent(g2, x + i * cellSize, y + j * cellSize, cellSize, cellSize);
 
-        int randomNumber = 1 + (int) (Math.random() * 3);
-
-        ImageCntrl imageCntrl;
-        if (randomNumber == 1) {
-          imageCntrl = ImageCntrl.CARD_L;
-        } else if (randomNumber == 2) {
-          imageCntrl = ImageCntrl.CARD_I;
-        } else {
-          imageCntrl = ImageCntrl.CARD_T;
+        // paint the card's goal
+        if (card.getGoal() != null) {
+          ImageCntrl goalImageCntrl = ImageCntrl.valueOf("GOAL_" + card.getGoal().name());
+          CardImage goalImage = new CardImage(goalImageCntrl).rotate(angles);
+          goalImage.paintComponent(g2, x + i * cellSize + cellSize / 4, y + j * cellSize + cellSize / 4, cellSize / 2,
+              cellSize / 2);
         }
-
-        Card card = new Card(imageCntrl).rotate(randomAngle);
-        card.paintComponent(g2, x + i * cellSize, y + j * cellSize, cellSize, cellSize);
-        this.add(card);
-
-        // Image image = imageCntrl.rotateImage(
-        // randomAngle).getImage().getScaledInstance(cellSize, cellSize,
-        // Image.SCALE_SMOOTH);
-        // g2.drawImage(image, x + i * cellSize, y + j * cellSize, this);
 
         // paint arrow around the board
         // TODO: fix arrow position
@@ -83,6 +88,14 @@ public class BoardPnl extends JPanel implements MouseListener {
               cellSize / 2, (float) Math.toRadians(180));
         }
       }
+    }
+
+    // Draw the players
+    g2.setColor(Color.RED);
+    for (Player player : model.getPlayers()) {
+      int[] position = player.getPosition();
+      g2.fillOval(x + position[0] * cellSize + cellSize / 3, y + position[1] * cellSize + cellSize / 3, cellSize / 3,
+        cellSize / 3);  
     }
   }
 

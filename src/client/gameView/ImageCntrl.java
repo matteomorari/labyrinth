@@ -14,7 +14,11 @@ public enum ImageCntrl {
   // load images
   CARD_L("L.png"),
   CARD_I("I.png"),
-  CARD_T("T.png");
+  CARD_T("T.png"),
+  GOAL_HELMET("helmet.png"),
+  GOAL_SWORD("sword.png"),
+  GOAL_SKULL("skull.png"),
+  GOAL_GEM("gem.png"),;
 
   private final Path path;
   private BufferedImage image;
@@ -38,7 +42,7 @@ public enum ImageCntrl {
     return image;
   }
 
-  public ImageCntrl rotateImage(double angle) {
+  public BufferedImage rotateImage(double angle) {
     double radians = Math.toRadians(angle);
     double sin = Math.abs(Math.sin(radians));
     double cos = Math.abs(Math.cos(radians));
@@ -57,9 +61,7 @@ public enum ImageCntrl {
     g2d.drawImage(image, 0, 0, null);
     g2d.dispose();
 
-    this.image = rotatedImage;
-
-    return this;
+    return rotatedImage;
   }
 
 }

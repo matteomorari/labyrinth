@@ -1,30 +1,18 @@
 package client.gameView;
 
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseListener;
 
 import javax.swing.JComponent;
 
-import java.awt.event.MouseEvent;
-
-public class Card extends JComponent{
+public class CardImage extends JComponent{
   private ImageCntrl imageCntrl;
   private Image image;
   // private int posX;
   // private int posY;
 
-  // The MouseListener that handles the click, etc.
-  private MouseListener listener = new MouseAdapter() {
-    public void mouseClicked(MouseEvent e) {
-      System.out.println("Clicked");
-    }
-  };
-
-  public Card(ImageCntrl imageCntrl) {
+  public CardImage(ImageCntrl imageCntrl) {
     this.imageCntrl = imageCntrl;
     this.image = imageCntrl.getImage();
-    addMouseListener(listener);
   }
 
   public void draw(Graphics2D g2, int posX, int posY, int dimension) {
@@ -48,8 +36,8 @@ public class Card extends JComponent{
   public void setImage(Image image) {
   }
 
-  public Card rotate(double angle) {
-    this.image = imageCntrl.rotateImage(angle).getImage();
+  public CardImage rotate(double angle) {
+    this.image = imageCntrl.rotateImage(angle);
     return this;
   }
 
