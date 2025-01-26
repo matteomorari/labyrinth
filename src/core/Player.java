@@ -1,11 +1,13 @@
 package core;
 
+import java.awt.Color;
 import java.util.ArrayDeque;
 
 public class Player {
   private ArrayDeque<Goal> goalsQueue;
   private int[] position;
   private int[] startPosition;
+  private Color color;
 
   public Player() {
     this.goalsQueue = new ArrayDeque<Goal>();
@@ -30,11 +32,19 @@ public class Player {
   }
 
   public void setStartPosition(int x, int y) {
-    this.startPosition = new int[] {x, y};
+    this.startPosition = new int[] { x, y };
     this.setPosition(x, y);
   }
 
   public int[] getStartPosition() {
     return this.startPosition;
+  }
+
+  public void setColor(Color color) {
+    this.color = color;
+  }
+
+  public Color getColor() {
+    return color;
   }
 }

@@ -4,7 +4,7 @@ import java.awt.*;
 
 import javax.swing.JComponent;
 
-public class CardImage extends JComponent{
+public class CardImage extends JComponent {
   private ImageCntrl imageCntrl;
   private Image image;
   // private int posX;

@@ -12,7 +12,6 @@ public enum CardType {
   private boolean isSouthOpen;
   private boolean isWestOpen;
 
-
   CardType(boolean isNordOpen, boolean isEastOpen, boolean isSouthOpen, boolean isWestOpen) {
     this.isNordOpen = isNordOpen;
     this.isEastOpen = isEastOpen;
