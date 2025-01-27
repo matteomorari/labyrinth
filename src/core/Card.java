@@ -13,6 +13,7 @@ public class Card {
   private boolean isWestOpen;
   private Orientation orientation;
   private Goal goal;
+  private ArrayList<Player> players;
 
   // for Dijkstra
   private Point position;
@@ -29,6 +30,7 @@ public class Card {
     this.orientation = Orientation.NORD;
     this.cardConnected = new ArrayList<Card>();
     this.distance = Integer.MAX_VALUE;
+    this.players = new ArrayList<Player>();
   }
 
   // Rotate the card 90 degrees clockwise
@@ -147,6 +149,21 @@ public class Card {
     this.cardConnected = new ArrayList<Card>();
   }
 
+  public void addPlayer(Player player) {
+    this.players.add(player);
+  }
+
+  public ArrayList<Player> getPlayers() {
+    return this.players;
+  }
+
+  public void removePlayer(Player player) {
+    this.players.remove(player);
+  }
+
+  public void clearPlayers() {
+    this.players.clear();
+  }
 
   @Override
   public String toString() {

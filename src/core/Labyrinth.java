@@ -129,6 +129,12 @@ public class Labyrinth {
     this.board.get(this.boardSize - 1).get(0).rotate(2);
     this.board.get(0).get(this.boardSize - 1);
     this.board.get(this.boardSize - 1).get(this.boardSize - 1).rotate(3);
+
+    // set the players to their start card
+    for (Player player : this.players) {
+      Card card = this.board.get(player.getStartPosition().x).get(player.getStartPosition().y);
+      card.addPlayer(player);
+    }
     return this.board;
   }
 
@@ -156,7 +162,6 @@ public class Labyrinth {
   }
 
   public void insertCard(int x, int y) {
-    // ! TODO: update card position
     if (x < 0 || x >= this.boardSize || y < 0 || y >= this.boardSize) {
       throw new IllegalArgumentException("Invalid position");
     }
@@ -169,10 +174,12 @@ public class Labyrinth {
     if (x == 0) {
       // shift the cards from top to bottom
       Card futureAvailableCard = this.board.get(this.boardSize - 1).get(y);
-      System.out.println(futureAvailableCard.toString());
       for (int i = this.boardSize - 1; i > 0; i--) {
         this.board.get(i).set(y, this.board.get(i - 1).get(y));
         this.board.get(i).get(y).setPosition(new Point(i, y));
+        for (Player player : this.board.get(i).get(y).getPlayers()) {
+          player.setPosition(i, y);
+        }
       }
       this.board.get(0).set(y, this.availableCard);
       this.board.get(0).get(y).setPosition(new Point(0, y));
@@ -185,6 +192,9 @@ public class Labyrinth {
       for (int i = 0; i < this.boardSize - 1; i++) {
         this.board.get(i).set(y, this.board.get(i + 1).get(y));
         this.board.get(i).get(y).setPosition(new Point(i, y));
+        for (Player player : this.board.get(i).get(y).getPlayers()) {
+          player.setPosition(i, y);
+        }
       }
       this.board.get(this.boardSize - 1).set(y, this.availableCard);
       this.board.get(this.boardSize - 1).get(y).setPosition(new Point(this.boardSize - 1, y));
@@ -197,6 +207,9 @@ public class Labyrinth {
       for (int i = this.boardSize - 1; i > 0; i--) {
         this.board.get(x).set(i, this.board.get(x).get(i - 1));
         this.board.get(x).get(i).setPosition(new Point(x, i));
+        for (Player player : this.board.get(i).get(y).getPlayers()) {
+          player.setPosition(i, y);
+        }
       }
       this.board.get(x).set(0, this.availableCard);
       this.board.get(x).get(0).setPosition(new Point(x, 0));
@@ -209,6 +222,9 @@ public class Labyrinth {
       for (int i = 0; i < this.boardSize - 1; i++) {
         this.board.get(x).set(i, this.board.get(x).get(i + 1));
         this.board.get(x).get(i).setPosition(new Point(x, i));
+        for (Player player : this.board.get(i).get(y).getPlayers()) {
+          player.setPosition(i, y);
+        }
       }
       this.board.get(x).set(this.boardSize - 1, this.availableCard);
       this.board.get(x).get(this.boardSize - 1).setPosition(new Point(x, this.boardSize - 1));
@@ -322,7 +338,11 @@ public class Labyrinth {
 
   public void movePlayer(int row, int col) {
     Player currentPlayer = this.getCurrentPlayer();
-    if (this.findPath(currentPlayer.getPosition()[0], currentPlayer.getPosition()[1], row, col)) {
+    Card previousPlayerCard = this.board.get(currentPlayer.getPosition().x).get(currentPlayer.getPosition().y);
+    if (this.findPath(currentPlayer.getPosition().x, currentPlayer.getPosition().y, row, col)) {
+      previousPlayerCard.removePlayer(currentPlayer);
+      previousPlayerCard.removePlayer(currentPlayer);
+      this.board.get(row).get(col).addPlayer(currentPlayer);
       currentPlayer.setPosition(row, col);
     }
   }
