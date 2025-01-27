@@ -1,7 +1,5 @@
 package core;
 
-import core.utility.Orientation;
-
 public enum CardType {
   I(true, false, true, false),
   L(true, true, false, false),

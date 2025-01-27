@@ -158,6 +158,7 @@ public class Labyrinth {
       throw new IllegalStateException("No available card");
     }
 
+    // TODO: HashMap?
     if (x == 0) {
       // shift the cards from top to bottom
       Card futureAvailableCard = this.board.get(this.boardSize - 1).get(y);
