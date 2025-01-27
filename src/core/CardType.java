@@ -3,7 +3,7 @@ package core;
 public enum CardType {
   I(true, false, true, false),
   L(true, true, false, false),
-  T(true, true, true, false);
+  T(true, true, false, true);
 
   private boolean isNordOpen;
   private boolean isEastOpen;

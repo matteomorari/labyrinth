@@ -2,12 +2,15 @@ package core;
 
 import java.util.List;
 
+import core.utility.CardComparator;
 import core.utility.Orientation;
 
+import java.awt.Point;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.PriorityQueue;
 
 public class Labyrinth {
   ArrayDeque<Player> players;
@@ -106,12 +109,15 @@ public class Labyrinth {
       ArrayList<Card> row = new ArrayList<Card>();
       for (int j = 0; j < this.boardSize; j++) {
         // the card in the corner must by of the type L
+        Card card = null;
         if ((i == 0 && j == 0) || (i == 0 && j == this.boardSize - 1) || (i == this.boardSize - 1 && j == 0)
             || (i == this.boardSize - 1 && j == this.boardSize - 1)) {
-          row.add(new Card(CardType.L));
+          card = new Card(CardType.L);
         } else {
-          row.add(this.createRandomCard());
+          card = this.createRandomCard();
         }
+        row.add(card);
+        card.setPosition(new Point(i, j));
       }
       this.board.add(row);
     }
@@ -150,6 +156,7 @@ public class Labyrinth {
   }
 
   public void insertCard(int x, int y) {
+    // ! TODO: update card position
     if (x < 0 || x >= this.boardSize || y < 0 || y >= this.boardSize) {
       throw new IllegalArgumentException("Invalid position");
     }
@@ -165,8 +172,10 @@ public class Labyrinth {
       System.out.println(futureAvailableCard.toString());
       for (int i = this.boardSize - 1; i > 0; i--) {
         this.board.get(i).set(y, this.board.get(i - 1).get(y));
+        this.board.get(i).get(y).setPosition(new Point(i, y));
       }
       this.board.get(0).set(y, this.availableCard);
+      this.board.get(0).get(y).setPosition(new Point(0, y));
       this.availableCard = futureAvailableCard;
     }
 
@@ -175,8 +184,10 @@ public class Labyrinth {
       Card futureAvailableCard = this.board.get(0).get(y);
       for (int i = 0; i < this.boardSize - 1; i++) {
         this.board.get(i).set(y, this.board.get(i + 1).get(y));
+        this.board.get(i).get(y).setPosition(new Point(i, y));
       }
       this.board.get(this.boardSize - 1).set(y, this.availableCard);
+      this.board.get(this.boardSize - 1).get(y).setPosition(new Point(this.boardSize - 1, y));
       this.availableCard = futureAvailableCard;
     }
 
@@ -185,8 +196,10 @@ public class Labyrinth {
       Card futureAvailableCard = this.board.get(x).get(this.boardSize - 1);
       for (int i = this.boardSize - 1; i > 0; i--) {
         this.board.get(x).set(i, this.board.get(x).get(i - 1));
+        this.board.get(x).get(i).setPosition(new Point(x, i));
       }
       this.board.get(x).set(0, this.availableCard);
+      this.board.get(x).get(0).setPosition(new Point(x, 0));
       this.availableCard = futureAvailableCard;
     }
 
@@ -195,9 +208,122 @@ public class Labyrinth {
       Card futureAvailableCard = this.board.get(x).get(0);
       for (int i = 0; i < this.boardSize - 1; i++) {
         this.board.get(x).set(i, this.board.get(x).get(i + 1));
+        this.board.get(x).get(i).setPosition(new Point(x, i));
       }
       this.board.get(x).set(this.boardSize - 1, this.availableCard);
+      this.board.get(x).get(this.boardSize - 1).setPosition(new Point(x, this.boardSize - 1));
       this.availableCard = futureAvailableCard;
+    }
+  }
+
+  public boolean findPath(int startRow, int startCol, int endRow, int endCol) {
+    PriorityQueue<Card> nodeDistanceQueue = new PriorityQueue<Card>(new CardComparator());
+
+    // reset the distance for each card
+    for (ArrayList<Card> row : this.board) {
+      for (Card card : row) {
+        card.resetGraph();
+      }
+    }
+
+    // initialize the start node
+    Card startCard = this.board.get(startRow).get(startCol);
+    // startCard.setPosition(startRow, startCol);
+    startCard.setDistance(0);
+    startCard.setFrom(startCard);
+    nodeDistanceQueue.add(startCard);
+
+    while (!nodeDistanceQueue.isEmpty()) {
+      Card currentNode = nodeDistanceQueue.poll();
+      int currentRow = currentNode.getPosition().x;
+      int currentCol = currentNode.getPosition().y;
+
+      if (currentRow == endRow && currentCol == endCol) {
+        return true;
+      }
+
+      ArrayList<Orientation> openOrientation = this.board.get(currentNode.getPosition().x)
+          .get(currentNode.getPosition().y).getOpenOrientation();
+
+      // for each open orientation check if the neighbor card is also open
+      for (Orientation orientation : openOrientation) {
+        switch (orientation) {
+          case Orientation.NORD:
+            if (this.validPosition(currentRow - 1, currentCol)) {
+              Card card = this.board.get(currentRow - 1).get(currentCol);
+              if (card.isSouthOpen()) {
+                currentNode.addCardConnected(card);
+                // if (card.getDistance() == Integer.MAX_VALUE) {
+                // }
+                if (card.getDistance() > currentNode.getDistance() + 1) {
+                  nodeDistanceQueue.add(card);
+                  card.setDistance(currentNode.getDistance() + 1);
+                  card.setFrom(currentNode);
+                }
+              }
+            }
+
+            break;
+          case Orientation.EAST:
+            if (this.validPosition(currentRow, currentCol + 1)) {
+              Card card = this.board.get(currentRow).get(currentCol + 1);
+              if (card.isWestOpen()) {
+                currentNode.addCardConnected(card);
+                if (card.getDistance() > currentNode.getDistance() + 1) {
+                  nodeDistanceQueue.add(card);
+                  card.setDistance(currentNode.getDistance() + 1);
+                  card.setFrom(currentNode);
+                }
+              }
+            }
+
+            break;
+          case Orientation.SOUTH:
+            if (this.validPosition(currentRow + 1, currentCol)) {
+              Card card = this.board.get(currentRow + 1).get(currentCol);
+              if (card.isNordOpen()) {
+                currentNode.addCardConnected(card);
+                if (card.getDistance() > currentNode.getDistance() + 1) {
+                  nodeDistanceQueue.add(card);
+                  card.setDistance(currentNode.getDistance() + 1);
+                  card.setFrom(currentNode);
+                }
+              }
+            }
+
+            break;
+          case Orientation.WEST:
+            if (this.validPosition(currentRow, currentCol - 1)) {
+              Card card = this.board.get(currentRow).get(currentCol - 1);
+              if (card.isEastOpen()) {
+                currentNode.addCardConnected(card);
+                if (card.getDistance() > currentNode.getDistance() + 1) {
+                  nodeDistanceQueue.add(card);
+                  card.setDistance(currentNode.getDistance() + 1);
+                  card.setFrom(currentNode);
+                }
+              }
+            }
+
+            break;
+
+          default:
+            break;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  public boolean validPosition(int row, int col) {
+    return row >= 0 && row < this.boardSize && col >= 0 && col < this.boardSize;
+  }
+
+  public void movePlayer(int row, int col) {
+    Player currentPlayer = this.getCurrentPlayer();
+    if (this.findPath(currentPlayer.getPosition()[0], currentPlayer.getPosition()[1], row, col)) {
+      currentPlayer.setPosition(row, col);
     }
   }
 }

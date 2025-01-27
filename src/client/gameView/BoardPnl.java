@@ -122,6 +122,10 @@ public class BoardPnl extends JPanel implements MouseListener {
 
     if (row >= 0 && row < BOARD_DIMENSION && col >= 0 && col < BOARD_DIMENSION) {
       System.out.println("Image clicked at row: " + (int) row + ", col: " + (int) col);
+      // System.out.println(model.findPath(0, 0, (int) row, (int) col));
+      model.movePlayer((int) row, (int) col);
+      repaint();
+      return;
     }
 
     for (Shape arrowBounds : arrowBoundsList) {
