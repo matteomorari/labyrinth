@@ -36,6 +36,11 @@ public class Animator {
     return this;
   }
 
+  public Animator setDuration(long duration) {
+    this.duration = duration;
+    return this;
+  }
+
   /**
    * Starts the animation
    */

@@ -2,8 +2,6 @@ package client.gameView;
 
 import java.awt.*;
 
-import javax.swing.JComponent;
-
 import client.animation.Animatable;
 
 public class CardImage implements Animatable {

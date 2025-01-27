@@ -44,6 +44,12 @@ public enum EasingFunction {
 
       return (float) result;
     }
+  },
+  EASE_OUT_CUBIC {
+    @Override
+    public float ease(float x) {
+      return 1 - (float) Math.pow(1 - x, 3);
+    }
   };
 
   public abstract float ease(float x);

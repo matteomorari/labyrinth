@@ -20,12 +20,19 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
   private static final int BOARD_ARC_RADIUS = 30;
   private static final int PADDING = 40;
   private static final int BOARD_DIMENSION = 7; // TODO: move to model
+  private static final long ANIMATION_DURATION = 600;
 
   private ArrayList<Shape> arrowBoundsList;
+  private int cellSize;
   private boolean cardAnimationInProgress = false;
+  private boolean playerPositionInProgress = false;
+  private Point playerAnimationPreviousPoint = new Point();
+  private Point playerAnimationFuturePoint = new Point();
+  private ArrayList<Point> playerAnimationPath;
   private Point lastCardInsertPosition = new Point();
   private int animationOffset = 0;
   private Animator animator;
+  private Player currentPlayer;
   // TODO: use controller
   private Labyrinth model;
   private ArrayList<ArrayList<Card>> board;
@@ -33,7 +40,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
   public BoardPnl() {
     setLayout(null);
     addMouseListener(this);
-    this.animator = new Animator(this, 1500, EasingFunction.EASE_OUT_BOUNCE, () -> cardAnimationInProgress = false);
+    this.animator = new Animator(this, ANIMATION_DURATION, EasingFunction.LINEAR, this::endAnimation);
     arrowBoundsList = new ArrayList<Shape>();
     this.model = new Labyrinth();
     // TODO: move to controller
@@ -45,6 +52,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     this.model.addPlayer(player2);
     model.initGame();
     this.board = model.getBoard();
+    this.currentPlayer = model.getCurrentPlayer();
   }
 
   @Override
@@ -61,27 +69,21 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     g2.fillRoundRect(initialXPosition, initialYPosition, size, size, BOARD_ARC_RADIUS, BOARD_ARC_RADIUS);
 
     // Draw the board
-    int cellSize = (size - PADDING * 2) / BOARD_DIMENSION;
+    cellSize = (size - PADDING * 2) / BOARD_DIMENSION;
     initialXPosition += PADDING;
     initialYPosition += PADDING;
     for (int i = 0; i < BOARD_DIMENSION; i++) {
       for (int j = 0; j < BOARD_DIMENSION; j++) {
+        Card card = board.get(i).get(j);
         // calc card position
         int posX = initialXPosition + j * cellSize;
         int posY = initialYPosition + i * cellSize;
         if (cardAnimationInProgress) {
-          if (lastCardInsertPosition.getX() == 0 && j == lastCardInsertPosition.getY()) {
-            posY -= animationOffset;
-          } else if (lastCardInsertPosition.getX() == BOARD_DIMENSION - 1 && j == lastCardInsertPosition.getY()) {
-            posY += animationOffset;
-          } else if (lastCardInsertPosition.getY() == 0 && i == lastCardInsertPosition.getX()) {
-            posX -= animationOffset;
-          } else if (lastCardInsertPosition.getY() == BOARD_DIMENSION - 1 && i == lastCardInsertPosition.getX()) {
-            posX += animationOffset;
-          }
+          int[] newPosition = calcCardAnimationDrawPosition(posX, posY, card);
+          posX = newPosition[0];
+          posY = newPosition[1];
         }
 
-        Card card = board.get(i).get(j);
         ImageCntrl imageCntrl = ImageCntrl.valueOf("CARD_" + card.getType().name());
         int angles = card.getOrientation().ordinal() * 90;
         CardImage cardImage = new CardImage(imageCntrl, g2).rotate(angles);
@@ -92,12 +94,6 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
           ImageCntrl goalImageCntrl = ImageCntrl.valueOf("GOAL_" + card.getGoal().name());
           CardImage goalImage = new CardImage(goalImageCntrl, g2).rotate(angles);
           goalImage.draw(posX + cellSize / 4, posY + cellSize / 4, cellSize / 2, cellSize / 2);
-        }
-
-        // Draw the players
-        for (Player player : card.getPlayers()) {
-          g2.setColor(player.getColor());
-          g2.fillOval(posX + cellSize / 3,  posY + cellSize / 3, cellSize / 3, cellSize / 3);
         }
 
         // paint arrow around the board
@@ -125,10 +121,58 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
         }
       }
     }
+
+    // Draw the player
+    for (Player player : model.getPlayers()) {
+      g2.setColor(player.getColor());
+      int posX = initialXPosition;
+      int posY = initialYPosition;
+      if (playerPositionInProgress && player.equals(currentPlayer)) {
+        posX += playerAnimationPreviousPoint.y * cellSize;
+        posY += playerAnimationPreviousPoint.x * cellSize;
+        if (playerAnimationPreviousPoint.x == playerAnimationFuturePoint.x) {
+          int horizontalDirection = (playerAnimationFuturePoint.y - playerAnimationPreviousPoint.y) > 0 ? 1 : -1;
+          posX += horizontalDirection * animationOffset;
+        }
+        if (playerAnimationPreviousPoint.y == playerAnimationFuturePoint.y) {
+          int verticalDirection = (playerAnimationFuturePoint.x - playerAnimationPreviousPoint.x) > 0 ? 1 : -1;
+          posY += verticalDirection * animationOffset;
+        }
+      } else {
+        posX += player.getPosition().y * cellSize;
+        posY += player.getPosition().x * cellSize;
+        if (cardAnimationInProgress) {
+          int[] newPosition = calcCardAnimationDrawPosition(posX, posY,
+              board.get(player.getPosition().x).get(player.getPosition().y));
+          posX = newPosition[0];
+          posY = newPosition[1];
+        }
+      }
+      g2.fillOval(posX + cellSize / 3, posY + cellSize / 3, cellSize / 3, cellSize / 3);
+    }
+  }
+
+  private int[] calcCardAnimationDrawPosition(int posX, int posY, Card card) {
+    if (lastCardInsertPosition.getX() == 0 && card.getPosition().getY() == lastCardInsertPosition.getY()) {
+      posY -= animationOffset;
+    } else if (lastCardInsertPosition.getX() == BOARD_DIMENSION - 1 && card.getPosition()
+        .getY() == lastCardInsertPosition.getY()) {
+      posY += animationOffset;
+    } else if (lastCardInsertPosition.getY() == 0 && card.getPosition().getX() == lastCardInsertPosition.getX()) {
+      posX -= animationOffset;
+    } else if (lastCardInsertPosition.getY() == BOARD_DIMENSION - 1
+        && card.getPosition().getX() == lastCardInsertPosition.getX()) {
+      posX += animationOffset;
+    }
+    return new int[] { posX, posY };
   }
 
   @Override
   public void mouseClicked(MouseEvent e) {
+    if (cardAnimationInProgress || playerPositionInProgress) {
+      return;
+    }
+
     int size = Math.min(getWidth(), getHeight());
     float cellSize = (size - PADDING * 2) / BOARD_DIMENSION;
     int x = (getWidth() - size) / 2 + PADDING;
@@ -139,9 +183,17 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
 
     if (row >= 0 && row < BOARD_DIMENSION && col >= 0 && col < BOARD_DIMENSION) {
       System.out.println("Image clicked at row: " + (int) row + ", col: " + (int) col);
-      model.movePlayer((int) row, (int) col);
-      repaint();
-      return;
+      playerAnimationPath = model.movePlayer((int) row, (int) col);
+      if (playerAnimationPath.size() == 0) {
+        return;
+      }
+      playerPositionInProgress = true;
+      animator.initializeAnimation(
+          new int[] { 0 },
+          new int[] { (int) cellSize })
+          .start();
+      playerAnimationPreviousPoint = playerAnimationPath.get(0);
+      playerAnimationFuturePoint = playerAnimationPath.get(1);
     }
 
     for (Shape arrowBounds : arrowBoundsList) {
@@ -153,7 +205,6 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
         cardAnimationInProgress = true;
         animator.initializeAnimation(new int[] { (int) cellSize }, new int[] { 0 }).start();
         lastCardInsertPosition.setLocation((int) row, (int) col);
-        // repaint();
         break;
       }
     }
@@ -197,5 +248,22 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
   public void updateAnimation(int[] values) {
     animationOffset = values[0];
     repaint();
+  }
+
+  private void endAnimation() {
+    cardAnimationInProgress = false;
+
+    if (playerPositionInProgress) {
+      int index = playerAnimationPath.indexOf(playerAnimationFuturePoint);
+      if (index < playerAnimationPath.size() - 1) {
+        animationOffset = 0;
+        animator.initializeAnimation(new int[] { 0 },
+            new int[] { (int) cellSize }).start();
+        playerAnimationPreviousPoint = playerAnimationFuturePoint;
+        playerAnimationFuturePoint = playerAnimationPath.get(index + 1);
+      } else {
+        playerPositionInProgress = false;
+      }
+    }
   }
 }
