@@ -242,6 +242,11 @@ public class Labyrinth {
     ArrayList<Position> path = new ArrayList<Position>();
     boolean found = false;
 
+    // if the path is only the start node, then the player is already there
+    if (startRow == endRow && startCol == endCol) {
+      return path;
+    }
+
     // reset the distance for each card
     for (ArrayList<Card> row : this.board) {
       for (Card card : row) {
