@@ -2,7 +2,7 @@ package core;
 
 import core.utility.CardComparator;
 import core.utility.Orientation;
-import java.awt.Point;
+import core.utility.Position;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -117,7 +117,7 @@ public class Labyrinth {
           card = this.createRandomCard();
         }
         row.add(card);
-        card.setPosition(new Point(i, j));
+        card.setPosition(new Position(i, j));
       }
       this.board.add(row);
     }
@@ -132,7 +132,10 @@ public class Labyrinth {
 
     // set the players to their start card
     for (Player player : this.players) {
-      Card card = this.board.get(player.getStartPosition().x).get(player.getStartPosition().y);
+      Card card =
+          this.board
+              .get(player.getStartPosition().getRow())
+              .get(player.getStartPosition().getCol());
       card.addPlayer(player);
     }
     return this.board;
@@ -176,13 +179,13 @@ public class Labyrinth {
       Card futureAvailableCard = this.board.get(this.boardSize - 1).get(y);
       for (int i = this.boardSize - 1; i > 0; i--) {
         this.board.get(i).set(y, this.board.get(i - 1).get(y));
-        this.board.get(i).get(y).setPosition(new Point(i, y));
+        this.board.get(i).get(y).setPosition(i, y);
         for (Player player : this.board.get(i).get(y).getPlayers()) {
           player.setPosition(i, y);
         }
       }
       this.board.get(0).set(y, this.availableCard);
-      this.board.get(0).get(y).setPosition(new Point(0, y));
+      this.board.get(0).get(y).setPosition(0, y);
       this.availableCard = futureAvailableCard;
     }
 
@@ -191,13 +194,13 @@ public class Labyrinth {
       Card futureAvailableCard = this.board.get(0).get(y);
       for (int i = 0; i < this.boardSize - 1; i++) {
         this.board.get(i).set(y, this.board.get(i + 1).get(y));
-        this.board.get(i).get(y).setPosition(new Point(i, y));
+        this.board.get(i).get(y).setPosition(i, y);
         for (Player player : this.board.get(i).get(y).getPlayers()) {
           player.setPosition(i, y);
         }
       }
       this.board.get(this.boardSize - 1).set(y, this.availableCard);
-      this.board.get(this.boardSize - 1).get(y).setPosition(new Point(this.boardSize - 1, y));
+      this.board.get(this.boardSize - 1).get(y).setPosition(this.boardSize - 1, y);
       this.availableCard = futureAvailableCard;
     }
 
@@ -206,13 +209,13 @@ public class Labyrinth {
       Card futureAvailableCard = this.board.get(x).get(this.boardSize - 1);
       for (int i = this.boardSize - 1; i > 0; i--) {
         this.board.get(x).set(i, this.board.get(x).get(i - 1));
-        this.board.get(x).get(i).setPosition(new Point(x, i));
+        this.board.get(x).get(i).setPosition(x, i);
         for (Player player : this.board.get(x).get(i).getPlayers()) {
           player.setPosition(x, i);
         }
       }
       this.board.get(x).set(0, this.availableCard);
-      this.board.get(x).get(0).setPosition(new Point(x, 0));
+      this.board.get(x).get(0).setPosition(x, 0);
       this.availableCard = futureAvailableCard;
     }
 
@@ -221,22 +224,22 @@ public class Labyrinth {
       Card futureAvailableCard = this.board.get(x).get(0);
       for (int i = 0; i < this.boardSize - 1; i++) {
         this.board.get(x).set(i, this.board.get(x).get(i + 1));
-        this.board.get(x).get(i).setPosition(new Point(x, i));
+        this.board.get(x).get(i).setPosition(x, i);
         for (Player player : this.board.get(x).get(i).getPlayers()) {
           player.setPosition(x, i);
         }
       }
       this.board.get(x).set(this.boardSize - 1, this.availableCard);
-      this.board.get(x).get(this.boardSize - 1).setPosition(new Point(x, this.boardSize - 1));
+      this.board.get(x).get(this.boardSize - 1).setPosition(x, this.boardSize - 1);
       this.availableCard = futureAvailableCard;
     }
   }
 
   // using Dijkstra's algorithm
   // TODO: https://www.baeldung.com/java-solve-maze
-  public ArrayList<Point> findPath(int startRow, int startCol, int endRow, int endCol) {
+  public ArrayList<Position> findPath(int startRow, int startCol, int endRow, int endCol) {
     PriorityQueue<Card> nodeDistanceQueue = new PriorityQueue<Card>(new CardComparator());
-    ArrayList<Point> path = new ArrayList<Point>();
+    ArrayList<Position> path = new ArrayList<Position>();
     boolean found = false;
 
     // reset the distance for each card
@@ -255,8 +258,8 @@ public class Labyrinth {
 
     while (!nodeDistanceQueue.isEmpty() && !found) {
       Card currentNode = nodeDistanceQueue.poll();
-      int currentRow = currentNode.getPosition().x;
-      int currentCol = currentNode.getPosition().y;
+      int currentRow = currentNode.getPosition().getRow();
+      int currentCol = currentNode.getPosition().getCol();
 
       if (currentRow == endRow && currentCol == endCol) {
         found = true;
@@ -264,8 +267,8 @@ public class Labyrinth {
 
       ArrayList<Orientation> openOrientation =
           this.board
-              .get(currentNode.getPosition().x)
-              .get(currentNode.getPosition().y)
+              .get(currentNode.getPosition().getRow())
+              .get(currentNode.getPosition().getCol())
               .getOpenOrientation();
 
       // for each open orientation check if the neighbor card is also open
@@ -351,12 +354,15 @@ public class Labyrinth {
     return row >= 0 && row < this.boardSize && col >= 0 && col < this.boardSize;
   }
 
-  public ArrayList<Point> movePlayer(int row, int col) {
+  public ArrayList<Position> movePlayer(int row, int col) {
     Player currentPlayer = this.getCurrentPlayer();
     Card previousPlayerCard =
-        this.board.get(currentPlayer.getPosition().x).get(currentPlayer.getPosition().y);
-    ArrayList<Point> path =
-        this.findPath(currentPlayer.getPosition().x, currentPlayer.getPosition().y, row, col);
+        this.board
+            .get(currentPlayer.getPosition().getRow())
+            .get(currentPlayer.getPosition().getCol());
+    ArrayList<Position> path =
+        this.findPath(
+            currentPlayer.getPosition().getRow(), currentPlayer.getPosition().getCol(), row, col);
     if (!path.isEmpty()) {
       previousPlayerCard.removePlayer(currentPlayer);
       this.board.get(row).get(col).addPlayer(currentPlayer);

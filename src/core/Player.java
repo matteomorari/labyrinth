@@ -1,19 +1,20 @@
 package core;
 
+import core.utility.Position;
+
 import java.awt.Color;
-import java.awt.Point;
 import java.util.ArrayDeque;
 
 public class Player {
   private ArrayDeque<Goal> goalsQueue;
-  private Point position;
-  private Point startPosition;
+  private Position position;
+  private Position startPosition;
   private Color color;
 
   public Player() {
     this.goalsQueue = new ArrayDeque<Goal>();
-    this.position = new Point();
-    this.startPosition = new Point();
+    this.position = new Position();
+    this.startPosition = new Position();
   }
 
   public void addGoal(Goal goal) {
@@ -25,19 +26,19 @@ public class Player {
   }
 
   public void setPosition(int x, int y) {
-    this.position.setLocation(x, y);
+    this.position.setPosition(x, y);
   }
 
-  public Point getPosition() {
+  public Position getPosition() {
     return this.position;
   }
 
   public void setStartPosition(int x, int y) {
-    this.startPosition.setLocation(x, y);
+    this.startPosition.setPosition(x, y);
     this.setPosition(x, y);
   }
 
-  public Point getStartPosition() {
+  public Position getStartPosition() {
     return this.startPosition;
   }
 

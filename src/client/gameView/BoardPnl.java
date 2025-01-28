@@ -6,10 +6,10 @@ import client.animation.EasingFunction;
 import core.Card;
 import core.Labyrinth;
 import core.Player;
+import core.utility.Position;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.Shape;
@@ -30,10 +30,10 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
   private int cellSize;
   private boolean cardAnimationInProgress = false;
   private boolean playerPositionInProgress = false;
-  private Point playerAnimationPreviousPoint = new Point();
-  private Point playerAnimationFuturePoint = new Point();
-  private ArrayList<Point> playerAnimationPath;
-  private Point lastCardInsertPosition = new Point();
+  private Position playerAnimationPreviousPoint;
+  private Position playerAnimationFuturePoint;
+  private ArrayList<Position> playerAnimationPath;
+  private Position lastCardInsertPosition;
   private int animationOffset = 0;
   private Animator animator;
   private Player currentPlayer;
@@ -46,9 +46,13 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     addMouseListener(this);
     this.animator =
         new Animator(this, ANIMATION_DURATION, EasingFunction.LINEAR, this::endAnimation);
-    arrowBoundsList = new ArrayList<>();
-    this.model = new Labyrinth();
+    this.arrowBoundsList = new ArrayList<>();
+    this.lastCardInsertPosition = new Position();
+
+
+
     // TODO: move to controller
+    this.model = new Labyrinth();
     Player player1 = new Player();
     player1.setColor(Color.RED);
     this.model.addPlayer(player1);
@@ -146,25 +150,25 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
       int posX = initialXPosition;
       int posY = initialYPosition;
       if (playerPositionInProgress && player.equals(currentPlayer)) {
-        posX += playerAnimationPreviousPoint.y * cellSize;
-        posY += playerAnimationPreviousPoint.x * cellSize;
-        if (playerAnimationPreviousPoint.x == playerAnimationFuturePoint.x) {
+        posX += playerAnimationPreviousPoint.getCol() * cellSize;
+        posY += playerAnimationPreviousPoint.getRow() * cellSize;
+        if (playerAnimationPreviousPoint.getRow() == playerAnimationFuturePoint.getRow()) {
           int horizontalDirection =
-              (playerAnimationFuturePoint.y - playerAnimationPreviousPoint.y) > 0 ? 1 : -1;
+              (playerAnimationFuturePoint.getCol() - playerAnimationPreviousPoint.getCol()) > 0 ? 1 : -1;
           posX += horizontalDirection * animationOffset;
         }
-        if (playerAnimationPreviousPoint.y == playerAnimationFuturePoint.y) {
+        if (playerAnimationPreviousPoint.getCol() == playerAnimationFuturePoint.getCol()) {
           int verticalDirection =
-              (playerAnimationFuturePoint.x - playerAnimationPreviousPoint.x) > 0 ? 1 : -1;
+              (playerAnimationFuturePoint.getRow() - playerAnimationPreviousPoint.getRow()) > 0 ? 1 : -1;
           posY += verticalDirection * animationOffset;
         }
       } else {
-        posX += player.getPosition().y * cellSize;
-        posY += player.getPosition().x * cellSize;
+        posX += player.getPosition().getCol() * cellSize;
+        posY += player.getPosition().getRow() * cellSize;
         if (cardAnimationInProgress) {
           int[] newPosition =
               calcCardAnimationDrawPosition(
-                  posX, posY, board.get(player.getPosition().x).get(player.getPosition().y));
+                  posX, posY, board.get(player.getPosition().getRow()).get(player.getPosition().getCol()));
           posX = newPosition[0];
           posY = newPosition[1];
         }
@@ -174,17 +178,17 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
   }
 
   private int[] calcCardAnimationDrawPosition(int posX, int posY, Card card) {
-    if (lastCardInsertPosition.getX() == 0
-        && card.getPosition().getY() == lastCardInsertPosition.getY()) {
+    if (lastCardInsertPosition.getRow() == 0
+        && card.getPosition().getCol() == lastCardInsertPosition.getCol()) {
       posY -= animationOffset;
-    } else if (lastCardInsertPosition.getX() == BOARD_DIMENSION - 1
-        && card.getPosition().getY() == lastCardInsertPosition.getY()) {
+    } else if (lastCardInsertPosition.getRow() == BOARD_DIMENSION - 1
+        && card.getPosition().getCol() == lastCardInsertPosition.getCol()) {
       posY += animationOffset;
-    } else if (lastCardInsertPosition.getY() == 0
-        && card.getPosition().getX() == lastCardInsertPosition.getX()) {
+    } else if (lastCardInsertPosition.getCol() == 0
+        && card.getPosition().getRow() == lastCardInsertPosition.getRow()) {
       posX -= animationOffset;
-    } else if (lastCardInsertPosition.getY() == BOARD_DIMENSION - 1
-        && card.getPosition().getX() == lastCardInsertPosition.getX()) {
+    } else if (lastCardInsertPosition.getCol() == BOARD_DIMENSION - 1
+        && card.getPosition().getRow() == lastCardInsertPosition.getRow()) {
       posX += animationOffset;
     }
     return new int[] {posX, posY};
@@ -229,7 +233,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
         model.insertCard(row, col);
         cardAnimationInProgress = true;
         animator.initializeAnimation(new int[] {cellSize}, new int[] {0}).start();
-        lastCardInsertPosition.setLocation(row, col);
+        lastCardInsertPosition.setPosition(row, col);
         return;
       }
     }

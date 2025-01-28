@@ -5,24 +5,23 @@ import javax.swing.Timer;
 public class Animator {
   private static final int TIMER_CYCLE_DURATION = 16; // 60 FPS (~16 ms per frame)
 
+  private Animatable target;
+  private long duration;
+  private EasingFunction easingFunction;
+  private Timer timer;
+  private long startTime;
   private int[] startValues;
   private int[] endValues;
   private int[] currentValues;
-  private long duration;
-  private long startTime;
-  private Timer timer;
   private Runnable onAnimationEnd;
-  private EasingFunction easingFunction;
-
-  private Animatable target;
 
   public Animator(
       Animatable target, long duration, EasingFunction easingFunction, Runnable onAnimationEnd) {
     this.target = target;
     this.duration = duration;
     this.easingFunction = easingFunction;
-    this.onAnimationEnd = onAnimationEnd;
     timer = new Timer(TIMER_CYCLE_DURATION, e -> animate());
+    this.onAnimationEnd = onAnimationEnd;
   }
 
   /** Initializes animation with multiple parameters. */

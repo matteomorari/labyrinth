@@ -1,7 +1,7 @@
 package core;
 
 import core.utility.Orientation;
-import java.awt.Point;
+import core.utility.Position;
 import java.util.ArrayList;
 
 public class Card {
@@ -15,7 +15,7 @@ public class Card {
   private ArrayList<Player> players;
 
   // for Dijkstra
-  private Point position;
+  private Position position;
   private int distance;
   private Card from;
   private ArrayList<Card> cardConnected;
@@ -27,6 +27,8 @@ public class Card {
     this.isSouthOpen = type.isSouthOpen();
     this.isWestOpen = type.isWestOpen();
     this.orientation = Orientation.NORD;
+    this.position = new Position();
+    
     this.cardConnected = new ArrayList<Card>();
     this.distance = Integer.MAX_VALUE;
     this.players = new ArrayList<Player>();
@@ -102,11 +104,11 @@ public class Card {
     return openOrientation;
   }
 
-  public void setPosition(int x, int y) {
-    this.position = new Point(x, y);
+  public void setPosition(int row, int col) {
+    this.position.setPosition(row, col);
   }
 
-  public void setPosition(Point position) {
+  public void setPosition(Position position) {
     this.position = position;
   }
 
@@ -134,7 +136,7 @@ public class Card {
     return from;
   }
 
-  public Point getPosition() {
+  public Position getPosition() {
     return position;
   }
 
@@ -163,4 +165,12 @@ public class Card {
   public void clearPlayers() {
     this.players.clear();
   }
+
+  @Override
+  public String toString() {
+    return "Card [type=" + type + ", isNordOpen=" + isNordOpen + ", isEastOpen=" + isEastOpen + ", isSouthOpen="
+        + isSouthOpen + ", isWestOpen=" + isWestOpen + ", orientation=" + orientation + ", goal=" + goal + "]";
+  }
+
+  
 }
