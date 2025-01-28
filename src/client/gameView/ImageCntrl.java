@@ -1,13 +1,13 @@
 package client.gameView;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import javax.imageio.ImageIO;
 
 public enum ImageCntrl {
@@ -18,7 +18,8 @@ public enum ImageCntrl {
   GOAL_HELMET("helmet.png"),
   GOAL_SWORD("sword.png"),
   GOAL_SKULL("skull.png"),
-  GOAL_GEM("gem.png"),;
+  GOAL_GEM("gem.png"),
+  ;
 
   private final Path path;
   private BufferedImage image;
@@ -51,7 +52,8 @@ public enum ImageCntrl {
     int newWidth = (int) Math.floor(w * cos + h * sin);
     int newHeight = (int) Math.floor(h * cos + w * sin);
 
-    BufferedImage rotatedImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+    BufferedImage rotatedImage =
+        new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
     Graphics2D g2d = rotatedImage.createGraphics();
     g2d.setComposite(AlphaComposite.Src);
     AffineTransform at = new AffineTransform();
@@ -63,5 +65,4 @@ public enum ImageCntrl {
 
     return rotatedImage;
   }
-
 }

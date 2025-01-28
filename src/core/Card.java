@@ -1,9 +1,8 @@
 package core;
 
+import core.utility.Orientation;
 import java.awt.Point;
 import java.util.ArrayList;
-
-import core.utility.Orientation;
 
 public class Card {
   CardType type;
@@ -107,6 +106,10 @@ public class Card {
     this.position = new Point(x, y);
   }
 
+  public void setPosition(Point position) {
+    this.position = position;
+  }
+
   public void setCardConnected(ArrayList<Card> cardConnected) {
     this.cardConnected = cardConnected;
   }
@@ -117,10 +120,6 @@ public class Card {
 
   public void setFrom(Card from) {
     this.from = from;
-  }
-
-  public void setPosition(Point position) {
-    this.position = position;
   }
 
   public ArrayList<Card> getCardConnected() {
@@ -163,11 +162,5 @@ public class Card {
 
   public void clearPlayers() {
     this.players.clear();
-  }
-
-  @Override
-  public String toString() {
-    return "Card [type=" + type + ", isNordOpen=" + isNordOpen + ", isEastOpen=" + isEastOpen + ", isSouthOpen="
-        + isSouthOpen + ", isWestOpen=" + isWestOpen + ", orientation=" + orientation + ", goal=" + goal + "]";
   }
 }

@@ -1,6 +1,7 @@
 package client.animation;
 
-// To add new easing functions, see https://easings.net/it and copy the Math function (converted to Java)
+// To add new easing functions, see https://easings.net/it and copy the Math function (converted to
+// Java)
 
 public enum EasingFunction {
   LINEAR {
@@ -14,10 +15,12 @@ public enum EasingFunction {
     public float ease(float x) {
       final double c4 = (2 * Math.PI) / 3;
 
-      if (x == 0)
+      if (x == 0) {
         return 0;
-      if (x == 1)
+      }
+      if (x == 1) {
         return 1;
+      }
 
       return (float) (Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1);
     }

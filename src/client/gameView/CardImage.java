@@ -1,8 +1,8 @@
 package client.gameView;
 
-import java.awt.*;
-
 import client.animation.Animatable;
+import java.awt.Graphics2D;
+import java.awt.Image;
 
 public class CardImage implements Animatable {
   private ImageCntrl imageCntrl;
@@ -22,18 +22,12 @@ public class CardImage implements Animatable {
   }
 
   public void draw(int posX, int posY, int width, int height) {
-    Image image = this.image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-    g2.drawImage(image, posX, posY, null);
-  }
-
-  public void paintComponent(Graphics g, int posX, int posY, int width, int height) {
-    Graphics2D g2 = (Graphics2D) g;
-    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    Image image = this.image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+    this.image = this.image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
     g2.drawImage(image, posX, posY, null);
   }
 
   public void setImage(Image image) {
+    this.image = image;
   }
 
   public CardImage rotate(double angle) {

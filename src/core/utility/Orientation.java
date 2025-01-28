@@ -2,7 +2,10 @@ package core.utility;
 
 public enum Orientation {
   // IMPORTANT: The order of the enum values is important, do NOT change it
-  NORD, EAST, SOUTH, WEST;
+  NORD,
+  EAST,
+  SOUTH,
+  WEST;
 
   public Orientation rotate(int angle) {
     return values()[(ordinal() + angle) % 4];

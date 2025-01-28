@@ -1,15 +1,13 @@
 package core;
 
-import java.util.List;
-
 import core.utility.CardComparator;
 import core.utility.Orientation;
-
 import java.awt.Point;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.PriorityQueue;
 
 public class Labyrinth {
@@ -25,8 +23,8 @@ public class Labyrinth {
   }
 
   public Labyrinth(int boardSize) {
-    this.players = new ArrayDeque<Player>();
-    this.board = new ArrayList<ArrayList<Card>>();
+    this.players = new ArrayDeque<>();
+    this.board = new ArrayList<>();
     this.boardSize = boardSize;
   }
 
@@ -110,7 +108,9 @@ public class Labyrinth {
       for (int j = 0; j < this.boardSize; j++) {
         // the card in the corner must by of the type L
         Card card = null;
-        if ((i == 0 && j == 0) || (i == 0 && j == this.boardSize - 1) || (i == this.boardSize - 1 && j == 0)
+        if ((i == 0 && j == 0)
+            || (i == 0 && j == this.boardSize - 1)
+            || (i == this.boardSize - 1 && j == 0)
             || (i == this.boardSize - 1 && j == this.boardSize - 1)) {
           card = new Card(CardType.L);
         } else {
@@ -262,8 +262,11 @@ public class Labyrinth {
         found = true;
       }
 
-      ArrayList<Orientation> openOrientation = this.board.get(currentNode.getPosition().x)
-          .get(currentNode.getPosition().y).getOpenOrientation();
+      ArrayList<Orientation> openOrientation =
+          this.board
+              .get(currentNode.getPosition().x)
+              .get(currentNode.getPosition().y)
+              .getOpenOrientation();
 
       // for each open orientation check if the neighbor card is also open
       for (Orientation orientation : openOrientation) {
@@ -273,8 +276,6 @@ public class Labyrinth {
               Card card = this.board.get(currentRow - 1).get(currentCol);
               if (card.isSouthOpen()) {
                 currentNode.addCardConnected(card);
-                // if (card.getDistance() == Integer.MAX_VALUE) {
-                // }
                 if (card.getDistance() > currentNode.getDistance() + 1) {
                   nodeDistanceQueue.add(card);
                   card.setDistance(currentNode.getDistance() + 1);
@@ -352,14 +353,15 @@ public class Labyrinth {
 
   public ArrayList<Point> movePlayer(int row, int col) {
     Player currentPlayer = this.getCurrentPlayer();
-    Card previousPlayerCard = this.board.get(currentPlayer.getPosition().x).get(currentPlayer.getPosition().y);
-    ArrayList<Point> path = this.findPath(currentPlayer.getPosition().x, currentPlayer.getPosition().y, row, col);
-    if (path.size() > 0) {
+    Card previousPlayerCard =
+        this.board.get(currentPlayer.getPosition().x).get(currentPlayer.getPosition().y);
+    ArrayList<Point> path =
+        this.findPath(currentPlayer.getPosition().x, currentPlayer.getPosition().y, row, col);
+    if (!path.isEmpty()) {
       previousPlayerCard.removePlayer(currentPlayer);
       this.board.get(row).get(col).addPlayer(currentPlayer);
       currentPlayer.setPosition(row, col);
     }
     return path;
   }
-
 }

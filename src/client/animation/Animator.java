@@ -5,7 +5,9 @@ import javax.swing.Timer;
 public class Animator {
   private static final int TIMER_CYCLE_DURATION = 16; // 60 FPS (~16 ms per frame)
 
-  private int[] startValues, endValues, currentValues;
+  private int[] startValues;
+  private int[] endValues;
+  private int[] currentValues;
   private long duration;
   private long startTime;
   private Timer timer;
@@ -14,7 +16,8 @@ public class Animator {
 
   private Animatable target;
 
-  public Animator(Animatable target, long duration, EasingFunction easingFunction, Runnable onAnimationEnd) {
+  public Animator(
+      Animatable target, long duration, EasingFunction easingFunction, Runnable onAnimationEnd) {
     this.target = target;
     this.duration = duration;
     this.easingFunction = easingFunction;
@@ -22,9 +25,7 @@ public class Animator {
     timer = new Timer(TIMER_CYCLE_DURATION, e -> animate());
   }
 
-  /**
-   * Initializes animation with multiple parameters
-   */
+  /** Initializes animation with multiple parameters. */
   public Animator initializeAnimation(int[] startValues, int[] endValues) {
     if (startValues.length != endValues.length) {
       throw new IllegalArgumentException("Start and end arrays must have the same length.");
@@ -41,9 +42,7 @@ public class Animator {
     return this;
   }
 
-  /**
-   * Starts the animation
-   */
+  /** Starts the animation. */
   public void start() {
     if (startValues == null || endValues == null) {
       throw new IllegalStateException("Animation values must be initialized before starting.");
@@ -52,9 +51,7 @@ public class Animator {
     timer.start();
   }
 
-  /**
-   * Handles animation steps
-   */
+  /** Handles animation steps. */
   private void animate() {
     long elapsedTime = System.currentTimeMillis() - startTime;
     float progress = Math.min(1.0f, (float) elapsedTime / duration);
