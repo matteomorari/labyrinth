@@ -223,6 +223,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
       animator.initializeAnimation(new int[] {0}, new int[] {cellSize}).start();
       playerAnimationPreviousPoint = playerAnimationPath.get(0);
       playerAnimationFuturePoint = playerAnimationPath.get(1);
+      return;
     }
 
     for (Shape arrowBounds : arrowBoundsList) {
