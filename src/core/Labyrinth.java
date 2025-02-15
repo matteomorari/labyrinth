@@ -238,8 +238,8 @@ public class Labyrinth {
   // using Dijkstra's algorithm
   // TODO: https://www.baeldung.com/java-solve-maze
   public ArrayList<Position> findPath(int startRow, int startCol, int endRow, int endCol) {
-    PriorityQueue<Card> nodeDistanceQueue = new PriorityQueue<Card>(new NodeComparator());
-    ArrayList<Position> path = new ArrayList<Position>();
+    PriorityQueue<Card> nodeDistanceQueue = new PriorityQueue<>(new NodeComparator());
+    ArrayList<Position> path = new ArrayList<>();
     boolean found = false;
 
     // if the path is only the start node, then the player is already there
@@ -256,7 +256,6 @@ public class Labyrinth {
 
     // initialize the start node
     Card startCard = this.board.get(startRow).get(startCol);
-    // startCard.setPosition(startRow, startCol);
     startCard.setDistance(0);
     startCard.setFrom(null);
     nodeDistanceQueue.add(startCard);
@@ -270,75 +269,11 @@ public class Labyrinth {
         found = true;
       }
 
-      ArrayList<Orientation> openOrientation =
-          this.board
-              .get(currentNode.getPosition().getRow())
-              .get(currentNode.getPosition().getCol())
-              .getOpenOrientation();
+      ArrayList<Orientation> openOrientation = currentNode.getOpenOrientation();
 
       // for each open orientation check if the neighbor card is also open
       for (Orientation orientation : openOrientation) {
-        switch (orientation) {
-          case Orientation.NORD:
-            if (this.validPosition(currentRow - 1, currentCol)) {
-              Card card = this.board.get(currentRow - 1).get(currentCol);
-              if (card.isSouthOpen()) {
-                currentNode.addCardConnected(card);
-                if (card.getDistance() > currentNode.getDistance() + 1) {
-                  nodeDistanceQueue.add(card);
-                  card.setDistance(currentNode.getDistance() + 1);
-                  card.setFrom(currentNode);
-                }
-              }
-            }
-
-            break;
-          case Orientation.EAST:
-            if (this.validPosition(currentRow, currentCol + 1)) {
-              Card card = this.board.get(currentRow).get(currentCol + 1);
-              if (card.isWestOpen()) {
-                currentNode.addCardConnected(card);
-                if (card.getDistance() > currentNode.getDistance() + 1) {
-                  nodeDistanceQueue.add(card);
-                  card.setDistance(currentNode.getDistance() + 1);
-                  card.setFrom(currentNode);
-                }
-              }
-            }
-
-            break;
-          case Orientation.SOUTH:
-            if (this.validPosition(currentRow + 1, currentCol)) {
-              Card card = this.board.get(currentRow + 1).get(currentCol);
-              if (card.isNordOpen()) {
-                currentNode.addCardConnected(card);
-                if (card.getDistance() > currentNode.getDistance() + 1) {
-                  nodeDistanceQueue.add(card);
-                  card.setDistance(currentNode.getDistance() + 1);
-                  card.setFrom(currentNode);
-                }
-              }
-            }
-
-            break;
-          case Orientation.WEST:
-            if (this.validPosition(currentRow, currentCol - 1)) {
-              Card card = this.board.get(currentRow).get(currentCol - 1);
-              if (card.isEastOpen()) {
-                currentNode.addCardConnected(card);
-                if (card.getDistance() > currentNode.getDistance() + 1) {
-                  nodeDistanceQueue.add(card);
-                  card.setDistance(currentNode.getDistance() + 1);
-                  card.setFrom(currentNode);
-                }
-              }
-            }
-
-            break;
-
-          default:
-            break;
-        }
+        processNeighbor(currentNode, orientation, nodeDistanceQueue);
       }
     }
 
@@ -353,6 +288,60 @@ public class Labyrinth {
     }
 
     return path;
+  }
+
+  private void processNeighbor(
+      Card currentNode, Orientation orientation, PriorityQueue<Card> nodeDistanceQueue) {
+    int currentRow = currentNode.getPosition().getRow();
+    int currentCol = currentNode.getPosition().getCol();
+    Card neighborCard = null;
+
+    switch (orientation) {
+      case NORD:
+        if (this.validPosition(currentRow - 1, currentCol)) {
+          neighborCard = this.board.get(currentRow - 1).get(currentCol);
+          if (neighborCard.isSouthOpen()) {
+            updateNeighbor(currentNode, neighborCard, nodeDistanceQueue);
+          }
+        }
+        break;
+      case EAST:
+        if (this.validPosition(currentRow, currentCol + 1)) {
+          neighborCard = this.board.get(currentRow).get(currentCol + 1);
+          if (neighborCard.isWestOpen()) {
+            updateNeighbor(currentNode, neighborCard, nodeDistanceQueue);
+          }
+        }
+        break;
+      case SOUTH:
+        if (this.validPosition(currentRow + 1, currentCol)) {
+          neighborCard = this.board.get(currentRow + 1).get(currentCol);
+          if (neighborCard.isNordOpen()) {
+            updateNeighbor(currentNode, neighborCard, nodeDistanceQueue);
+          }
+        }
+        break;
+      case WEST:
+        if (this.validPosition(currentRow, currentCol - 1)) {
+          neighborCard = this.board.get(currentRow).get(currentCol - 1);
+          if (neighborCard.isEastOpen()) {
+            updateNeighbor(currentNode, neighborCard, nodeDistanceQueue);
+          }
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  private void updateNeighbor(
+      Card currentNode, Card neighborCard, PriorityQueue<Card> nodeDistanceQueue) {
+    currentNode.addCardConnected(neighborCard);
+    if (neighborCard.getDistance() > currentNode.getDistance() + 1) {
+      nodeDistanceQueue.add(neighborCard);
+      neighborCard.setDistance(currentNode.getDistance() + 1);
+      neighborCard.setFrom(currentNode);
+    }
   }
 
   public boolean validPosition(int row, int col) {
