@@ -28,7 +28,7 @@ public class Card {
     this.isWestOpen = type.isWestOpen();
     this.orientation = Orientation.NORD;
     this.position = new Position();
-    
+
     this.cardConnected = new ArrayList<Card>();
     this.distance = Integer.MAX_VALUE;
     this.players = new ArrayList<Player>();
@@ -104,8 +104,9 @@ public class Card {
     return openOrientation;
   }
 
-  public void setPosition(int row, int col) {
+  public Card setPosition(int row, int col) {
     this.position.setPosition(row, col);
+    return this;
   }
 
   public void setPosition(Position position) {
@@ -172,24 +173,37 @@ public class Card {
   }
 
   public void updatePlayersPosition() {
-    for (Player player: this.players) {
+    for (Player player : this.players) {
       player.setPosition(this.position.getRow(), this.position.getCol());
+      System.out.println(player.getPosition().col + " " + player.getPosition().row);
     }
   }
 
   public void shiftPlayersToNewCard(Card card) {
-    for (Player player: this.players) {
-      player.setPosition(position.getRow(), position.getCol());
+    for (Player player : this.players) {
+      player.setPosition(card.getPosition().getRow(), position.getPosition().getCol());
       card.addPlayer(player);
+      System.out.println(player.getPosition().col + " " + player.getPosition().row);
     }
     this.clearPlayers();
   }
 
   @Override
   public String toString() {
-    return "Card [type=" + type + ", isNordOpen=" + isNordOpen + ", isEastOpen=" + isEastOpen + ", isSouthOpen="
-        + isSouthOpen + ", isWestOpen=" + isWestOpen + ", orientation=" + orientation + ", goal=" + goal + "]";
+    return "Card [type="
+        + type
+        + ", isNordOpen="
+        + isNordOpen
+        + ", isEastOpen="
+        + isEastOpen
+        + ", isSouthOpen="
+        + isSouthOpen
+        + ", isWestOpen="
+        + isWestOpen
+        + ", orientation="
+        + orientation
+        + ", goal="
+        + goal
+        + "]";
   }
-
-  
 }

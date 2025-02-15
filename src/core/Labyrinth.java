@@ -122,7 +122,7 @@ public class Labyrinth {
       this.board.add(row);
     }
 
-    availableCard = this.createRandomCard();
+    availableCard = this.createRandomCard().setPosition(-1, -1);
 
     // set the right orientation for the corner cards
     this.board.get(0).get(0).rotate();
@@ -165,12 +165,7 @@ public class Labyrinth {
   }
 
   public void insertCard(Position insertPosition) {
-    if (insertPosition.row < 0
-        || insertPosition.row >= this.boardSize
-        || insertPosition.col < 0
-        || insertPosition.col >= this.boardSize) {
-      throw new IllegalArgumentException("Invalid position");
-    }
+    validatePosition(insertPosition);
 
     if (this.availableCard == null) {
       throw new IllegalStateException("No available card");
@@ -178,28 +173,32 @@ public class Labyrinth {
 
     Position endPosition = calculateEndPosition(insertPosition);
 
-    int rowStep = (endPosition.getRow() - insertPosition.row) / (this.boardSize - 1);
-    int colStep = (endPosition.getCol() - insertPosition.col) / (this.boardSize - 1);
+    // 1 if the cards are move from the top to the bottom or from the left to the right
+    // -1 if the cards are move from the bottom to the top or from the right to the left
+    // 0 if the row/col is the same and so the relative position won't change in the following cycle
+    int rowDirection = Integer.compare(endPosition.getRow(), insertPosition.row);
+    int colDirection = Integer.compare(endPosition.getCol(), insertPosition.col);
 
-    Card futureAvailableCard = this.board.get(endPosition.row).get(endPosition.col);
-    this.updateNextAvailableCard(futureAvailableCard);
-    for (int i = 0; i < this.boardSize - 1; i++) {
-      Card cardToMove =
-          this.board
-              .get(endPosition.row - (i + 1) * rowStep)
-              .get(endPosition.col - (i + 1) * colStep);
-      Position newPosition =
-          new Position(endPosition.row - i * rowStep, endPosition.col - i * colStep);
-      this.updateCardPosition(cardToMove, newPosition);
-    }
+    Card nextAvailableCard = this.board.get(endPosition.row).get(endPosition.col);
+    this.updateNextAvailableCard(nextAvailableCard);
+
+    // move the cards
+    moveCards(endPosition, rowDirection, colDirection);
 
     this.updateCardPosition(availableCard, insertPosition);
-    this.availableCard = futureAvailableCard;
+    this.availableCard = nextAvailableCard;
+  }
+
+  private void validatePosition(Position insertPosition) {
+    if (insertPosition.row < 0
+        || insertPosition.row >= this.boardSize
+        || insertPosition.col < 0
+        || insertPosition.col >= this.boardSize) {
+      throw new IllegalArgumentException("Invalid position");
+    }
   }
 
   private Position calculateEndPosition(Position insertPosition) {
-    // TODO: hashMap?
-
     Position endPosition = new Position();
     if (insertPosition.row == 0) {
       endPosition.setPosition(this.boardSize - 1, insertPosition.col);
@@ -216,6 +215,17 @@ public class Labyrinth {
   private void updateNextAvailableCard(Card card) {
     card.setPosition(-1, -1);
     card.shiftPlayersToNewCard(this.availableCard);
+  }
+
+  private void moveCards(Position endPosition, int rowDirection, int colDirection) {
+    for (int i = 0; i < this.boardSize - 1; i++) {
+      int currentRow = endPosition.row - (i + 1) * rowDirection;
+      int currentCol = endPosition.col - (i + 1) * colDirection;
+      Card cardToMove = this.board.get(currentRow).get(currentCol);
+      Position newPosition =
+          new Position(endPosition.row - i * rowDirection, endPosition.col - i * colDirection);
+      this.updateCardPosition(cardToMove, newPosition);
+    }
   }
 
   private void updateCardPosition(Card card, Position newPosition) {
