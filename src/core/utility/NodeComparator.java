@@ -1,11 +1,10 @@
 package core.utility;
 
-import core.Card;
 import java.util.Comparator;
 
-public class CardComparator implements Comparator<Card> {
+public class NodeComparator implements Comparator<Node> {
   @Override
-  public int compare(Card node1, Card node2) {
+  public int compare(Node node1, Node node2) {
     return node1.getDistance() - node2.getDistance();
   }
 }

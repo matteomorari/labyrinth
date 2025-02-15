@@ -1,6 +1,6 @@
 package core;
 
-import core.utility.CardComparator;
+import core.utility.NodeComparator;
 import core.utility.Orientation;
 import core.utility.Position;
 import java.util.ArrayDeque;
@@ -122,7 +122,9 @@ public class Labyrinth {
       this.board.add(row);
     }
 
-    availableCard = this.createRandomCard().setPosition(-1, -1);
+    // create the
+    this.availableCard = this.createRandomCard();
+    this.availableCard.setPosition(-1, -1);
 
     // set the right orientation for the corner cards
     this.board.get(0).get(0).rotate();
@@ -236,7 +238,7 @@ public class Labyrinth {
   // using Dijkstra's algorithm
   // TODO: https://www.baeldung.com/java-solve-maze
   public ArrayList<Position> findPath(int startRow, int startCol, int endRow, int endCol) {
-    PriorityQueue<Card> nodeDistanceQueue = new PriorityQueue<Card>(new CardComparator());
+    PriorityQueue<Card> nodeDistanceQueue = new PriorityQueue<Card>(new NodeComparator());
     ArrayList<Position> path = new ArrayList<Position>();
     boolean found = false;
 
@@ -344,7 +346,7 @@ public class Labyrinth {
       Card currentCard = this.board.get(endRow).get(endCol);
       while (currentCard.getFrom() != null) {
         path.add(currentCard.getPosition());
-        currentCard = currentCard.getFrom();
+        currentCard = (Card) currentCard.getFrom();
       }
       path.add(currentCard.getPosition()); // get also the start node
       Collections.reverse(path);

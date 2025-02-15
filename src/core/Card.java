@@ -1,10 +1,11 @@
 package core;
 
+import core.utility.Node;
 import core.utility.Orientation;
 import core.utility.Position;
 import java.util.ArrayList;
 
-public class Card {
+public class Card extends Node {
   CardType type;
   private boolean isNordOpen;
   private boolean isEastOpen;
@@ -14,12 +15,6 @@ public class Card {
   private Goal goal;
   private ArrayList<Player> players;
 
-  // for Dijkstra
-  private Position position;
-  private int distance;
-  private Card from;
-  private ArrayList<Card> cardConnected;
-
   public Card(CardType type) {
     this.type = type;
     this.isNordOpen = type.isNordOpen();
@@ -27,10 +22,6 @@ public class Card {
     this.isSouthOpen = type.isSouthOpen();
     this.isWestOpen = type.isWestOpen();
     this.orientation = Orientation.NORD;
-    this.position = new Position();
-
-    this.cardConnected = new ArrayList<Card>();
-    this.distance = Integer.MAX_VALUE;
     this.players = new ArrayList<Player>();
   }
 
@@ -104,53 +95,6 @@ public class Card {
     return openOrientation;
   }
 
-  public Card setPosition(int row, int col) {
-    this.position.setPosition(row, col);
-    return this;
-  }
-
-  public void setPosition(Position position) {
-    this.position = position;
-  }
-
-  public void setCardConnected(ArrayList<Card> cardConnected) {
-    this.cardConnected = cardConnected;
-  }
-
-  public void setDistance(int distance) {
-    this.distance = distance;
-  }
-
-  public void setFrom(Card from) {
-    this.from = from;
-  }
-
-  public ArrayList<Card> getCardConnected() {
-    return cardConnected;
-  }
-
-  public int getDistance() {
-    return distance;
-  }
-
-  public Card getFrom() {
-    return from;
-  }
-
-  public Position getPosition() {
-    return position;
-  }
-
-  public void addCardConnected(Card cardConnected) {
-    this.cardConnected.add(cardConnected);
-  }
-
-  public void resetGraph() {
-    this.distance = Integer.MAX_VALUE;
-    this.from = null;
-    this.cardConnected = new ArrayList<Card>();
-  }
-
   public void addPlayer(Player player) {
     this.players.add(player);
   }
@@ -168,19 +112,19 @@ public class Card {
   }
 
   public void move(Position position) {
-    this.position.setPosition(position.row, position.col);
+    this.getPosition().setPosition(position.row, position.col);
     this.updatePlayersPosition();
   }
 
   public void updatePlayersPosition() {
     for (Player player : this.players) {
-      player.setPosition(this.position.getRow(), this.position.getCol());
+      player.setPosition(this.getPosition().getRow(), this.getPosition().getCol());
     }
   }
 
   public void shiftPlayersToNewCard(Card card) {
     for (Player player : this.players) {
-      player.setPosition(card.getPosition().getRow(), position.getPosition().getCol());
+      player.setPosition(card.getPosition().getRow(), getPosition().getPosition().getCol());
       card.addPlayer(player);
     }
     this.clearPlayers();
