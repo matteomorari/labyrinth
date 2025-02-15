@@ -4,5 +4,6 @@
     "java.project.referencedLibraries": [
         "lib/**/*.jar"
     ],
+    "editor.rulers": [80, 100],
     // "java.checkstyle.configuration": "/google_checks.xml",
 }

@@ -175,7 +175,6 @@ public class Card {
   public void updatePlayersPosition() {
     for (Player player : this.players) {
       player.setPosition(this.position.getRow(), this.position.getCol());
-      System.out.println(player.getPosition().col + " " + player.getPosition().row);
     }
   }
 
@@ -183,7 +182,6 @@ public class Card {
     for (Player player : this.players) {
       player.setPosition(card.getPosition().getRow(), position.getPosition().getCol());
       card.addPlayer(player);
-      System.out.println(player.getPosition().col + " " + player.getPosition().row);
     }
     this.clearPlayers();
   }
