@@ -166,6 +166,25 @@ public class Card {
     this.players.clear();
   }
 
+  public void move(Position position) {
+    this.position.setPosition(position.row, position.col);
+    this.updatePlayersPosition();
+  }
+
+  public void updatePlayersPosition() {
+    for (Player player: this.players) {
+      player.setPosition(this.position.getRow(), this.position.getCol());
+    }
+  }
+
+  public void shiftPlayersToNewCard(Card card) {
+    for (Player player: this.players) {
+      player.setPosition(position.getRow(), position.getCol());
+      card.addPlayer(player);
+    }
+    this.clearPlayers();
+  }
+
   @Override
   public String toString() {
     return "Card [type=" + type + ", isNordOpen=" + isNordOpen + ", isEastOpen=" + isEastOpen + ", isSouthOpen="

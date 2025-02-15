@@ -164,8 +164,11 @@ public class Labyrinth {
     this.availableCard = availableCard;
   }
 
-  public void insertCard(int x, int y) {
-    if (x < 0 || x >= this.boardSize || y < 0 || y >= this.boardSize) {
+  public void insertCard(Position insertPosition) {
+    if (insertPosition.row < 0
+        || insertPosition.row >= this.boardSize
+        || insertPosition.col < 0
+        || insertPosition.col >= this.boardSize) {
       throw new IllegalArgumentException("Invalid position");
     }
 
@@ -173,66 +176,51 @@ public class Labyrinth {
       throw new IllegalStateException("No available card");
     }
 
-    // TODO: HashMap?
-    if (x == 0) {
-      // shift the cards from top to bottom
-      Card futureAvailableCard = this.board.get(this.boardSize - 1).get(y);
-      for (int i = this.boardSize - 1; i > 0; i--) {
-        this.board.get(i).set(y, this.board.get(i - 1).get(y));
-        this.board.get(i).get(y).setPosition(i, y);
-        for (Player player : this.board.get(i).get(y).getPlayers()) {
-          player.setPosition(i, y);
-        }
-      }
-      this.board.get(0).set(y, this.availableCard);
-      this.board.get(0).get(y).setPosition(0, y);
-      this.availableCard = futureAvailableCard;
+    Position endPosition = calculateEndPosition(insertPosition);
+
+    int rowStep = (endPosition.getRow() - insertPosition.row) / (this.boardSize - 1);
+    int colStep = (endPosition.getCol() - insertPosition.col) / (this.boardSize - 1);
+
+    Card futureAvailableCard = this.board.get(endPosition.row).get(endPosition.col);
+    this.updateNextAvailableCard(futureAvailableCard);
+    for (int i = 0; i < this.boardSize - 1; i++) {
+      Card cardToMove =
+          this.board
+              .get(endPosition.row - (i + 1) * rowStep)
+              .get(endPosition.col - (i + 1) * colStep);
+      Position newPosition =
+          new Position(endPosition.row - i * rowStep, endPosition.col - i * colStep);
+      this.updateCardPosition(cardToMove, newPosition);
     }
 
-    if (x == this.boardSize - 1) {
-      // shift the cards from bottom to top
-      Card futureAvailableCard = this.board.get(0).get(y);
-      for (int i = 0; i < this.boardSize - 1; i++) {
-        this.board.get(i).set(y, this.board.get(i + 1).get(y));
-        this.board.get(i).get(y).setPosition(i, y);
-        for (Player player : this.board.get(i).get(y).getPlayers()) {
-          player.setPosition(i, y);
-        }
-      }
-      this.board.get(this.boardSize - 1).set(y, this.availableCard);
-      this.board.get(this.boardSize - 1).get(y).setPosition(this.boardSize - 1, y);
-      this.availableCard = futureAvailableCard;
-    }
+    this.updateCardPosition(availableCard, insertPosition);
+    this.availableCard = futureAvailableCard;
+  }
 
-    if (y == 0) {
-      // shift the cards from left to right
-      Card futureAvailableCard = this.board.get(x).get(this.boardSize - 1);
-      for (int i = this.boardSize - 1; i > 0; i--) {
-        this.board.get(x).set(i, this.board.get(x).get(i - 1));
-        this.board.get(x).get(i).setPosition(x, i);
-        for (Player player : this.board.get(x).get(i).getPlayers()) {
-          player.setPosition(x, i);
-        }
-      }
-      this.board.get(x).set(0, this.availableCard);
-      this.board.get(x).get(0).setPosition(x, 0);
-      this.availableCard = futureAvailableCard;
-    }
+  private Position calculateEndPosition(Position insertPosition) {
+    // TODO: hashMap?
 
-    if (y == this.boardSize - 1) {
-      // shift the cards from right to left
-      Card futureAvailableCard = this.board.get(x).get(0);
-      for (int i = 0; i < this.boardSize - 1; i++) {
-        this.board.get(x).set(i, this.board.get(x).get(i + 1));
-        this.board.get(x).get(i).setPosition(x, i);
-        for (Player player : this.board.get(x).get(i).getPlayers()) {
-          player.setPosition(x, i);
-        }
-      }
-      this.board.get(x).set(this.boardSize - 1, this.availableCard);
-      this.board.get(x).get(this.boardSize - 1).setPosition(x, this.boardSize - 1);
-      this.availableCard = futureAvailableCard;
+    Position endPosition = new Position();
+    if (insertPosition.row == 0) {
+      endPosition.setPosition(this.boardSize - 1, insertPosition.col);
+    } else if (insertPosition.row == this.boardSize - 1) {
+      endPosition.setPosition(0, insertPosition.col);
+    } else if (insertPosition.col == 0) {
+      endPosition.setPosition(insertPosition.row, this.boardSize - 1);
+    } else if (insertPosition.col == this.boardSize - 1) {
+      endPosition.setPosition(insertPosition.row, 0);
     }
+    return endPosition;
+  }
+
+  private void updateNextAvailableCard(Card card) {
+    card.setPosition(-1, -1);
+    card.shiftPlayersToNewCard(this.availableCard);
+  }
+
+  private void updateCardPosition(Card card, Position newPosition) {
+    this.board.get(newPosition.getRow()).set(newPosition.getCol(), card);
+    card.move(newPosition);
   }
 
   // using Dijkstra's algorithm

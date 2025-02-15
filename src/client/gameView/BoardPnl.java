@@ -232,7 +232,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
         row = Math.min(Math.abs(row), BOARD_DIMENSION - 1);
         col = Math.min(Math.abs(col), BOARD_DIMENSION - 1);
         System.out.println("Arrow clicked at row: " + row + ", col: " + col);
-        model.insertCard(row, col);
+        model.insertCard(new Position(row, col));
         cardAnimationInProgress = true;
         animator.initializeAnimation(new int[] {cellSize}, new int[] {0}).start();
         lastCardInsertPosition.setPosition(row, col);
