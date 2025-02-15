@@ -4,6 +4,13 @@
     "java.project.referencedLibraries": [
         "lib/**/*.jar"
     ],
-    "editor.rulers": [80, 100],
+    "editor.rulers": [
+        80,
+        100
+    ],
+    "cSpell.words": [
+        "pajc"
+    ],
+    "java.configuration.updateBuildConfiguration": "interactive",
     // "java.checkstyle.configuration": "/google_checks.xml",
 }

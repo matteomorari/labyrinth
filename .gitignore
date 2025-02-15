@@ -1,2 +1,37 @@
 # Compiled class file
 *.class
+
+# Maven specific files
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+effective-pom.xml
+
+# Eclipse specific files
+.classpath
+.project
+.settings/
+
+# IDEA specific files
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# NetBeans specific files
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# OS specific files
+.DS_Store
+Thumbs.db
