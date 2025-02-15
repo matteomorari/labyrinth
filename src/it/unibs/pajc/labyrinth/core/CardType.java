@@ -1,4 +1,4 @@
-package core;
+package it.unibs.pajc.labyrinth.core;
 
 public enum CardType {
   I(true, false, true, false),

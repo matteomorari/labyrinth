@@ -1,4 +1,4 @@
-package client.gameView;
+package it.unibs.pajc.labyrinth.client.gameView;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

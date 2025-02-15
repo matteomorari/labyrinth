@@ -1,6 +1,6 @@
-package client.gameView;
+package it.unibs.pajc.labyrinth.client.gameView;
 
-import client.animation.Animatable;
+import it.unibs.pajc.labyrinth.client.animation.Animatable;
 import java.awt.Graphics2D;
 import java.awt.Image;
 

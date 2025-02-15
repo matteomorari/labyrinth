@@ -1,6 +1,6 @@
-package client;
+package it.unibs.pajc.labyrinth.client;
 
-import client.gameView.GamePnl;
+import it.unibs.pajc.labyrinth.client.gameView.GamePnl;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import javax.swing.JFrame;

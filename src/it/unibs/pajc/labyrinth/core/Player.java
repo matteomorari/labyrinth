@@ -1,7 +1,6 @@
-package core;
+package it.unibs.pajc.labyrinth.core;
 
-import core.utility.Position;
-
+import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.awt.Color;
 import java.util.ArrayDeque;
 

@@ -1,4 +1,4 @@
-package client.animation;
+package it.unibs.pajc.labyrinth.client.animation;
 
 // To add new easing functions, see https://easings.net/it and copy the Math function (converted to
 // Java)

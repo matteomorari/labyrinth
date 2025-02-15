@@ -1,8 +1,8 @@
-package core;
+package it.unibs.pajc.labyrinth.core;
 
-import core.utility.NodeComparator;
-import core.utility.Orientation;
-import core.utility.Position;
+import it.unibs.pajc.labyrinth.core.utility.NodeComparator;
+import it.unibs.pajc.labyrinth.core.utility.Orientation;
+import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;

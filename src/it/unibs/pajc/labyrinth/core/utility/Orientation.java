@@ -1,4 +1,4 @@
-package core.utility;
+package it.unibs.pajc.labyrinth.core.utility;
 
 public enum Orientation {
   // IMPORTANT: The order of the enum values is important, do NOT change it

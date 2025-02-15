@@ -1,4 +1,4 @@
-package core.utility;
+package it.unibs.pajc.labyrinth.core.utility;
 
 import java.util.ArrayList;
 

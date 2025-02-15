@@ -1,4 +1,4 @@
-package client.animation;
+package it.unibs.pajc.labyrinth.client.animation;
 
 import javax.swing.Timer;
 

@@ -1,8 +1,8 @@
-package core;
+package it.unibs.pajc.labyrinth.core;
 
-import core.utility.Node;
-import core.utility.Orientation;
-import core.utility.Position;
+import it.unibs.pajc.labyrinth.core.utility.Node;
+import it.unibs.pajc.labyrinth.core.utility.Orientation;
+import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.util.ArrayList;
 
 public class Card extends Node {

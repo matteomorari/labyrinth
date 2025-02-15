@@ -1,4 +1,4 @@
-package client.gameView;
+package it.unibs.pajc.labyrinth.client.gameView;
 
 import java.awt.AlphaComposite;
 import java.awt.Graphics2D;

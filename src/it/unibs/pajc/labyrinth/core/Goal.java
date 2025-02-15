@@ -1,4 +1,4 @@
-package core;
+package it.unibs.pajc.labyrinth.core;
 
 public enum Goal {
   HELMET,

@@ -1,12 +1,12 @@
-package client.gameView;
+package it.unibs.pajc.labyrinth.client.gameView;
 
-import client.animation.Animatable;
-import client.animation.Animator;
-import client.animation.EasingFunction;
-import core.Card;
-import core.Labyrinth;
-import core.Player;
-import core.utility.Position;
+import it.unibs.pajc.labyrinth.client.animation.Animatable;
+import it.unibs.pajc.labyrinth.client.animation.Animator;
+import it.unibs.pajc.labyrinth.client.animation.EasingFunction;
+import it.unibs.pajc.labyrinth.core.Card;
+import it.unibs.pajc.labyrinth.core.Labyrinth;
+import it.unibs.pajc.labyrinth.core.Player;
+import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
