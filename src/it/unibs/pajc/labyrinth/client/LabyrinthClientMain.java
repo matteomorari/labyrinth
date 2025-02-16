@@ -1,7 +1,10 @@
 package it.unibs.pajc.labyrinth.client;
 
 import it.unibs.pajc.labyrinth.client.gameView.GamePnl;
+import it.unibs.pajc.labyrinth.core.Labyrinth;
+import it.unibs.pajc.labyrinth.core.Player;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -36,9 +39,22 @@ public class LabyrinthClientMain {
     // frame.setResizable(false);
     frame.setLayout(new BorderLayout(10, 10));
 
-    JPanel gamePanel = new GamePnl();
-    frame.add(gamePanel);
+    Labyrinth labyrinthModel = new Labyrinth();
 
+    Player player1 = new Player();
+    player1.setColor(Color.RED);
+    labyrinthModel.addPlayer(player1);
+
+    Player player2 = new Player();
+    player2.setColor(Color.YELLOW);
+    labyrinthModel.addPlayer(player2);
+
+    LabyrinthLocalController controller = new LabyrinthLocalController(labyrinthModel);
+    JPanel gamePanel = new GamePnl(controller);
+    labyrinthModel.addChangeListener(e -> gamePanel.repaint());
+    frame.add(gamePanel);
     frame.setVisible(true);
+    
+    controller.initGame();
   }
 }

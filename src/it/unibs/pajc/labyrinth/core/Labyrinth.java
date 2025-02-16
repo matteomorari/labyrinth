@@ -10,13 +10,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
 
-public class Labyrinth {
+public class Labyrinth extends BaseModel {
   ArrayDeque<Player> players;
   ArrayList<ArrayList<Card>> board;
   Card availableCard;
+  Position lastInsertedCardPosition;
+  ArrayList<Position> lastPlayerMovedPath;
   private static final int GOALS_FOR_PLAYER = 2;
 
   private int boardSize;
+
+  private boolean hasCurrentPlayerMoved = false;
+  private boolean hasCurrentPlayerInserted = false;
 
   public Labyrinth() {
     this(7);
@@ -26,6 +31,13 @@ public class Labyrinth {
     this.players = new ArrayDeque<>();
     this.board = new ArrayList<>();
     this.boardSize = boardSize;
+    this.availableCard = null;
+    this.lastInsertedCardPosition = null;
+    this.lastPlayerMovedPath = new ArrayList<Position>();
+  }
+
+  public int getBoardSize() {
+    return boardSize;
   }
 
   public void addPlayer(Player player) {
@@ -98,6 +110,8 @@ public class Labyrinth {
         }
       }
     }
+
+    this.fireChangeListener();
   }
 
   public ArrayList<ArrayList<Card>> initBoard() {
@@ -173,7 +187,9 @@ public class Labyrinth {
       throw new IllegalStateException("No available card");
     }
 
-    Position endPosition = calculateEndPosition(insertPosition);
+    this.hasCurrentPlayerInserted = true;
+
+    Position endPosition = getOppositePosition(insertPosition);
 
     // 1 if the cards are move from the top to the bottom or from the left to the right
     // -1 if the cards are move from the bottom to the top or from the right to the left
@@ -189,6 +205,9 @@ public class Labyrinth {
 
     this.updateCardPosition(availableCard, insertPosition);
     this.availableCard = nextAvailableCard;
+
+    this.lastInsertedCardPosition = insertPosition;
+    this.fireChangeListener();
   }
 
   private void validatePosition(Position insertPosition) {
@@ -198,9 +217,15 @@ public class Labyrinth {
         || insertPosition.col >= this.boardSize) {
       throw new IllegalArgumentException("Invalid position");
     }
+
+    // you cant insert a card in opposite position of the last inserted card
+    if (this.lastInsertedCardPosition != null
+        && getOppositePosition(insertPosition).equals(this.lastInsertedCardPosition)) {
+      throw new IllegalArgumentException("Illegal move");
+    }
   }
 
-  private Position calculateEndPosition(Position insertPosition) {
+  private Position getOppositePosition(Position insertPosition) {
     Position endPosition = new Position();
     if (insertPosition.row == 0) {
       endPosition.setPosition(this.boardSize - 1, insertPosition.col);
@@ -348,7 +373,7 @@ public class Labyrinth {
     return row >= 0 && row < this.boardSize && col >= 0 && col < this.boardSize;
   }
 
-  public ArrayList<Position> movePlayer(int row, int col) {
+  public void movePlayer(int row, int col) {
     Player currentPlayer = this.getCurrentPlayer();
     Card previousPlayerCard =
         this.board
@@ -358,10 +383,42 @@ public class Labyrinth {
         this.findPath(
             currentPlayer.getPosition().getRow(), currentPlayer.getPosition().getCol(), row, col);
     if (!path.isEmpty()) {
+      // TODO: use proper Card method
+      this.hasCurrentPlayerMoved = true;
       previousPlayerCard.removePlayer(currentPlayer);
       this.board.get(row).get(col).addPlayer(currentPlayer);
       currentPlayer.setPosition(row, col);
+
+      this.lastPlayerMovedPath = path;
+      this.fireChangeListener();
     }
-    return path;
+  }
+
+  public ArrayList<Position> getLastPlayerMovedPath() {
+    return lastPlayerMovedPath;
+  }
+
+  public Position lastInsertedCardPosition() {
+    return lastInsertedCardPosition;
+  }
+
+  public void setHasCurrentPlayerInserted(boolean hasCurrentPlayerInserted) {
+    this.hasCurrentPlayerInserted = hasCurrentPlayerInserted;
+  }
+
+  public void setHasCurrentPlayerMoved(boolean hasCurrentPlayerMoved) {
+    this.hasCurrentPlayerMoved = hasCurrentPlayerMoved;
+  }
+
+  public void setLastInsertedCardPosition(Position lastInsertedCardPosition) {
+    this.lastInsertedCardPosition = lastInsertedCardPosition;
+  }
+
+  public boolean hasCurrentPlayerInserted() {
+    return hasCurrentPlayerInserted;
+  }
+
+  public boolean hasCurrentPlayerMoved() {
+    return hasCurrentPlayerMoved;
   }
 }

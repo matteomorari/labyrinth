@@ -1,5 +1,6 @@
 package it.unibs.pajc.labyrinth.client.gameView;
 
+import it.unibs.pajc.labyrinth.core.LabyrinthController;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -8,8 +9,11 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 public class GamePnl extends JPanel {
+  LabyrinthController controller;
 
-  public GamePnl() {
+  public GamePnl(LabyrinthController controller) {
+    this.controller = controller;
+
     setLayout(new BorderLayout(10, 10));
     this.setBorder(
         BorderFactory.createEmptyBorder(10, 10, 10, 10)); // 20px padding around the frame
@@ -30,7 +34,7 @@ public class GamePnl extends JPanel {
     add(rightPanel, BorderLayout.EAST);
 
     // Center panel
-    JPanel gameBoardPanel = new BoardPnl();
+    JPanel gameBoardPanel = new BoardPnl(controller);
     add(gameBoardPanel, BorderLayout.CENTER);
   }
 

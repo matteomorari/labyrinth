@@ -21,6 +21,9 @@ public class Position {
   }
 
   public boolean equals(Position position) {
+    if (position == null) {
+      return false;
+    }
     return this.row == position.row && this.col == position.col;
   }
 
