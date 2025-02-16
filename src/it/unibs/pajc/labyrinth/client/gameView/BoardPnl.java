@@ -74,16 +74,21 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
   }
 
   private void checkNewAnimation() {
-    if (controller.hasCurrentPlayerMoved()) {
-      controller.setHasCurrentPlayerMoved(false);
-      lastPlayerMovedPath = controller.getLastPlayerMovedPath();
-      firePlayerMoveAnimation();
-    }
+    // TODO: fix animation concurrency due to bot move
+    // if (cardAnimationInProgress || playerPositionInProgress) {
+    //   return;
+    // }
 
     if (controller.hasCurrentPlayerInserted()) {
       controller.setHasCurrentPlayerInserted(false);
       lastCardInsertPosition = controller.lastInsertedCardPosition();
       fireCardInsertAnimation();
+    }
+
+    if (controller.hasCurrentPlayerMoved()) {
+      controller.setHasCurrentPlayerMoved(false);
+      lastPlayerMovedPath = controller.getLastPlayerMovedPath();
+      firePlayerMoveAnimation();
     }
   }
 
@@ -102,7 +107,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
 
   private void startAnimation() {
     animator.initializeAnimation(new int[] {0}, new int[] {cellSize}).start();
-  } 
+  }
 
   private void drawBackground(Graphics2D g2) {
     g2.setColor(Color.LIGHT_GRAY); // bg color
@@ -201,7 +206,8 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     }
   }
 
-  private int[] getPlayerAnimationPosition(Player player, int initialXPosition, int initialYPosition) {
+  private int[] getPlayerAnimationPosition(
+      Player player, int initialXPosition, int initialYPosition) {
     int posX = initialXPosition;
     int posY = initialYPosition;
 

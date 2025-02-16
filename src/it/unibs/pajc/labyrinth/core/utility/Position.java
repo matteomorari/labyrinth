@@ -20,11 +20,16 @@ public class Position {
     this.col = 0;
   }
 
-  public boolean equals(Position position) {
-    if (position == null) {
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    return this.row == position.row && this.col == position.col;
+    Position position = (Position) obj;
+    return row == position.row && col == position.col;
   }
 
   public void setPosition(int row, int col) {

@@ -1,11 +1,14 @@
 package it.unibs.pajc.labyrinth.client;
 
 import it.unibs.pajc.labyrinth.client.gameView.GamePnl;
+import it.unibs.pajc.labyrinth.core.Bot;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
+
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -52,9 +55,15 @@ public class LabyrinthClientMain {
     LabyrinthLocalController controller = new LabyrinthLocalController(labyrinthModel);
     JPanel gamePanel = new GamePnl(controller);
     labyrinthModel.addChangeListener(e -> gamePanel.repaint());
-    frame.add(gamePanel);
+    frame.add(gamePanel, BorderLayout.CENTER);
     frame.setVisible(true);
-    
+
     controller.initGame();
+
+    // TODO: to remove
+    Bot bot1 = new Bot(labyrinthModel, player1);
+    JButton button = new JButton("move bot");
+    frame.add(button, BorderLayout.SOUTH);
+    button.addActionListener(e -> bot1.calcMove());
   }
 }

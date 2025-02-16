@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Node {
   private Position position;
   private int distance;
-  private Node from;
+  private transient Node from;
   private ArrayList<Node> cardConnected;
 
   public Node() {
