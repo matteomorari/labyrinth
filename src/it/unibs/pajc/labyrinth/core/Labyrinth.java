@@ -187,6 +187,13 @@ public class Labyrinth extends BaseModel {
       throw new IllegalStateException("No available card");
     }
 
+    // you cant insert a card in opposite position of the last inserted card
+    if (this.lastInsertedCardPosition != null
+        && getOppositePosition(insertPosition).equals(this.lastInsertedCardPosition)) {
+      System.out.println("Illegal move");
+      return;
+    }
+
     this.hasCurrentPlayerInserted = true;
 
     Position endPosition = getOppositePosition(insertPosition);
@@ -216,12 +223,6 @@ public class Labyrinth extends BaseModel {
         || insertPosition.col < 0
         || insertPosition.col >= this.boardSize) {
       throw new IllegalArgumentException("Invalid position");
-    }
-
-    // you cant insert a card in opposite position of the last inserted card
-    if (this.lastInsertedCardPosition != null
-        && getOppositePosition(insertPosition).equals(this.lastInsertedCardPosition)) {
-      throw new IllegalArgumentException("Illegal move");
     }
   }
 
