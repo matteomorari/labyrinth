@@ -26,20 +26,20 @@ public class Bot {
   public void calcMove() {
     ArrayList<Position> availableCardInsertionPoint = model.getAvailableCardInsertionPoint();
     HashMap<Move, PositionDistance> ClosestGoalPositionsMap = new HashMap<>();
-    for (Position position : availableCardInsertionPoint) {
+    for (Position cardInsertionPosition : availableCardInsertionPoint) {
       for (int i = 0; i < Orientation.values().length; i++) {
         Labyrinth modelCopy = createModelCopy();
         modelCopy.getAvailableCard().rotate(i);
-        modelCopy.insertCard(position);
-        ArrayList<Position> availablePlayerMove =
+        modelCopy.insertCard(cardInsertionPosition);
+        ArrayList<Position> reachablePlayerPositions =
             modelCopy.findPath(
                 player.getPosition(), player.getCurrentGoal().getCard().getPosition());
 
         PositionDistance closestGoalPosition =
             findClosestGoalPosition(
-                availablePlayerMove, player.getCurrentGoal().getCard().getPosition());
+                reachablePlayerPositions, player.getCurrentGoal().getCard().getPosition());
 
-        Move move = new Move(position, i);
+        Move move = new Move(cardInsertionPosition, i);
         ClosestGoalPositionsMap.put(move, closestGoalPosition);
       }
     }

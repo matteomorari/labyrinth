@@ -228,26 +228,17 @@ public class Labyrinth extends BaseModel {
   }
 
   public ArrayList<Position> getAvailableCardInsertionPoint() {
-    // TODO: improve
     ArrayList<Position> availableCardInsertionPoint = new ArrayList<>();
-    for (int i = 0; i < this.boardSize; i++) {
-      availableCardInsertionPoint.add(new Position(0, i));
-      availableCardInsertionPoint.add(new Position(this.boardSize - 1, i));
-      availableCardInsertionPoint.add(new Position(i, 0));
-      availableCardInsertionPoint.add(new Position(i, this.boardSize - 1));
+    for (int i = 1; i < this.boardSize - 1; i++) {
+        availableCardInsertionPoint.add(new Position(0, i));
+        availableCardInsertionPoint.add(new Position(this.boardSize - 1, i));
+        availableCardInsertionPoint.add(new Position(i, 0));
+        availableCardInsertionPoint.add(new Position(i, this.boardSize - 1));
     }
 
     if (lastInsertedCardPosition != null) {
       availableCardInsertionPoint.remove(getOppositePosition(lastInsertedCardPosition));
     }
-
-    // remove the four corner
-    // TODO: seems to not working
-    availableCardInsertionPoint.remove(new Position(0, 0));
-    availableCardInsertionPoint.remove(new Position(0, this.boardSize - 1));
-    availableCardInsertionPoint.remove(new Position(this.boardSize - 1, 0));
-    availableCardInsertionPoint.remove(new Position(this.boardSize - 1, this.boardSize - 1));
-
     return availableCardInsertionPoint;
   }
 
