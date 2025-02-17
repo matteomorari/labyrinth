@@ -22,8 +22,10 @@ public class Bot {
 
   // TODO! what if the goal is on the available card?
   // TODO! seems that if the goal is reachable without any card insertion, dosn't work
-  //TODO! when the goal card change position, seems that the goal position stay the old one
+  // TODO! when the goal card change position, seems that the goal position stay the old one
   public void calcMove() {
+    System.out.println("Searching for" + model.getCurrentPlayer().getCurrentGoal().toString());
+
     ArrayList<Position> availableCardInsertionPoint = model.getAvailableCardInsertionPoint();
     HashMap<Move, PositionDistance> ClosestGoalPositionsMap = new HashMap<>();
     for (Position cardInsertionPosition : availableCardInsertionPoint) {
@@ -31,20 +33,19 @@ public class Bot {
         Labyrinth modelCopy = createModelCopy();
         modelCopy.getAvailableCard().rotate(i);
         modelCopy.insertCard(cardInsertionPosition);
+        Position currentGoalPosition = player.getCurrentGoal().getCard().getPosition();
+
         ArrayList<Position> reachablePlayerPositions =
-            modelCopy.findPath(
-                player.getPosition(), player.getCurrentGoal().getCard().getPosition());
+            modelCopy.findPath(player.getPosition(), currentGoalPosition);
 
         PositionDistance closestGoalPosition =
-            findClosestGoalPosition(
-                reachablePlayerPositions, player.getCurrentGoal().getCard().getPosition());
+            findClosestGoalPosition(reachablePlayerPositions, currentGoalPosition);
 
         Move move = new Move(cardInsertionPosition, i);
         ClosestGoalPositionsMap.put(move, closestGoalPosition);
       }
     }
 
-    // TODO! what if the plaer is already on the goal the bestMove will be null. Should be zero
     Move bestMove = null;
     Position bestPosition = null;
     int minDistance = Integer.MAX_VALUE;
@@ -57,7 +58,6 @@ public class Bot {
       }
     }
 
-    System.out.println(model.getCurrentPlayer().getCurrentGoal().toString());
     model.getAvailableCard().rotate(bestMove.getCardRotateNumber());
     model.insertCard(bestMove.getInsertPosition());
     model.movePlayer(bestPosition.row, bestPosition.col);

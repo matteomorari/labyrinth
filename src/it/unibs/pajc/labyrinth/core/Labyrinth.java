@@ -230,10 +230,10 @@ public class Labyrinth extends BaseModel {
   public ArrayList<Position> getAvailableCardInsertionPoint() {
     ArrayList<Position> availableCardInsertionPoint = new ArrayList<>();
     for (int i = 1; i < this.boardSize - 1; i++) {
-        availableCardInsertionPoint.add(new Position(0, i));
-        availableCardInsertionPoint.add(new Position(this.boardSize - 1, i));
-        availableCardInsertionPoint.add(new Position(i, 0));
-        availableCardInsertionPoint.add(new Position(i, this.boardSize - 1));
+      availableCardInsertionPoint.add(new Position(0, i));
+      availableCardInsertionPoint.add(new Position(this.boardSize - 1, i));
+      availableCardInsertionPoint.add(new Position(i, 0));
+      availableCardInsertionPoint.add(new Position(i, this.boardSize - 1));
     }
 
     if (lastInsertedCardPosition != null) {
@@ -288,7 +288,8 @@ public class Labyrinth extends BaseModel {
 
     // if the path is only the start node, then the player is already there
     if (startPosition.row == endPosition.row && startPosition.col == endPosition.col) {
-      return path;
+      visitedPositions.add(startPosition);
+      return visitedPositions;
     }
 
     // reset the distance for each card
@@ -321,11 +322,6 @@ public class Labyrinth extends BaseModel {
         processNeighbor(currentNode, orientation, nodeDistanceQueue, visitedPositions);
       }
     }
-
-    // ArrayList<Position> result = new ArrayList<>();
-    // result.add(new Position(0, 0));
-    // result.add(new Position(0, 2));
-    // return result;
 
     if (found) {
       Card currentCard = this.board.get(endPosition.row).get(endPosition.col);
@@ -412,20 +408,22 @@ public class Labyrinth extends BaseModel {
     Position currentPosition = currentPlayer.getPosition();
     ArrayList<Position> path = this.findPath(currentPosition, new Position(row, col));
 
-    if (path.contains(new Position(row, col))) {
-      // TODO: use proper Card method
-      this.hasCurrentPlayerMoved = true;
-      Card previousPlayerCard =
-          this.board
-              .get(currentPlayer.getPosition().getRow())
-              .get(currentPlayer.getPosition().getCol());
-      previousPlayerCard.removePlayer(currentPlayer);
-      this.board.get(row).get(col).addPlayer(currentPlayer);
-      currentPlayer.setPosition(row, col);
-
-      this.lastPlayerMovedPath = path;
-      this.fireChangeListener();
+    if (!path.contains(new Position(row, col)) || path.size() < 2) {
+      return;
     }
+
+    // TODO: use proper Card method
+    this.hasCurrentPlayerMoved = true;
+    Card previousPlayerCard =
+        this.board
+            .get(currentPlayer.getPosition().getRow())
+            .get(currentPlayer.getPosition().getCol());
+    previousPlayerCard.removePlayer(currentPlayer);
+    this.board.get(row).get(col).addPlayer(currentPlayer);
+    currentPlayer.setPosition(row, col);
+
+    this.lastPlayerMovedPath = path;
+    this.fireChangeListener();
   }
 
   public ArrayList<Position> getLastPlayerMovedPath() {
