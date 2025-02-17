@@ -143,8 +143,8 @@ public class Labyrinth extends BaseModel {
 
     // set the right orientation for the corner cards
     this.board.get(0).get(0).rotate();
-    this.board.get(this.boardSize - 1).get(0).rotate(2);
-    this.board.get(0).get(this.boardSize - 1);
+    this.board.get(0).get(this.boardSize - 1).rotate(2);
+    this.board.get(boardSize - 1).get(0);
     this.board.get(this.boardSize - 1).get(this.boardSize - 1).rotate(3);
 
     // set the players to their start card

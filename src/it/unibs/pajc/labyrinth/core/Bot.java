@@ -20,9 +20,9 @@ public class Bot {
     this.player = player;
   }
 
-  //TODO! what if the goal is on the available card?
-  //TODO! what if the plaer is already on the goal?
-  //TODO! seems that if the goal is reachable without any card insertion, dosn't work
+  // TODO! what if the goal is on the available card?
+  // TODO! seems that if the goal is reachable without any card insertion, dosn't work
+  //TODO! when the goal card change position, seems that the goal position stay the old one
   public void calcMove() {
     ArrayList<Position> availableCardInsertionPoint = model.getAvailableCardInsertionPoint();
     HashMap<Move, PositionDistance> ClosestGoalPositionsMap = new HashMap<>();
@@ -44,9 +44,10 @@ public class Bot {
       }
     }
 
+    // TODO! what if the plaer is already on the goal the bestMove will be null. Should be zero
     Move bestMove = null;
     Position bestPosition = null;
-    double minDistance = Double.MAX_VALUE;
+    int minDistance = Integer.MAX_VALUE;
     for (Move move : ClosestGoalPositionsMap.keySet()) {
       PositionDistance closestGoalPosition = ClosestGoalPositionsMap.get(move);
       if (closestGoalPosition.distance < minDistance) {
@@ -90,9 +91,9 @@ public class Bot {
 
   class PositionDistance {
     Position position;
-    double distance;
+    int distance;
 
-    PositionDistance(Position position, double distance) {
+    PositionDistance(Position position, int distance) {
       this.position = position;
       this.distance = distance;
     }
@@ -101,10 +102,10 @@ public class Bot {
   private PositionDistance findClosestGoalPosition(
       ArrayList<Position> positions, Position goalPosition) {
     Position closestPosition = null;
-    double minDistance = Double.MAX_VALUE;
+    int minDistance = Integer.MAX_VALUE;
 
     for (Position position : positions) {
-      double distance = calculateDistance(position, goalPosition);
+      int distance = calculateDistance(position, goalPosition);
       if (distance < minDistance) {
         minDistance = distance;
         closestPosition = position;
@@ -114,13 +115,11 @@ public class Bot {
     return new PositionDistance(closestPosition, minDistance);
   }
 
-  // TODO: Improve this method
-  private double calculateDistance(Position p1, Position p2) {
+  private int calculateDistance(Position p1, Position p2) {
     return Math.abs(p1.row - p2.row) + Math.abs(p1.col - p2.col);
   }
 
-  // TODO: turn into private
-  public Labyrinth createModelCopy() {
+  private Labyrinth createModelCopy() {
     // Gson gson = new Gson();
     Gson gson =
         new GsonBuilder()
