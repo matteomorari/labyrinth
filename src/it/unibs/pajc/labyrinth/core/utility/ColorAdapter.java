@@ -6,13 +6,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-
 import java.awt.Color;
 import java.lang.reflect.Type;
 
 public class ColorAdapter implements JsonDeserializer<Color>, JsonSerializer<Color> {
 
-    @Override
+  @Override
   public JsonElement serialize(Color color, Type colorType, JsonSerializationContext context) {
     JsonObject json = new JsonObject();
     json.addProperty("red", color.getRed());

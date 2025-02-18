@@ -17,7 +17,7 @@ public class Bot {
     // this.player;
   }
 
-  // TODO! if the goal change position and should be reachable, doesn't work
+  // TODO! if the goal changes, the goal position in the users queu isn't updated correctly
   public void calcMove() {
     System.out.println(
         "Searching for: " + model.getCurrentPlayer().getCurrentGoal().getType().toString());

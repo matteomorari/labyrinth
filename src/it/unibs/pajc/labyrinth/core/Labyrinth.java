@@ -222,7 +222,7 @@ public class Labyrinth extends BaseModel {
     //   for (Goal goal : player.getGoals()) {
     //     Goal playerGoal = goal;
     //     Goal boardGoal;
-        
+
     //     for (int i = 0; i < boardSize; i++) {
     //       for (int j = 0; j < boardSize; j++) {
     //         boardGoal = board.get(i).get(j).getGoal();
@@ -305,10 +305,7 @@ public class Labyrinth extends BaseModel {
     this.board.get(newPosition.getRow()).set(newPosition.getCol(), card);
     card.move(newPosition);
     if (card.getGoal() != null) {
-      Position pos1 = card.getGoal().getPosition();
       card.getGoal().setPosition(newPosition);
-      Position pos2 = card.getGoal().getPosition();
-      int a = 5;
     }
   }
 

@@ -31,5 +31,4 @@ public class Goal {
   public void setType(GoalType type) {
     this.type = type;
   }
-  
 }

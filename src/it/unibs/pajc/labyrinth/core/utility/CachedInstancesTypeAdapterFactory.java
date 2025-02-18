@@ -15,5 +15,4 @@ public class CachedInstancesTypeAdapterFactory implements TypeAdapterFactory {
   public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
     throw new UnsupportedOperationException("Unimplemented method 'create'");
   }
-
 }

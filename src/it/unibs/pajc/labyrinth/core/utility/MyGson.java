@@ -6,8 +6,6 @@ import it.unibs.pajc.labyrinth.core.Goal;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
 import java.awt.Color;
-import java.io.FileWriter;
-import java.io.IOException;
 
 public class MyGson {
   Gson gson;
@@ -32,6 +30,7 @@ public class MyGson {
   public Labyrinth fromJson(String json) {
     Labyrinth modelCopy = gson.fromJson(json, Labyrinth.class);
     // TODO: hard solution, to improve
+    // we need the goal class  to be the same instance in the board and in the player
     for (Player player : modelCopy.getPlayers()) {
       for (Goal playerGoal : player.getGoals()) {
         Goal boardGoal;

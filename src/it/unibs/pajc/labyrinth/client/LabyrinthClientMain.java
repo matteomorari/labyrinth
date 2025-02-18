@@ -5,7 +5,6 @@ import it.unibs.pajc.labyrinth.core.Bot;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.utility.MyGson;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
