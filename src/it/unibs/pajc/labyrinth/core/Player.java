@@ -8,7 +8,7 @@ public class Player {
   private ArrayDeque<Goal> goalsQueue;
   private Position position;
   private Position startPosition;
-  private transient Color color;
+  private Color color;
 
   public Player() {
     this.goalsQueue = new ArrayDeque<Goal>();
@@ -22,6 +22,10 @@ public class Player {
 
   public Goal getCurrentGoal() {
     return this.goalsQueue.peek();
+  }
+
+  public ArrayDeque<Goal> getGoals() {
+    return goalsQueue;
   }
 
   public void setPosition(int x, int y) {

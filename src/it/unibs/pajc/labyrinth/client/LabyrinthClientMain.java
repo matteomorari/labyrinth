@@ -4,10 +4,15 @@ import it.unibs.pajc.labyrinth.client.gameView.GamePnl;
 import it.unibs.pajc.labyrinth.core.Bot;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
+import it.unibs.pajc.labyrinth.core.utility.MyGson;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
-
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -42,15 +47,30 @@ public class LabyrinthClientMain {
     // frame.setResizable(false);
     frame.setLayout(new BorderLayout(10, 10));
 
-    Labyrinth labyrinthModel = new Labyrinth();
+    final boolean LOAD_FROM_FILE = false;
+    Labyrinth labyrinthModel;
 
-    Player player1 = new Player();
-    player1.setColor(Color.RED);
-    labyrinthModel.addPlayer(player1);
+    if (LOAD_FROM_FILE) {
+      String deepCopy = "";
+      try {
+        deepCopy =
+            new String(Files.readAllBytes(Paths.get("modelCOpy.json")), StandardCharsets.UTF_8);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
 
-    Player player2 = new Player();
-    player2.setColor(Color.YELLOW);
-    labyrinthModel.addPlayer(player2);
+      MyGson myGson = new MyGson();
+      labyrinthModel = myGson.fromJson(deepCopy);
+    } else {
+      labyrinthModel = new Labyrinth();
+      Player player1 = new Player();
+      player1.setColor(Color.RED);
+      labyrinthModel.addPlayer(player1);
+
+      Player player2 = new Player();
+      player2.setColor(Color.YELLOW);
+      labyrinthModel.addPlayer(player2);
+    }
 
     LabyrinthLocalController controller = new LabyrinthLocalController(labyrinthModel);
     JPanel gamePanel = new GamePnl(controller);
@@ -58,10 +78,12 @@ public class LabyrinthClientMain {
     frame.add(gamePanel, BorderLayout.CENTER);
     frame.setVisible(true);
 
-    controller.initGame();
+    if (!LOAD_FROM_FILE) {
+      controller.initGame();
+    }
 
     // TODO: to remove
-    Bot bot1 = new Bot(labyrinthModel, player1);
+    Bot bot1 = new Bot(labyrinthModel, labyrinthModel.getCurrentPlayer());
     JButton button = new JButton("move bot");
     frame.add(button, BorderLayout.SOUTH);
     button.addActionListener(e -> bot1.calcMove());

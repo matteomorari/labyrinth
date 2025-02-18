@@ -1,12 +1,8 @@
 package it.unibs.pajc.labyrinth.core;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import it.unibs.pajc.labyrinth.core.utility.ColorDeserializer;
-import it.unibs.pajc.labyrinth.core.utility.ColorSerializer;
+import it.unibs.pajc.labyrinth.core.utility.MyGson;
 import it.unibs.pajc.labyrinth.core.utility.Orientation;
 import it.unibs.pajc.labyrinth.core.utility.Position;
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -14,35 +10,42 @@ public class Bot {
 
   Labyrinth model;
   Player player;
+  MyGson myGson = new MyGson();
 
   public Bot(Labyrinth model, Player player) {
     this.model = model;
-    this.player = player;
+    // this.player;
   }
 
-  // TODO! what if the goal is on the available card?
-  // TODO! seems that if the goal is reachable without any card insertion, dosn't work
-  // TODO! when the goal card change position, seems that the goal position stay the old one
+  // TODO! if the goal change position and should be reachable, doesn't work
   public void calcMove() {
-    System.out.println("Searching for" + model.getCurrentPlayer().getCurrentGoal().toString());
+    System.out.println(
+        "Searching for: " + model.getCurrentPlayer().getCurrentGoal().getType().toString());
 
     ArrayList<Position> availableCardInsertionPoint = model.getAvailableCardInsertionPoint();
     HashMap<Move, PositionDistance> ClosestGoalPositionsMap = new HashMap<>();
     for (Position cardInsertionPosition : availableCardInsertionPoint) {
       for (int i = 0; i < Orientation.values().length; i++) {
-        Labyrinth modelCopy = createModelCopy();
+        Labyrinth modelCopy = myGson.createCopy(model);
         modelCopy.getAvailableCard().rotate(i);
         modelCopy.insertCard(cardInsertionPosition);
-        Position currentGoalPosition = player.getCurrentGoal().getCard().getPosition();
+
+        Player currentPlayerCopy = modelCopy.getCurrentPlayer();
+        Position currentGoalPosition = currentPlayerCopy.getCurrentGoal().getPosition();
+
+        if (currentGoalPosition.equals(new Position(-1, -1))) {
+          // skip if the goal is on the available card
+          continue;
+        }
 
         ArrayList<Position> reachablePlayerPositions =
-            modelCopy.findPath(player.getPosition(), currentGoalPosition);
+            modelCopy.findPath(currentPlayerCopy.getPosition(), currentGoalPosition);
 
-        PositionDistance closestGoalPosition =
+        PositionDistance closestGoalPosition2 =
             findClosestGoalPosition(reachablePlayerPositions, currentGoalPosition);
 
-        Move move = new Move(cardInsertionPosition, i);
-        ClosestGoalPositionsMap.put(move, closestGoalPosition);
+        Move move2 = new Move(cardInsertionPosition, i);
+        ClosestGoalPositionsMap.put(move2, closestGoalPosition2);
       }
     }
 
@@ -58,9 +61,11 @@ public class Bot {
       }
     }
 
-    model.getAvailableCard().rotate(bestMove.getCardRotateNumber());
-    model.insertCard(bestMove.getInsertPosition());
-    model.movePlayer(bestPosition.row, bestPosition.col);
+    if (bestMove != null && bestPosition != null) {
+      this.model.getAvailableCard().rotate(bestMove.getCardRotateNumber());
+      this.model.insertCard(bestMove.getInsertPosition());
+      this.model.movePlayer(bestPosition.row, bestPosition.col);
+    }
   }
 
   class Move {
@@ -117,19 +122,5 @@ public class Bot {
 
   private int calculateDistance(Position p1, Position p2) {
     return Math.abs(p1.row - p2.row) + Math.abs(p1.col - p2.col);
-  }
-
-  private Labyrinth createModelCopy() {
-    // Gson gson = new Gson();
-    Gson gson =
-        new GsonBuilder()
-            .registerTypeAdapter(Color.class, new ColorSerializer())
-            .registerTypeAdapter(Color.class, new ColorDeserializer())
-            .setPrettyPrinting()
-            .create();
-    String deepCopy = gson.toJson(model);
-    // System.out.println(deepCopy);
-    Labyrinth modelCopy = gson.fromJson(deepCopy, Labyrinth.class);
-    return modelCopy;
   }
 }

@@ -124,7 +124,7 @@ public class Card extends Node {
 
   public void shiftPlayersToNewCard(Card card) {
     for (Player player : this.players) {
-      player.setPosition(card.getPosition().getRow(), getPosition().getPosition().getCol());
+      player.setPosition(card.getPosition().getRow(), card.getPosition().getCol());
       card.addPlayer(player);
     }
     this.clearPlayers();

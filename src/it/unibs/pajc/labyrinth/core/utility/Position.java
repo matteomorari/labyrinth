@@ -32,10 +32,11 @@ public class Position {
     return row == position.row && col == position.col;
   }
 
-  @Override
-  public int hashCode() {
-    return 31 * row + col;
-  }
+  // TODO: to compare with ==
+  // @Override
+  // public int hashCode() {
+  //   return 31 * row + col;
+  // }
 
   public void setPosition(int row, int col) {
     this.row = row;
@@ -53,10 +54,6 @@ public class Position {
   public void set(Position position) {
     this.row = position.row;
     this.col = position.col;
-  }
-
-  public Position getPosition() {
-    return this;
   }
 
   public int getCol() {

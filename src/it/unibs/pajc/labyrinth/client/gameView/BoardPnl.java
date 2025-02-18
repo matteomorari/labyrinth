@@ -83,6 +83,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
       controller.setHasCurrentPlayerInserted(false);
       lastCardInsertPosition = controller.lastInsertedCardPosition();
       fireCardInsertAnimation();
+      // return;
     }
 
     if (controller.hasCurrentPlayerMoved()) {
@@ -148,7 +149,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     cardImage.draw(posX, posY, cellSize, cellSize);
 
     if (card.getGoal() != null) {
-      ImageCntrl goalImageCntrl = ImageCntrl.valueOf("GOAL_" + card.getGoal().name());
+      ImageCntrl goalImageCntrl = ImageCntrl.valueOf("GOAL_" + card.getGoal().getType().name());
       CardImage goalImage = new CardImage(goalImageCntrl, g2).rotate(angles);
       goalImage.draw(posX + cellSize / 4, posY + cellSize / 4, cellSize / 2, cellSize / 2);
     }

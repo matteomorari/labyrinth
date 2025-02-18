@@ -4,10 +4,23 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+
 import java.awt.Color;
 import java.lang.reflect.Type;
 
-public class ColorDeserializer implements JsonDeserializer<Color> {
+public class ColorAdapter implements JsonDeserializer<Color>, JsonSerializer<Color> {
+
+    @Override
+  public JsonElement serialize(Color color, Type colorType, JsonSerializationContext context) {
+    JsonObject json = new JsonObject();
+    json.addProperty("red", color.getRed());
+    json.addProperty("green", color.getGreen());
+    json.addProperty("blue", color.getBlue());
+    json.addProperty("opacity", color.getAlpha());
+    return json;
+  }
 
   @Override
   public Color deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) {

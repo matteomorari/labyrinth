@@ -7,7 +7,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.PriorityQueue;
 
 public class Labyrinth extends BaseModel {
@@ -86,28 +85,31 @@ public class Labyrinth extends BaseModel {
     this.initBoard();
 
     // shuffle goals
-    List<Goal> goalsList = Arrays.asList(Goal.values());
+    ArrayList<GoalType> goalsList = new ArrayList<GoalType>(Arrays.asList(GoalType.values()));
     Collections.shuffle(goalsList);
 
     // assign goals for each player
     for (Player player : this.players) {
       for (int i = 0; i < GOALS_FOR_PLAYER; i++) {
-        player.addGoal(goalsList.get(i));
+        player.addGoal(new Goal(goalsList.getFirst()));
+        goalsList.removeFirst();
       }
     }
 
     // assign goals to the card
     // TODO: improve
-    for (Goal goal : goalsList) {
-      boolean isAssigned = false;
-      while (!isAssigned) {
-        int x = (int) (Math.random() * this.boardSize);
-        int y = (int) (Math.random() * this.boardSize);
-        Card card = this.board.get(x).get(y);
-        if (card.getGoal() == null) {
-          card.setGoal(goal);
-          goal.setCard(card);
-          isAssigned = true;
+    for (Player player : this.players) {
+      for (Goal goal : player.getGoals()) {
+        boolean isAssigned = false;
+        while (!isAssigned) {
+          int x = (int) (Math.random() * this.boardSize);
+          int y = (int) (Math.random() * this.boardSize);
+          Card card = this.board.get(x).get(y);
+          if (card.getGoal() == null) {
+            card.setGoal(goal);
+            goal.setPosition(card.getPosition());
+            isAssigned = true;
+          }
         }
       }
     }
@@ -215,6 +217,29 @@ public class Labyrinth extends BaseModel {
     this.availableCard = nextAvailableCard;
 
     this.lastInsertedCardPosition = insertPosition;
+    // print from player
+    // for (Player player : this.getPlayers()) {
+    //   for (Goal goal : player.getGoals()) {
+    //     Goal playerGoal = goal;
+    //     Goal boardGoal;
+        
+    //     for (int i = 0; i < boardSize; i++) {
+    //       for (int j = 0; j < boardSize; j++) {
+    //         boardGoal = board.get(i).get(j).getGoal();
+    //         if (boardGoal != null) {
+    //           if (playerGoal.getType().equals(boardGoal.getType())) {
+    //             System.out.println(playerGoal.getType());
+    //             System.out.println("Player: " + playerGoal.getPosition());
+    //             System.out.println("Goal: " + boardGoal.getPosition());
+    //             System.out.println(
+    //                 "Hash: " + (playerGoal == boardGoal));
+    //             System.out.println();
+    //           }
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
     this.fireChangeListener();
   }
 
@@ -259,6 +284,10 @@ public class Labyrinth extends BaseModel {
   private void updateNextAvailableCard(Card card) {
     card.setPosition(-1, -1);
     card.shiftPlayersToNewCard(this.availableCard);
+    // TODO: to improve e put together with the others
+    if (card.getGoal() != null) {
+      card.getGoal().setPosition(new Position(-1, -1));
+    }
   }
 
   private void moveCards(Position endPosition, int rowDirection, int colDirection) {
@@ -275,6 +304,12 @@ public class Labyrinth extends BaseModel {
   private void updateCardPosition(Card card, Position newPosition) {
     this.board.get(newPosition.getRow()).set(newPosition.getCol(), card);
     card.move(newPosition);
+    if (card.getGoal() != null) {
+      Position pos1 = card.getGoal().getPosition();
+      card.getGoal().setPosition(newPosition);
+      Position pos2 = card.getGoal().getPosition();
+      int a = 5;
+    }
   }
 
   // using Dijkstra's algorithm
