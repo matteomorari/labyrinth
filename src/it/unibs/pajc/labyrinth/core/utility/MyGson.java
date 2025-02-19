@@ -35,20 +35,22 @@ public class MyGson {
       for (Goal playerGoal : player.getGoals()) {
         Goal boardGoal;
 
+        if (modelCopy.getAvailableCard().getGoal() != null) {
+          if (playerGoal.getType().equals(modelCopy.getAvailableCard().getGoal().getType())) {
+            modelCopy.getAvailableCard().setGoal(playerGoal);
+          }
+          continue;
+        }
+
         for (int i = 0; i < modelCopy.getBoardSize(); i++) {
           for (int j = 0; j < modelCopy.getBoardSize(); j++) {
             boardGoal = modelCopy.getBoard().get(i).get(j).getGoal();
-            if (boardGoal == null || modelCopy.getAvailableCard().getGoal() == null) {
+            if (boardGoal == null) {
               continue;
             }
 
             if (playerGoal.getType().equals(boardGoal.getType())) {
               modelCopy.getBoard().get(i).get(j).setGoal(playerGoal);
-              // boardGoal.setPosition(playerGoal.getPosition());
-              // System.out.println(modelCopy.getBoard().get(i).get(j).getGoal() == playerGoal);
-            }
-            if (playerGoal.getType().equals(modelCopy.getAvailableCard().getGoal().getType())) {
-              modelCopy.getAvailableCard().setGoal(playerGoal);
             }
           }
         }
