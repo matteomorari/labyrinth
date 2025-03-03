@@ -9,6 +9,7 @@ public class Player {
   private Position position;
   private Position startPosition;
   private Color color;
+  private String name;
 
   public Player() {
     this.goalsQueue = new ArrayDeque<Goal>();
@@ -51,5 +52,13 @@ public class Player {
 
   public Color getColor() {
     return color;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+    return this.name;
   }
 }

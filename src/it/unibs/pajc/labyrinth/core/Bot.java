@@ -17,10 +17,12 @@ public class Bot {
     // this.player;
   }
 
-  // TODO! if the goal changes, the goal position in the users queu isn't updated correctly
+  // TODO! if the goal changes, the goal position in the users queu isn't updated
+  // correctly
   public void calcMove() {
-    System.out.println(
-        "Searching for: " + model.getCurrentPlayer().getCurrentGoal().getType().toString());
+    // System.out.println(
+    // "Searching for: " +
+    // model.getCurrentPlayer().getCurrentGoal().getType().toString());
 
     ArrayList<Position> availableCardInsertionPoint = model.getAvailableCardInsertionPoint();
     HashMap<Move, PositionDistance> ClosestGoalPositionsMap = new HashMap<>();
@@ -31,18 +33,23 @@ public class Bot {
         modelCopy.insertCard(cardInsertionPosition);
 
         Player currentPlayerCopy = modelCopy.getCurrentPlayer();
-        Position currentGoalPosition = currentPlayerCopy.getCurrentGoal().getPosition();
+        Position currentGoalPosition;
+
+        if (currentPlayerCopy.getCurrentGoal() == null) {
+          currentGoalPosition = currentPlayerCopy.getStartPosition();
+        } else {
+          currentGoalPosition = currentPlayerCopy.getCurrentGoal().getPosition();
+        }
 
         if (currentGoalPosition.equals(new Position(-1, -1))) {
           // skip if the goal is on the available card
           continue;
         }
 
-        ArrayList<Position> reachablePlayerPositions =
-            modelCopy.findPath(currentPlayerCopy.getPosition(), currentGoalPosition);
+        ArrayList<Position> reachablePlayerPositions = modelCopy.findPath(currentPlayerCopy.getPosition(),
+            currentGoalPosition);
 
-        PositionDistance closestGoalPosition2 =
-            findClosestGoalPosition(reachablePlayerPositions, currentGoalPosition);
+        PositionDistance closestGoalPosition2 = findClosestGoalPosition(reachablePlayerPositions, currentGoalPosition);
 
         Move move2 = new Move(cardInsertionPosition, i);
         ClosestGoalPositionsMap.put(move2, closestGoalPosition2);
@@ -66,6 +73,12 @@ public class Bot {
       this.model.insertCard(bestMove.getInsertPosition());
       this.model.movePlayer(bestPosition.row, bestPosition.col);
     }
+
+    model.goalObtained(model.getCurrentPlayer());
+    // goalObtained();
+    if (model.gameOver())
+      System.out.println("game over");
+
   }
 
   class Move {

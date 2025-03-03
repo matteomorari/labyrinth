@@ -15,7 +15,7 @@ public class Labyrinth extends BaseModel {
   private Card availableCard;
   private Position lastInsertedCardPosition;
   private ArrayList<Position> lastPlayerMovedPath;
-  private static final int GOALS_FOR_PLAYER = 2;
+  private static final int GOALS_FOR_PLAYER = 3;
 
   private int boardSize;
 
@@ -105,7 +105,7 @@ public class Labyrinth extends BaseModel {
           int x = (int) (Math.random() * this.boardSize);
           int y = (int) (Math.random() * this.boardSize);
           Card card = this.board.get(x).get(y);
-          if (card.getGoal() == null) {
+          if (card.getGoal() == null && validGoalPosition(x, y)) {
             card.setGoal(goal);
             goal.setPosition(card.getPosition());
             isAssigned = true;
@@ -113,8 +113,15 @@ public class Labyrinth extends BaseModel {
         }
       }
     }
-
     this.fireChangeListener();
+  }
+
+  public boolean validGoalPosition(int x, int y) {
+    if ((x == 0 && y == 0) || (x == 0 && y == this.boardSize - 1) || (x == this.boardSize - 1 && y == 0)
+        || (x == this.boardSize - 1 && y == this.boardSize - 1))
+      return false;
+
+    return true;
   }
 
   public ArrayList<ArrayList<Card>> initBoard() {
@@ -123,7 +130,7 @@ public class Labyrinth extends BaseModel {
     for (int i = 0; i < this.boardSize; i++) {
       ArrayList<Card> row = new ArrayList<Card>();
       for (int j = 0; j < this.boardSize; j++) {
-        // the card in the corner must by of the type L
+        // the card in the corner must be of the type L
         Card card = null;
         if ((i == 0 && j == 0)
             || (i == 0 && j == this.boardSize - 1)
@@ -151,10 +158,9 @@ public class Labyrinth extends BaseModel {
 
     // set the players to their start card
     for (Player player : this.players) {
-      Card card =
-          this.board
-              .get(player.getStartPosition().getRow())
-              .get(player.getStartPosition().getCol());
+      Card card = this.board
+          .get(player.getStartPosition().getRow())
+          .get(player.getStartPosition().getCol());
       card.addPlayer(player);
     }
     return this.board;
@@ -201,9 +207,12 @@ public class Labyrinth extends BaseModel {
 
     Position endPosition = getOppositePosition(insertPosition);
 
-    // 1 if the cards are move from the top to the bottom or from the left to the right
-    // -1 if the cards are move from the bottom to the top or from the right to the left
-    // 0 if the row/col is the same and so the relative position won't change in the following cycle
+    // 1 if the cards are moved from the top to the bottom or from the left to the
+    // right
+    // -1 if the cards are moved from the bottom to the top or from the right to the
+    // left
+    // 0 if the row/col is the same and so the relative position won't change in the
+    // following cycle
     int rowDirection = Integer.compare(endPosition.getRow(), insertPosition.row);
     int colDirection = Integer.compare(endPosition.getCol(), insertPosition.col);
 
@@ -219,26 +228,26 @@ public class Labyrinth extends BaseModel {
     this.lastInsertedCardPosition = insertPosition;
     // print from player
     // for (Player player : this.getPlayers()) {
-    //   for (Goal goal : player.getGoals()) {
-    //     Goal playerGoal = goal;
-    //     Goal boardGoal;
+    // for (Goal goal : player.getGoals()) {
+    // Goal playerGoal = goal;
+    // Goal boardGoal;
 
-    //     for (int i = 0; i < boardSize; i++) {
-    //       for (int j = 0; j < boardSize; j++) {
-    //         boardGoal = board.get(i).get(j).getGoal();
-    //         if (boardGoal != null) {
-    //           if (playerGoal.getType().equals(boardGoal.getType())) {
-    //             System.out.println(playerGoal.getType());
-    //             System.out.println("Player: " + playerGoal.getPosition());
-    //             System.out.println("Goal: " + boardGoal.getPosition());
-    //             System.out.println(
-    //                 "Hash: " + (playerGoal == boardGoal));
-    //             System.out.println();
-    //           }
-    //         }
-    //       }
-    //     }
-    //   }
+    // for (int i = 0; i < boardSize; i++) {
+    // for (int j = 0; j < boardSize; j++) {
+    // boardGoal = board.get(i).get(j).getGoal();
+    // if (boardGoal != null) {
+    // if (playerGoal.getType().equals(boardGoal.getType())) {
+    // System.out.println(playerGoal.getType());
+    // System.out.println("Player: " + playerGoal.getPosition());
+    // System.out.println("Goal: " + boardGoal.getPosition());
+    // System.out.println(
+    // "Hash: " + (playerGoal == boardGoal));
+    // System.out.println();
+    // }
+    // }
+    // }
+    // }
+    // }
     // }
     this.fireChangeListener();
   }
@@ -295,8 +304,7 @@ public class Labyrinth extends BaseModel {
       int currentRow = endPosition.row - (i + 1) * rowDirection;
       int currentCol = endPosition.col - (i + 1) * colDirection;
       Card cardToMove = this.board.get(currentRow).get(currentCol);
-      Position newPosition =
-          new Position(endPosition.row - i * rowDirection, endPosition.col - i * colDirection);
+      Position newPosition = new Position(endPosition.row - i * rowDirection, endPosition.col - i * colDirection);
       this.updateCardPosition(cardToMove, newPosition);
     }
   }
@@ -311,7 +319,8 @@ public class Labyrinth extends BaseModel {
 
   // using Dijkstra's algorithm
   // TODO: https://www.baeldung.com/java-solve-maze
-  // public ArrayList<Position> findPath(int startRow, int startCol, int endRow, int endCol) {
+  // public ArrayList<Position> findPath(int startRow, int startCol, int endRow,
+  // int endCol) {
   public ArrayList<Position> findPath(Position startPosition, Position endPosition) {
     PriorityQueue<Card> nodeDistanceQueue = new PriorityQueue<>(new NodeComparator());
     ArrayList<Position> path = new ArrayList<>();
@@ -446,10 +455,9 @@ public class Labyrinth extends BaseModel {
 
     // TODO: use proper Card method
     this.hasCurrentPlayerMoved = true;
-    Card previousPlayerCard =
-        this.board
-            .get(currentPlayer.getPosition().getRow())
-            .get(currentPlayer.getPosition().getCol());
+    Card previousPlayerCard = this.board
+        .get(currentPlayer.getPosition().getRow())
+        .get(currentPlayer.getPosition().getCol());
     previousPlayerCard.removePlayer(currentPlayer);
     this.board.get(row).get(col).addPlayer(currentPlayer);
     currentPlayer.setPosition(row, col);
@@ -484,5 +492,20 @@ public class Labyrinth extends BaseModel {
 
   public boolean hasCurrentPlayerMoved() {
     return hasCurrentPlayerMoved;
+  }
+
+  public boolean gameOver() {
+    for (Player player : players) {
+      if (player.getGoals().isEmpty() && player.getPosition().equals(player.getStartPosition()))
+        return true;
+    }
+    return false;
+  }
+
+  public void goalObtained(Player player) {
+    if (!player.getGoals().isEmpty() && player.getCurrentGoal().getPosition().equals(player.getPosition())) {
+      System.out.println(player.getCurrentGoal().getType().toString() + " has been taken");
+      player.getGoals().removeFirst();
+    }
   }
 }
