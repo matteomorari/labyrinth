@@ -14,18 +14,16 @@ public class Bot {
 
   public Bot(Labyrinth model, Player player) {
     this.model = model;
-    // this.player;
+    //TODO: this.player;
   }
 
-  // TODO! if the goal changes, the goal position in the users queu isn't updated
-  // correctly
+  // TODO! if the goal changes, the goal position in the users queu isn't updated correctly
   public void calcMove() {
-    // System.out.println(
-    // "Searching for: " +
-    // model.getCurrentPlayer().getCurrentGoal().getType().toString());
+    System.out.println(
+        "Searching for: " + model.getCurrentPlayer().getCurrentGoal().getType().toString());
 
     ArrayList<Position> availableCardInsertionPoint = model.getAvailableCardInsertionPoint();
-    HashMap<Move, PositionDistance> ClosestGoalPositionsMap = new HashMap<>();
+    HashMap<Move, PositionDistance> closestGoalPositionsMap = new HashMap<>();
     for (Position cardInsertionPosition : availableCardInsertionPoint) {
       for (int i = 0; i < Orientation.values().length; i++) {
         Labyrinth modelCopy = myGson.createCopy(model);
@@ -35,7 +33,8 @@ public class Bot {
         Player currentPlayerCopy = modelCopy.getCurrentPlayer();
         Position currentGoalPosition;
 
-        if (currentPlayerCopy.getCurrentGoal() == null) {
+        if (currentPlayerCopy.getGoals().isEmpty()) {
+          // if the player has already found all the goals, to win must reach the start position
           currentGoalPosition = currentPlayerCopy.getStartPosition();
         } else {
           currentGoalPosition = currentPlayerCopy.getCurrentGoal().getPosition();
@@ -46,21 +45,22 @@ public class Bot {
           continue;
         }
 
-        ArrayList<Position> reachablePlayerPositions = modelCopy.findPath(currentPlayerCopy.getPosition(),
-            currentGoalPosition);
+        ArrayList<Position> reachablePlayerPositions =
+            modelCopy.findPath(currentPlayerCopy.getPosition(), currentGoalPosition);
 
-        PositionDistance closestGoalPosition2 = findClosestGoalPosition(reachablePlayerPositions, currentGoalPosition);
+        PositionDistance closestGoalPosition2 =
+            findClosestGoalPosition(reachablePlayerPositions, currentGoalPosition);
 
         Move move2 = new Move(cardInsertionPosition, i);
-        ClosestGoalPositionsMap.put(move2, closestGoalPosition2);
+        closestGoalPositionsMap.put(move2, closestGoalPosition2);
       }
     }
 
     Move bestMove = null;
     Position bestPosition = null;
     int minDistance = Integer.MAX_VALUE;
-    for (Move move : ClosestGoalPositionsMap.keySet()) {
-      PositionDistance closestGoalPosition = ClosestGoalPositionsMap.get(move);
+    for (Move move : closestGoalPositionsMap.keySet()) {
+      PositionDistance closestGoalPosition = closestGoalPositionsMap.get(move);
       if (closestGoalPosition.distance < minDistance) {
         minDistance = closestGoalPosition.distance;
         bestMove = move;
@@ -74,20 +74,16 @@ public class Bot {
       this.model.movePlayer(bestPosition.row, bestPosition.col);
     }
 
-    model.goalObtained(model.getCurrentPlayer());
-    // goalObtained();
-    if (model.gameOver())
-      System.out.println("game over");
-
+    model.isGoalFound(model.getCurrentPlayer());
   }
 
   class Move {
     Position insertPosition;
     int cardRotateNumber;
 
-    Move(Position insertPosition, int CardRotateNumber) {
+    Move(Position insertPosition, int cardRotateNumber) {
       this.insertPosition = insertPosition;
-      this.cardRotateNumber = CardRotateNumber;
+      this.cardRotateNumber = cardRotateNumber;
     }
 
     public void setCardRotateNumber(int cardRotateNumber) {

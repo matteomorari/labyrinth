@@ -11,8 +11,9 @@ public class Player {
   private Color color;
   private String name;
 
-  public Player() {
-    this.goalsQueue = new ArrayDeque<Goal>();
+  public Player(String name) {
+    this.name = name;
+    this.goalsQueue = new ArrayDeque<>();
     this.position = new Position();
     this.startPosition = new Position();
   }

@@ -62,13 +62,21 @@ public class LabyrinthClientMain {
       labyrinthModel = myGson.fromJson(deepCopy);
     } else {
       labyrinthModel = new Labyrinth();
-      Player player1 = new Player();
+      Player player1 = new Player("Pippo");
       player1.setColor(Color.RED);
       labyrinthModel.addPlayer(player1);
 
-      Player player2 = new Player();
+      Player player2 = new Player("Pluto");
       player2.setColor(Color.YELLOW);
       labyrinthModel.addPlayer(player2);
+
+      Player player3 = new Player("Minni");
+      player3.setColor(Color.BLUE);
+      labyrinthModel.addPlayer(player3);
+
+      Player player4 = new Player("Giampiero");
+      player4.setColor(Color.GREEN);
+      labyrinthModel.addPlayer(player4);
     }
 
     LabyrinthLocalController controller = new LabyrinthLocalController(labyrinthModel);

@@ -57,7 +57,8 @@ public class Animator {
     float easedProgress = easingFunction.ease(progress);
 
     for (int i = 0; i < startValues.length; i++) {
-      currentValues[i] = (int) (startValues[i] + easedProgress * (endValues[i] - startValues[i]));
+      int delta = endValues[i] - startValues[i];
+      currentValues[i] = (int) (startValues[i] + easedProgress * delta);
     }
 
     target.updateAnimation(currentValues);
