@@ -12,7 +12,7 @@ import java.util.Random;
 
 public class Labyrinth extends BaseModel {
   private static final int GOALS_FOR_PLAYER = 6;
-  private final Random random = new Random();
+  private final transient Random random = new Random();
 
   private int boardSize;
   private ArrayDeque<Player> players;
