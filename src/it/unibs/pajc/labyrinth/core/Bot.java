@@ -19,8 +19,13 @@ public class Bot {
 
   // TODO! if the goal changes, the goal position in the users queu isn't updated correctly
   public void calcMove() {
-    System.out.println(
-        "Searching for: " + model.getCurrentPlayer().getCurrentGoal().getType().toString());
+
+    if(model.getCurrentPlayer().getGoals().isEmpty()){
+      System.out.println("going at the base!!");
+    }else{
+      System.out.println(
+          "Searching for: " + model.getCurrentPlayer().getCurrentGoal().getType().toString());
+    }
 
     ArrayList<Position> availableCardInsertionPoint = model.getAvailableCardInsertionPoint();
     HashMap<Move, PositionDistance> closestGoalPositionsMap = new HashMap<>();
@@ -73,8 +78,6 @@ public class Bot {
       this.model.insertCard(bestMove.getInsertPosition());
       this.model.movePlayer(bestPosition.row, bestPosition.col);
     }
-
-    model.isGoalFound(model.getCurrentPlayer());
   }
 
   class Move {

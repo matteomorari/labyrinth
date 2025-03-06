@@ -11,7 +11,7 @@ import java.util.PriorityQueue;
 import java.util.Random;
 
 public class Labyrinth extends BaseModel {
-  private static final int GOALS_FOR_PLAYER = 6;
+  private static final int GOALS_FOR_PLAYER = 2;
   private final transient Random random = new Random();
 
   private int boardSize;
@@ -475,6 +475,8 @@ public class Labyrinth extends BaseModel {
 
     this.lastPlayerMovedPath = path;
     this.fireChangeListener();
+    isGoalFound(currentPlayer);
+    isGameFinished();
   }
 
   public ArrayList<Position> getLastPlayerMovedPath() {
