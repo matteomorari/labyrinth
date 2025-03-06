@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 public class Card extends Node {
   CardType type;
+  private String uniqueID;
   private boolean isNordOpen;
   private boolean isEastOpen;
   private boolean isSouthOpen;
@@ -15,7 +16,7 @@ public class Card extends Node {
   private Goal goal;
   private ArrayList<Player> players;
 
-  public Card(CardType type) {
+  public Card(CardType type, String uniqueID) {
     this.type = type;
     this.isNordOpen = type.isNordOpen();
     this.isEastOpen = type.isEastOpen();
@@ -147,5 +148,22 @@ public class Card extends Node {
         + ", goal="
         + goal
         + "]";
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    Card other = (Card) obj;
+    return uniqueID != null && uniqueID.equals(other.uniqueID);
+  }
+
+  @Override
+  public int hashCode() {
+    return uniqueID != null ? uniqueID.hashCode() : 0;
   }
 }

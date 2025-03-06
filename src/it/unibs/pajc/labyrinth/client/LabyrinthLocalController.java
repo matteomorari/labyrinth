@@ -51,23 +51,7 @@ public class LabyrinthLocalController implements LabyrinthController {
     return model.lastInsertedCardPosition();
   }
 
-  @Override
-  public void setHasCurrentPlayerInserted(boolean hasCurrentPlayerInserted) {
-    model.setHasCurrentPlayerInserted(hasCurrentPlayerInserted);
-  }
-
-  @Override
-  public void setHasCurrentPlayerMoved(boolean hasCurrentPlayerMoved) {
-    model.setHasCurrentPlayerMoved(hasCurrentPlayerMoved);
-  }
-
-  @Override
-  public boolean hasCurrentPlayerInserted() {
-    return model.hasCurrentPlayerInserted();
-  }
-
-  @Override
-  public boolean hasCurrentPlayerMoved() {
-    return model.hasCurrentPlayerMoved();
+  public Card getAvailableCard() {
+    return model.getAvailableCard();
   }
 }

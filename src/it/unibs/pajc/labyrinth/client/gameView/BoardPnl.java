@@ -18,6 +18,7 @@ import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javax.swing.JPanel;
 
 public class BoardPnl extends JPanel implements MouseListener, Animatable {
@@ -29,9 +30,13 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
   private ArrayList<ArrayList<Card>> board;
   private LabyrinthController controller;
   private Player currentPlayer;
+  private Card currentAvailableCard;
+  private Card previousAvailableCard;
+  private HashMap<Player, Position> lastPlayerPositions;
   private ArrayList<Position> lastPlayerMovedPath;
   private ArrayList<Shape> arrowBoundsList;
   private int cellSize;
+  private Player playerToAnimate;
   private boolean cardAnimationInProgress = false;
   private boolean playerPositionInProgress = false;
   private Position playerAnimationPreviousPoint;
@@ -49,8 +54,23 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     this.arrowBoundsList = new ArrayList<>();
     this.lastCardInsertPosition = new Position();
     this.lastPlayerMovedPath = new ArrayList<>();
+    this.lastPlayerPositions = new HashMap<>();
 
-    boardSize = controller.getBoardSize();
+    initData();
+  }
+
+  private void initData() {
+    this.currentAvailableCard = controller.getAvailableCard();
+    this.previousAvailableCard = currentAvailableCard;
+    this.boardSize = controller.getBoardSize();
+
+    updateLastPlayerPosition();
+  }
+
+  private void updateLastPlayerPosition() {
+    for (Player player : controller.getPlayers()) {
+      lastPlayerPositions.put(player, new Position(player.getPosition()));
+    }
   }
 
   @Override
@@ -70,6 +90,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
 
   private void updateData() {
     this.currentPlayer = controller.getCurrentPlayer();
+    this.currentAvailableCard = controller.getAvailableCard();
     this.board = controller.getBoard();
   }
 
@@ -79,31 +100,45 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     //   return;
     // }
 
-    if (controller.hasCurrentPlayerInserted()) {
-      controller.setHasCurrentPlayerInserted(false);
+    // check if a new card has been inserted
+    if (!currentAvailableCard.equals(previousAvailableCard)) {
+      // controller.setHasCurrentPlayerInserted(false); //!
       lastCardInsertPosition = controller.lastInsertedCardPosition();
+      previousAvailableCard = currentAvailableCard;
+      updateLastPlayerPosition();
       fireCardInsertAnimation();
-      // return;
+      return;
     }
 
-    if (controller.hasCurrentPlayerMoved()) {
-      controller.setHasCurrentPlayerMoved(false);
-      lastPlayerMovedPath = controller.getLastPlayerMovedPath();
-      firePlayerMoveAnimation();
-    }
+    // check if a player has moved
+      for (Player player : controller.getPlayers()) {
+        if (!player.getPosition().equals(lastPlayerPositions.get(player))) {
+          this.lastPlayerPositions.put(player, new Position(player.getPosition()));
+          this.lastPlayerMovedPath = controller.getLastPlayerMovedPath();
+          this.playerToAnimate = player;
+          firePlayerMoveAnimation();
+          return;
+        }
+      }
+
+    // if (controller.hasCurrentPlayerMoved()) {
+    //   controller.setHasCurrentPlayerMoved(false); //!
+    //   lastPlayerMovedPath = controller.getLastPlayerMovedPath();
+    //   firePlayerMoveAnimation();
+    // }
   }
 
   // TODO: change name firePlayerMoveAnimation and initializeAnimation
+  private void fireCardInsertAnimation() {
+    cardAnimationInProgress = true;
+    startAnimation();
+  }
+
   private void firePlayerMoveAnimation() {
     startAnimation();
     playerAnimationPreviousPoint = lastPlayerMovedPath.get(0);
     playerAnimationFuturePoint = lastPlayerMovedPath.get(1);
     playerPositionInProgress = true;
-  }
-
-  private void fireCardInsertAnimation() {
-    cardAnimationInProgress = true;
-    startAnimation();
   }
 
   private void startAnimation() {
@@ -212,7 +247,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     int posX = initialXPosition;
     int posY = initialYPosition;
 
-    if (playerPositionInProgress && player.equals(currentPlayer)) {
+    if (playerPositionInProgress && player.equals(playerToAnimate)) {
       posX += playerAnimationPreviousPoint.getCol() * cellSize;
       posY += playerAnimationPreviousPoint.getRow() * cellSize;
       posX +=

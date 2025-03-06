@@ -23,11 +23,5 @@ public interface LabyrinthController {
 
   Position lastInsertedCardPosition();
 
-  void setHasCurrentPlayerInserted(boolean hasCurrentPlayerInserted);
-
-  void setHasCurrentPlayerMoved(boolean hasCurrentPlayerMoved);
-
-  boolean hasCurrentPlayerInserted();
-
-  boolean hasCurrentPlayerMoved();
+  Card getAvailableCard();
 }

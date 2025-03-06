@@ -80,14 +80,14 @@ public class LabyrinthClientMain {
     }
 
     LabyrinthLocalController controller = new LabyrinthLocalController(labyrinthModel);
+    if (!LOAD_FROM_FILE) {
+      controller.initGame();
+    }
+
     JPanel gamePanel = new GamePnl(controller);
     labyrinthModel.addChangeListener(e -> gamePanel.repaint());
     frame.add(gamePanel, BorderLayout.CENTER);
     frame.setVisible(true);
-
-    if (!LOAD_FROM_FILE) {
-      controller.initGame();
-    }
 
     // TODO: to remove
     Bot bot1 = new Bot(labyrinthModel, labyrinthModel.getCurrentPlayer());

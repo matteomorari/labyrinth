@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.UUID;
 
 public class Labyrinth extends BaseModel {
   private static final int GOALS_FOR_PLAYER = 2;
@@ -20,7 +21,7 @@ public class Labyrinth extends BaseModel {
   private Card availableCard;
   private Position lastInsertedCardPosition;
   private ArrayList<Position> lastPlayerMovedPath;
-  private boolean hasCurrentPlayerMoved = false;
+  // TODO: to move to the player class?
   private boolean hasCurrentPlayerInserted = false;
 
   public Labyrinth() {
@@ -77,8 +78,13 @@ public class Labyrinth extends BaseModel {
     return this.players.peek();
   }
 
+  public void skipTurn() {
+    nextPlayer();
+  }
+
   public Player nextPlayer() {
     this.players.add(this.players.poll());
+    this.hasCurrentPlayerInserted = false;
     return this.getCurrentPlayer();
   }
 
@@ -140,7 +146,7 @@ public class Labyrinth extends BaseModel {
             || (i == 0 && j == this.boardSize - 1)
             || (i == this.boardSize - 1 && j == 0)
             || (i == this.boardSize - 1 && j == this.boardSize - 1)) {
-          card = new Card(CardType.L);
+          card = new Card(CardType.L, UUID.randomUUID().toString());
         } else {
           card = this.createRandomCard();
         }
@@ -174,7 +180,7 @@ public class Labyrinth extends BaseModel {
   private Card createRandomCard() {
     CardType cardType = CardType.values()[random.nextInt(CardType.values().length)];
     int randomAngle = random.nextInt(Orientation.values().length);
-    return new Card(cardType).rotate(randomAngle);
+    return new Card(cardType, UUID.randomUUID().toString()).rotate(randomAngle);
   }
 
   public ArrayDeque<Player> getPlayers() {
@@ -193,6 +199,15 @@ public class Labyrinth extends BaseModel {
     this.availableCard = availableCard;
   }
 
+  public Card getPlayerCard(Player player) {
+    Position playerPosition = player.getPosition();
+    if (availableCard.getPosition().equals(playerPosition)) {
+      return availableCard;
+    }
+    
+    return this.board.get(player.getPosition().getRow()).get(player.getPosition().getCol());
+  }
+
   public void insertCard(Position insertPosition) {
     validatePosition(insertPosition);
 
@@ -204,6 +219,10 @@ public class Labyrinth extends BaseModel {
     if (this.lastInsertedCardPosition != null
         && getOppositePosition(insertPosition).equals(this.lastInsertedCardPosition)) {
       System.out.println("Illegal move");
+      return;
+    }
+
+    if (hasCurrentPlayerInserted) {
       return;
     }
 
@@ -309,7 +328,33 @@ public class Labyrinth extends BaseModel {
       Position newPosition =
           new Position(endPosition.row - i * rowDirection, endPosition.col - i * colDirection);
       this.updateCardPosition(cardToMove, newPosition);
+
+      // if the player can't move, go to the next player immediately
+      if (getCardOpenDirection(getPlayerCard(getCurrentPlayer())).isEmpty()) {
+        nextPlayer();
+      }
     }
+  }
+
+  // ! seems to not reflect the actual state of the board
+  private ArrayList<Orientation> getCardOpenDirection(Card card) {
+    ArrayList<Orientation> openOrientation = new ArrayList<>();
+    for (Orientation orientation : Orientation.values()) {
+      Position neighborPosition = getNeighborPosition(card.getPosition(), orientation);
+      // Check if the neighbor position is within the board boundaries
+      // TODO: move in the getNeighborPosition, if out of bounds return Exception
+      if (isPositionWithinBounds(neighborPosition.getRow(), neighborPosition.getCol())) {
+        Boolean isOpen =
+            isPathOpenBetweenCards(
+                card,
+                this.board.get(neighborPosition.getRow()).get(neighborPosition.getCol()),
+                orientation);
+        if (isOpen) {
+          openOrientation.add(orientation);
+        }
+      }
+    }
+    return openOrientation;
   }
 
   private void updateCardPosition(Card card, Position newPosition) {
@@ -459,12 +504,11 @@ public class Labyrinth extends BaseModel {
     Position currentPosition = currentPlayer.getPosition();
     ArrayList<Position> path = this.findPath(currentPosition, new Position(row, col));
 
-    if (!path.contains(new Position(row, col)) || path.size() < 2) {
+    if (!path.contains(new Position(row, col)) || path.size() < 2 || !hasCurrentPlayerInserted) {
       return;
     }
 
     // TODO: use proper Card method
-    this.hasCurrentPlayerMoved = true;
     Card previousPlayerCard =
         this.board
             .get(currentPlayer.getPosition().getRow())
@@ -474,9 +518,10 @@ public class Labyrinth extends BaseModel {
     currentPlayer.setPosition(row, col);
 
     this.lastPlayerMovedPath = path;
-    this.fireChangeListener();
     isGoalFound(currentPlayer);
+    nextPlayer();
     isGameFinished();
+    this.fireChangeListener();
   }
 
   public ArrayList<Position> getLastPlayerMovedPath() {
@@ -487,24 +532,8 @@ public class Labyrinth extends BaseModel {
     return lastInsertedCardPosition;
   }
 
-  public void setHasCurrentPlayerInserted(boolean hasCurrentPlayerInserted) {
-    this.hasCurrentPlayerInserted = hasCurrentPlayerInserted;
-  }
-
-  public void setHasCurrentPlayerMoved(boolean hasCurrentPlayerMoved) {
-    this.hasCurrentPlayerMoved = hasCurrentPlayerMoved;
-  }
-
   public void setLastInsertedCardPosition(Position lastInsertedCardPosition) {
     this.lastInsertedCardPosition = lastInsertedCardPosition;
-  }
-
-  public boolean hasCurrentPlayerInserted() {
-    return hasCurrentPlayerInserted;
-  }
-
-  public boolean hasCurrentPlayerMoved() {
-    return hasCurrentPlayerMoved;
   }
 
   public boolean isGameFinished() {
