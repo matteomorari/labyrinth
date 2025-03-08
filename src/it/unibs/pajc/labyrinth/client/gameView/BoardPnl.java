@@ -111,15 +111,15 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     }
 
     // check if a player has moved
-      for (Player player : controller.getPlayers()) {
-        if (!player.getPosition().equals(lastPlayerPositions.get(player))) {
-          this.lastPlayerPositions.put(player, new Position(player.getPosition()));
-          this.lastPlayerMovedPath = controller.getLastPlayerMovedPath();
-          this.playerToAnimate = player;
-          firePlayerMoveAnimation();
-          return;
-        }
+    for (Player player : controller.getPlayers()) {
+      if (!player.getPosition().equals(lastPlayerPositions.get(player))) {
+        this.lastPlayerPositions.put(player, new Position(player.getPosition()));
+        this.lastPlayerMovedPath = controller.getLastPlayerMovedPath();
+        this.playerToAnimate = player;
+        firePlayerMoveAnimation();
+        return;
       }
+    }
 
     // if (controller.hasCurrentPlayerMoved()) {
     //   controller.setHasCurrentPlayerMoved(false); //!

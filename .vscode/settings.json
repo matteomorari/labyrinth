@@ -15,6 +15,9 @@
         "pajc"
     ],
     "java.configuration.updateBuildConfiguration": "interactive",
+    "[java]": {
+        "editor.defaultFormatter": "josevseb.google-java-format-for-vs-code"
+    },
     "java.format.settings.url": ".vscode/java-formatter.xml",
     // "java.checkstyle.configuration": "/google_checks.xml",
 }

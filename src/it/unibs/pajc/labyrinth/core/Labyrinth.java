@@ -48,25 +48,25 @@ public class Labyrinth extends BaseModel {
     }
 
     switch (playerCount) {
-    case 0:
-      this.players.add(player);
-      player.setStartPosition(0, 0);
-      break;
-    case 1:
-      this.players.add(player);
-      player.setStartPosition(boardSize - 1, boardSize - 1);
-      break;
-    case 2:
-      this.players.add(player);
-      player.setStartPosition(0, boardSize - 1);
-      break;
-    case 3:
-      this.players.add(player);
-      player.setStartPosition(boardSize - 1, 0);
-      break;
-    default:
-      // This should never happen because of the check above
-      throw new IllegalStateException("Unexpected player count: " + playerCount);
+      case 0:
+        this.players.add(player);
+        player.setStartPosition(0, 0);
+        break;
+      case 1:
+        this.players.add(player);
+        player.setStartPosition(boardSize - 1, boardSize - 1);
+        break;
+      case 2:
+        this.players.add(player);
+        player.setStartPosition(0, boardSize - 1);
+        break;
+      case 3:
+        this.players.add(player);
+        player.setStartPosition(boardSize - 1, 0);
+        break;
+      default:
+        // This should never happen because of the check above
+        throw new IllegalStateException("Unexpected player count: " + playerCount);
     }
   }
 
@@ -128,7 +128,9 @@ public class Labyrinth extends BaseModel {
   }
 
   private boolean isCornerPosition(int row, int col) {
-    return (row == 0 && col == 0) || (row == 0 && col == this.boardSize - 1) || (row == this.boardSize - 1 && col == 0)
+    return (row == 0 && col == 0)
+        || (row == 0 && col == this.boardSize - 1)
+        || (row == this.boardSize - 1 && col == 0)
         || (row == this.boardSize - 1 && col == this.boardSize - 1);
   }
 
@@ -140,7 +142,9 @@ public class Labyrinth extends BaseModel {
       for (int j = 0; j < this.boardSize; j++) {
         // the card in the corner must be of the type L
         Card card = null;
-        if ((i == 0 && j == 0) || (i == 0 && j == this.boardSize - 1) || (i == this.boardSize - 1 && j == 0)
+        if ((i == 0 && j == 0)
+            || (i == 0 && j == this.boardSize - 1)
+            || (i == this.boardSize - 1 && j == 0)
             || (i == this.boardSize - 1 && j == this.boardSize - 1)) {
           card = new Card(CardType.L, UUID.randomUUID().toString());
         } else {
@@ -164,7 +168,10 @@ public class Labyrinth extends BaseModel {
 
     // set the players to their start card
     for (Player player : this.players) {
-      Card card = this.board.get(player.getStartPosition().getRow()).get(player.getStartPosition().getCol());
+      Card card =
+          this.board
+              .get(player.getStartPosition().getRow())
+              .get(player.getStartPosition().getCol());
       card.addPlayer(player);
     }
     return this.board;
@@ -271,7 +278,9 @@ public class Labyrinth extends BaseModel {
 
   // TODO: there is a duplicate
   private void validatePosition(Position insertPosition) {
-    if (insertPosition.row < 0 || insertPosition.row >= this.boardSize || insertPosition.col < 0
+    if (insertPosition.row < 0
+        || insertPosition.row >= this.boardSize
+        || insertPosition.col < 0
         || insertPosition.col >= this.boardSize) {
       throw new IllegalArgumentException("Invalid position");
     }
@@ -320,7 +329,8 @@ public class Labyrinth extends BaseModel {
       int currentRow = endPosition.row - (i + 1) * rowDirection;
       int currentCol = endPosition.col - (i + 1) * colDirection;
       Card cardToMove = this.board.get(currentRow).get(currentCol);
-      Position newPosition = new Position(endPosition.row - i * rowDirection, endPosition.col - i * colDirection);
+      Position newPosition =
+          new Position(endPosition.row - i * rowDirection, endPosition.col - i * colDirection);
       this.updateCardPosition(cardToMove, newPosition);
     }
   }
@@ -333,8 +343,11 @@ public class Labyrinth extends BaseModel {
       // Check if the neighbor position is within the board boundaries
       // TODO: move in the getNeighborPosition, if out of bounds return Exception
       if (isPositionWithinBounds(neighborPosition.getRow(), neighborPosition.getCol())) {
-        Boolean isOpen = isPathOpenBetweenCards(card,
-            this.board.get(neighborPosition.getRow()).get(neighborPosition.getCol()), orientation);
+        Boolean isOpen =
+            isPathOpenBetweenCards(
+                card,
+                this.board.get(neighborPosition.getRow()).get(neighborPosition.getCol()),
+                orientation);
         if (isOpen) {
           openOrientation.add(orientation);
         }
@@ -410,7 +423,10 @@ public class Labyrinth extends BaseModel {
     return visitedPositions;
   }
 
-  private void processNeighbor(Card currentNode, Orientation orientation, PriorityQueue<Card> nodeDistanceQueue,
+  private void processNeighbor(
+      Card currentNode,
+      Orientation orientation,
+      PriorityQueue<Card> nodeDistanceQueue,
       ArrayList<Position> visitedPositions) {
 
     // Calculate neighbor position based on orientation
@@ -439,36 +455,37 @@ public class Labyrinth extends BaseModel {
     int col = currentPosition.getCol();
 
     switch (orientation) {
-    case NORD:
-      return new Position(row - 1, col);
-    case EAST:
-      return new Position(row, col + 1);
-    case SOUTH:
-      return new Position(row + 1, col);
-    case WEST:
-      return new Position(row, col - 1);
-    default:
-      return new Position(row, col); // This should never happen
+      case NORD:
+        return new Position(row - 1, col);
+      case EAST:
+        return new Position(row, col + 1);
+      case SOUTH:
+        return new Position(row + 1, col);
+      case WEST:
+        return new Position(row, col - 1);
+      default:
+        return new Position(row, col); // This should never happen
     }
   }
 
   // Helper method to check if the path between two cards is open
   private boolean isPathOpenBetweenCards(Card fromCard, Card toCard, Orientation direction) {
     switch (direction) {
-    case NORD:
-      return fromCard.isNordOpen() && toCard.isSouthOpen();
-    case EAST:
-      return fromCard.isEastOpen() && toCard.isWestOpen();
-    case SOUTH:
-      return fromCard.isSouthOpen() && toCard.isNordOpen();
-    case WEST:
-      return fromCard.isWestOpen() && toCard.isEastOpen();
-    default:
-      return false;
+      case NORD:
+        return fromCard.isNordOpen() && toCard.isSouthOpen();
+      case EAST:
+        return fromCard.isEastOpen() && toCard.isWestOpen();
+      case SOUTH:
+        return fromCard.isSouthOpen() && toCard.isNordOpen();
+      case WEST:
+        return fromCard.isWestOpen() && toCard.isEastOpen();
+      default:
+        return false;
     }
   }
 
-  private void updateNeighborDistance(Card currentNode, Card neighborCard, PriorityQueue<Card> nodeDistanceQueue) {
+  private void updateNeighborDistance(
+      Card currentNode, Card neighborCard, PriorityQueue<Card> nodeDistanceQueue) {
     currentNode.addCardConnected(neighborCard);
     if (neighborCard.getDistance() > currentNode.getDistance() + 1) {
       nodeDistanceQueue.add(neighborCard);
@@ -491,8 +508,10 @@ public class Labyrinth extends BaseModel {
     }
 
     // TODO: use proper Card method
-    Card previousPlayerCard = this.board.get(currentPlayer.getPosition().getRow())
-        .get(currentPlayer.getPosition().getCol());
+    Card previousPlayerCard =
+        this.board
+            .get(currentPlayer.getPosition().getRow())
+            .get(currentPlayer.getPosition().getCol());
     previousPlayerCard.removePlayer(currentPlayer);
     this.board.get(row).get(col).addPlayer(currentPlayer);
     currentPlayer.setPosition(row, col);
