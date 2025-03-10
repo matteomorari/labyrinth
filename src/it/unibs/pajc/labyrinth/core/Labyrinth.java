@@ -7,6 +7,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.UUID;
@@ -42,31 +43,32 @@ public class Labyrinth extends BaseModel {
   }
 
   public void addPlayer(Player player) {
-    int playerCount = players.size();
-    if (playerCount > 4) {
-      throw new IllegalArgumentException("Only 4 players are allowed");
-    }
+    this.players.add(player);
+  }
 
-    switch (playerCount) {
-      case 0:
-        this.players.add(player);
-        player.setStartPosition(0, 0);
-        break;
+  public void positionPlayers(){
+    Iterator<Player> it = players.iterator();
+    it.next().setPosition(0,0);
+
+    switch (players.size()) {
       case 1:
-        this.players.add(player);
-        player.setStartPosition(boardSize - 1, boardSize - 1);
         break;
       case 2:
-        this.players.add(player);
-        player.setStartPosition(0, boardSize - 1);
+        it.next().setPosition(0,0);
         break;
       case 3:
-        this.players.add(player);
-        player.setStartPosition(boardSize - 1, 0);
+        it.next().setPosition(0, boardSize - 1);
+        it.next().setPosition(boardSize - 1, boardSize - 1);
         break;
+      case 4:;
+        it.next().setPosition(0, boardSize - 1);
+        it.next().setPosition(boardSize - 1, boardSize - 1);
+        it.next().setPosition(boardSize - 1, 0);
+        break;
+      case 0:
       default:
         // This should never happen because of the check above
-        throw new IllegalStateException("Unexpected player count: " + playerCount);
+        throw new IllegalStateException("Unexpected player count: " + players.size());
     }
   }
 
@@ -90,6 +92,7 @@ public class Labyrinth extends BaseModel {
 
   public void initGame() {
     this.initBoard();
+    this.positionPlayers();
 
     // shuffle goals
     ArrayList<GoalType> goalsList = new ArrayList<>(Arrays.asList(GoalType.values()));
@@ -250,29 +253,6 @@ public class Labyrinth extends BaseModel {
     if (getCardOpenDirection(getPlayerCard(getCurrentPlayer())).isEmpty()) {
       nextPlayer();
     }
-    // print from player
-    // for (Player player : this.getPlayers()) {
-    // for (Goal goal : player.getGoals()) {
-    // Goal playerGoal = goal;
-    // Goal boardGoal;
-
-    // for (int i = 0; i < boardSize; i++) {
-    // for (int j = 0; j < boardSize; j++) {
-    // boardGoal = board.get(i).get(j).getGoal();
-    // if (boardGoal != null) {
-    // if (playerGoal.getType().equals(boardGoal.getType())) {
-    // System.out.println(playerGoal.getType());
-    // System.out.println("Player: " + playerGoal.getPosition());
-    // System.out.println("Goal: " + boardGoal.getPosition());
-    // System.out.println(
-    // "Hash: " + (playerGoal == boardGoal));
-    // System.out.println();
-    // }
-    // }
-    // }
-    // }
-    // }
-    // }
     this.fireChangeListener();
   }
 
