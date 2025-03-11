@@ -103,6 +103,7 @@ public class Labyrinth extends BaseModel {
     this.hasCurrentPlayerInserted = false;
     //in case due to card insertion the player change position and the goal is found
     isGoalFound(getCurrentPlayer());
+    System.out.println("Current player: " + this.getCurrentPlayer().getName());
     return this.getCurrentPlayer();
   }
 

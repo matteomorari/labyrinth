@@ -19,5 +19,7 @@
         "editor.defaultFormatter": "josevseb.google-java-format-for-vs-code"
     },
     "java.format.settings.url": ".vscode/java-formatter.xml",
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
     // "java.checkstyle.configuration": "/google_checks.xml",
 }

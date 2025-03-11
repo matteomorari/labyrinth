@@ -14,15 +14,15 @@ public class Bot {
 
   public Bot(Labyrinth model, Player player) {
     this.model = model;
-    //TODO: this.player;
+    // TODO: this.player;
   }
 
   // TODO! if the goal changes, the goal position in the users queu isn't updated correctly
   public void calcMove() {
 
-    if(model.getCurrentPlayer().getGoals().isEmpty()){
+    if (model.getCurrentPlayer().getGoals().isEmpty()) {
       System.out.println("going at the base!!");
-    }else{
+    } else {
       System.out.println(
           "Searching for: " + model.getCurrentPlayer().getCurrentGoal().getType().toString());
     }
@@ -76,10 +76,12 @@ public class Bot {
     if (bestMove != null && bestPosition != null) {
       this.model.getAvailableCard().rotate(bestMove.getCardRotateNumber());
       this.model.insertCard(bestMove.getInsertPosition());
-      if(model.getCurrentPlayer().getPosition().equals(bestPosition)){
+      if (model.getCurrentPlayer().getPosition().equals(bestPosition)) {
         System.out.println("I'm already in the best position");
+        this.model.skipTurn();
+      } else {
+        this.model.movePlayer(bestPosition.row, bestPosition.col);
       }
-      this.model.movePlayer(bestPosition.row, bestPosition.col);
     }
   }
 
