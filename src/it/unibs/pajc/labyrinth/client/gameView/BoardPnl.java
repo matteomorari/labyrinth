@@ -275,6 +275,18 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     return new int[] {posX, posY};
   }
 
+  private int[] getPlayerDirection() {
+  int posX , posY;
+  posX =
+          Integer.compare(
+                  playerAnimationFuturePoint.getCol(), playerAnimationPreviousPoint.getCol());
+  posY =
+          Integer.compare(
+                  playerAnimationFuturePoint.getRow(), playerAnimationPreviousPoint.getRow());
+
+  return new int[] {posX, posY};
+  }
+
   private int[] getCardAnimationPosition(int posX, int posY, Card card) {
     // TODO: improve
     int row = lastCardInsertPosition.getRow();

@@ -38,7 +38,8 @@ public enum ImageCntrl {
   GOAL_LIZARD("lizard.png"),
   GOAL_MAP("map.png"),
   GOAL_MOUSE("mouse.png"),
-  GOAL_FAIRY("fairy.png"),;
+  GOAL_FAIRY("fairy.png"),
+  GOAL_CARD("goal.png");
 
   private final Path path;
   private BufferedImage image;

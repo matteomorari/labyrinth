@@ -78,7 +78,6 @@ public class Bot {
       this.model.insertCard(bestMove.getInsertPosition());
       if(model.getCurrentPlayer().getPosition().equals(bestPosition)){
         System.out.println("I'm already in the best position");
-        model.skipTurn();
       }
       this.model.movePlayer(bestPosition.row, bestPosition.col);
     }

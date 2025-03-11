@@ -46,30 +46,44 @@ public class Labyrinth extends BaseModel {
     this.players.add(player);
   }
 
-  public void positionPlayers(){
-    Iterator<Player> it = players.iterator();
-    it.next().setPosition(0,0);
+  public void initializePlayerPositions() {
+    int numberOfPlayers = players.size();
 
-    switch (players.size()) {
-      case 1:
-        break;
-      case 2:
-        it.next().setPosition(0,0);
-        break;
-      case 3:
-        it.next().setPosition(0, boardSize - 1);
-        it.next().setPosition(boardSize - 1, boardSize - 1);
-        break;
-      case 4:;
-        it.next().setPosition(0, boardSize - 1);
-        it.next().setPosition(boardSize - 1, boardSize - 1);
-        it.next().setPosition(boardSize - 1, 0);
-        break;
-      case 0:
-      default:
-        // This should never happen because of the check above
-        throw new IllegalStateException("Unexpected player count: " + players.size());
+    if (numberOfPlayers < 2 || numberOfPlayers > 4) {
+      throw new IllegalArgumentException("Invalid number of players, must be between 2 and 4");
     }
+
+    Position[] cornerPositions = getCornerPositions();
+
+    // Define which corners to use based on player count
+    // All configurations start with TOP_LEFT (index 0)
+    int[][] playerConfigurations = {
+      {0, 2}, // 2 players: TOP_LEFT, BOTTOM_RIGHT
+      {0, 1, 2}, // 3 players: TOP_LEFT, TOP_RIGHT, BOTTOM_RIGHT
+      {0, 1, 2, 3} // 4 players: All corners
+    };
+
+    // Get the configuration for this number of players
+    int[] cornerIndices = playerConfigurations[numberOfPlayers - 2];
+
+    // Assign players to positions
+    Iterator<Player> it = players.iterator();
+    for (int i = 0; i < numberOfPlayers; i++) {
+      Player player = it.next();
+      Position corner = cornerPositions[cornerIndices[i]];
+      player.setPosition(corner.getRow(), corner.getCol());
+    }
+  }
+
+  private Position[] getCornerPositions() {
+    // Define all corner positions:
+    Position[] cornerPositions = {
+      new Position(0, 0), // TOP_LEFT
+      new Position(0, boardSize - 1), // TOP_RIGHT
+      new Position(boardSize - 1, boardSize - 1), // BOTTOM_RIGHT
+      new Position(boardSize - 1, 0) // BOTTOM_LEFT
+    };
+    return cornerPositions;
   }
 
   public void removePlayer(Player player) {
@@ -87,12 +101,14 @@ public class Labyrinth extends BaseModel {
   public Player nextPlayer() {
     this.players.add(this.players.poll());
     this.hasCurrentPlayerInserted = false;
+    //in case due to card insertion the player change position and the goal is found
+    isGoalFound(getCurrentPlayer());
     return this.getCurrentPlayer();
   }
 
   public void initGame() {
     this.initBoard();
-    this.positionPlayers();
+    this.initializePlayerPositions();
 
     // shuffle goals
     ArrayList<GoalType> goalsList = new ArrayList<>(Arrays.asList(GoalType.values()));

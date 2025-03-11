@@ -6,6 +6,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 public class GamePnl extends JPanel {
@@ -20,9 +22,12 @@ public class GamePnl extends JPanel {
 
     // Left panel (2 vertical components)
     JPanel leftPanel = new JPanel(new GridLayout(2, 1, 10, 10));
-    leftPanel.add(createPanel());
-    leftPanel.add(createPanel());
-    leftPanel.setPreferredSize(new Dimension(300, leftPanel.getPreferredSize().height));
+    leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+   
+    leftPanel.add(new GoalPnl(controller));
+    leftPanel.add(Box.createVerticalStrut(20));
+    leftPanel.add(new GoalStatusPnl(controller));
+    leftPanel.setPreferredSize(new Dimension(300, 350));
     add(leftPanel, BorderLayout.WEST);
 
     // Right panel (3 vertical components)
