@@ -39,8 +39,14 @@ public enum ImageCntrl {
   GOAL_MAP("map.png"),
   GOAL_MOUSE("mouse.png"),
   GOAL_FAIRY("fairy.png"),
-  GOAL_CARD("goal.png");
+  GOAL_CARD("goal.png"),
+  PLAYER1("player1_sprite.png"),
+  PLAYER2("player2_sprite.png"),
+  PLAYER3("player3_sprite.png"),
+  PLAYER4("player4_sprite.png"),
+  ;
 
+  private static final int IMAGE_SIZE = 72;
   private final Path path;
   private BufferedImage image;
 
@@ -63,6 +69,15 @@ public enum ImageCntrl {
     return image;
   }
 
+  public BufferedImage getSprite(int xGrid, int yGrid) {
+
+    if (image == null) {
+      System.out.println("invalid sprite sheet");
+    }
+
+    return image.getSubimage(xGrid * IMAGE_SIZE, yGrid * IMAGE_SIZE, IMAGE_SIZE, IMAGE_SIZE);
+  }
+
   public BufferedImage rotateImage(double angle) {
     double radians = Math.toRadians(angle);
     double sin = Math.abs(Math.sin(radians));
@@ -72,7 +87,8 @@ public enum ImageCntrl {
     int newWidth = (int) Math.floor(w * cos + h * sin);
     int newHeight = (int) Math.floor(h * cos + w * sin);
 
-    BufferedImage rotatedImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+    BufferedImage rotatedImage =
+        new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
     Graphics2D g2d = rotatedImage.createGraphics();
     g2d.setComposite(AlphaComposite.Src);
     AffineTransform at = new AffineTransform();

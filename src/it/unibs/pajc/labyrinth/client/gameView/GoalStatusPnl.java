@@ -1,78 +1,68 @@
 package it.unibs.pajc.labyrinth.client.gameView;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.util.ArrayDeque;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
 import it.unibs.pajc.labyrinth.core.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Player;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import javax.swing.JPanel;
 
 public class GoalStatusPnl extends JPanel {
-    private LabyrinthController controller;
-    private ArrayDeque<Player> players;
-    
-    public GoalStatusPnl(LabyrinthController controller) {
-        this.controller = controller;
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBackground(Color.LIGHT_GRAY);
-        refreshPanel();  
-    }
+  private LabyrinthController controller;
+  private final Font titleFont = new Font("Times New Roman", Font.BOLD, 20);
+  private final Font playerFont = new Font("Times New Roman", Font.PLAIN, 16);
 
+  public GoalStatusPnl(LabyrinthController controller) {
+    this.controller = controller;
+    setBackground(Color.LIGHT_GRAY);
+    setPreferredSize(new Dimension(300, 100));
+  }
 
-    public void refreshPanel(){
-        removeAll();
-        // Set a BoxLayout with Y_AXIS to allow better control over vertical layout
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBackground(Color.LIGHT_GRAY);
-    
-        // Add minimal space before the text label 
-        add(Box.createVerticalStrut(5)); 
-    
-        // text label
-        JPanel textPanel = new JPanel();
-        textPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        textPanel.setBackground(Color.LIGHT_GRAY);  
-    
-        // Create the label with the title
-        JLabel textLabel = new JLabel("<html><center>CARTE<br>RIMANENTI</center></html>", JLabel.CENTER);
-        textLabel.setFont(new Font("Times New Roman", Font.BOLD, 20)); 
-        textLabel.setForeground(Color.BLACK);
-        textLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-    
-        textPanel.add(textLabel);  
-        add(textPanel);  
-    
-        // Loop through each player and show their remaining goals
-        for(Player player : controller.getPlayers()){
-            // Create a text label for each player
-            JPanel playerPanel = new JPanel();
-            playerPanel.setAlignmentX(Component.CENTER_ALIGNMENT);  
-            playerPanel.setBackground(Color.LIGHT_GRAY);
-    
-            // Set a maximum size to prevent the player panel from growing too large
-            playerPanel.setMaximumSize(new Dimension(250, 20)); 
-            playerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-    
-            // Create a label showing the player's name and goals left
-            JLabel playerLabel = new JLabel("<html><center>- " + player.getName() + " " + player.getGoals().size() + " goals left</center></html>", JLabel.CENTER);
-            playerLabel.setFont(new Font("Times New Roman", Font.PLAIN, 16)); 
-            playerLabel.setForeground(Color.BLACK);
-            playerLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            playerLabel.setPreferredSize(new Dimension(250, 20));
-    
-            playerPanel.add(playerLabel);  
-            add(playerPanel); 
-        }
-    
-        // Set the preferred size of the GoalStatusPnl to make it smaller
-        setPreferredSize(new Dimension(300, 100)); 
+  @Override
+  protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
+
+    Graphics2D g2d = (Graphics2D) g;
+    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    g2d.setRenderingHint(
+        RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+    // Calculate dimensions
+    int width = getWidth();
+    int currentY = 15; // Starting Y position
+    int lineHeight = 20;
+
+    // Draw title
+    g2d.setFont(titleFont);
+    FontMetrics titleMetrics = g2d.getFontMetrics();
+    String titleLine1 = "CARTE";
+    String titleLine2 = "RIMANENTI";
+
+    int titleWidth1 = titleMetrics.stringWidth(titleLine1);
+    int titleWidth2 = titleMetrics.stringWidth(titleLine2);
+
+    g2d.drawString(titleLine1, (width - titleWidth1) / 2, currentY);
+    currentY += lineHeight;
+    g2d.drawString(titleLine2, (width - titleWidth2) / 2, currentY);
+    currentY += lineHeight + 5; // Add some spacing after title
+
+    // Draw player information
+    g2d.setFont(playerFont);
+    FontMetrics playerMetrics = g2d.getFontMetrics();
+
+    if (controller != null && controller.getPlayers() != null) {
+      for (Player player : controller.getPlayers()) {
+        String playerText =
+            "- " + player.getName() + " " + player.getGoals().size() + " goals left";
+        int textWidth = playerMetrics.stringWidth(playerText);
+
+        g2d.drawString(playerText, (width - textWidth) / 2, currentY);
+        currentY += lineHeight;
+      }
     }
+  }
 }

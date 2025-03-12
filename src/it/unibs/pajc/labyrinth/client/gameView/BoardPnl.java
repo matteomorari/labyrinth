@@ -234,6 +234,8 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     for (Player player : controller.getPlayers()) {
       g2.setColor(player.getColor());
       int[] playerPosition = getPlayerAnimationPosition(player, initialXPosition, initialYPosition);
+      // if (player.getName().equals("Blu"))
+      //   g2.drawImage(PlayerAnimation(standing), playerPosition[0], playerPosition[1], null);
       g2.fillOval(
           playerPosition[0] + cellSize / 3,
           playerPosition[1] + cellSize / 3,
@@ -241,6 +243,18 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
           cellSize / 3);
     }
   }
+
+  // private int frameCount2 = 0;
+
+  // public BufferedImage PlayerAnimation(BufferedImage[] frames) {
+
+  //   BufferedImage im = frames[frameCount2];
+  //   this.frameCount2 += 1;
+  //   if (frameCount2 >= frames.length) {
+  //     this.frameCount2 = 0;
+  //   }
+  //   return im;
+  // }
 
   private int[] getPlayerAnimationPosition(
       Player player, int initialXPosition, int initialYPosition) {
@@ -276,15 +290,13 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
   }
 
   private int[] getPlayerDirection() {
-  int posX , posY;
-  posX =
-          Integer.compare(
-                  playerAnimationFuturePoint.getCol(), playerAnimationPreviousPoint.getCol());
-  posY =
-          Integer.compare(
-                  playerAnimationFuturePoint.getRow(), playerAnimationPreviousPoint.getRow());
+    int posX, posY;
+    posX =
+        Integer.compare(playerAnimationFuturePoint.getCol(), playerAnimationPreviousPoint.getCol());
+    posY =
+        Integer.compare(playerAnimationFuturePoint.getRow(), playerAnimationPreviousPoint.getRow());
 
-  return new int[] {posX, posY};
+    return new int[] {posX, posY};
   }
 
   private int[] getCardAnimationPosition(int posX, int posY, Card card) {
