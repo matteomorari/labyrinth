@@ -6,6 +6,7 @@ import it.unibs.pajc.labyrinth.client.animation.EasingFunction;
 import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Player;
+import it.unibs.pajc.labyrinth.core.utility.Orientation;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -17,8 +18,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import javax.swing.JPanel;
 
 public class BoardPnl extends JPanel implements MouseListener, Animatable {
@@ -44,6 +48,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
   private Position lastCardInsertPosition;
   private int animationOffset = 0;
   private Animator animator;
+  private HashMap<List<Integer>, Orientation> playerDirectionImage;
 
   public BoardPnl(LabyrinthController controller) {
     setLayout(null);
@@ -55,6 +60,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     this.lastCardInsertPosition = new Position();
     this.lastPlayerMovedPath = new ArrayList<>();
     this.lastPlayerPositions = new HashMap<>();
+    this.playerDirectionImage = new HashMap<>();
 
     initData();
   }
@@ -226,35 +232,73 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     }
   }
 
+  // non serve
+  // private void setPlayersImage() {
+  //   for (Player player : controller.getPlayers()) {
+  //     this.playerAnimationImage.put(
+  //         player.getName(), ImageCntrl.valueOf(player.getName() + "_PLAYER_SPRITE"));
+  //   }
+  // }
+
   private void drawPlayers(Graphics2D g2) {
     int size = Math.min(getWidth(), getHeight());
     int initialXPosition = (getWidth() - size) / 2 + PADDING;
     int initialYPosition = (getHeight() - size) / 2 + PADDING;
+    // this.setPlayersImage();
+    this.setAnimationDirection();
 
     for (Player player : controller.getPlayers()) {
-      g2.setColor(player.getColor());
+
       int[] playerPosition = getPlayerAnimationPosition(player, initialXPosition, initialYPosition);
-      // if (player.getName().equals("Blu"))
-      //   g2.drawImage(PlayerAnimation(standing), playerPosition[0], playerPosition[1], null);
-      g2.fillOval(
-          playerPosition[0] + cellSize / 3,
-          playerPosition[1] + cellSize / 3,
-          cellSize / 3,
-          cellSize / 3);
+      int[] playerDirection = getPlayerDirection(player);
+
+      if (playerDirection[0] == 0 && playerDirection[1] == 0) {
+        g2.drawImage(
+            ImageCntrl.valueOf(player.getName() + "_PLAYER_SPRITE").getStandingAnimationImage(),
+            // playerAnimationImage.get(player.getName()).getStandingImage(),
+            playerPosition[0],
+            playerPosition[1],
+            null);
+      } else {
+        g2.drawImage(
+            PlayerAnimation(
+                ImageCntrl.valueOf(player.getName() + "_PLAYER_SPRITE")
+                    .getAnimationSprite()
+                    .get(
+                        playerDirectionImage.get(
+                            Arrays.asList(playerDirection[0], playerDirection[1])))),
+            playerPosition[0],
+            playerPosition[1],
+            null);
+        // g2.fillOval(
+        //     playerPosition[0] + cellSize / 3,
+        //     playerPosition[1] + cellSize / 3,
+        //     cellSize / 3,
+        //     cellSize / 3);
+      }
     }
   }
 
-  // private int frameCount2 = 0;
+  // iterates through the imagearray
+  private int frameCount = 0;
 
-  // public BufferedImage PlayerAnimation(BufferedImage[] frames) {
+  public BufferedImage PlayerAnimation(BufferedImage[] frames) {
 
-  //   BufferedImage im = frames[frameCount2];
-  //   this.frameCount2 += 1;
-  //   if (frameCount2 >= frames.length) {
-  //     this.frameCount2 = 0;
-  //   }
-  //   return im;
-  // }
+    BufferedImage im = frames[frameCount];
+    this.frameCount += 1;
+    if (frameCount >= frames.length) {
+      this.frameCount = 0;
+    }
+    return im;
+  }
+
+  // hashmap directions
+  private void setAnimationDirection() {
+    this.playerDirectionImage.put(Arrays.asList(0, -1), Orientation.NORD);
+    this.playerDirectionImage.put(Arrays.asList(-1, 0), Orientation.WEST);
+    this.playerDirectionImage.put(Arrays.asList(1, 0), Orientation.EAST);
+    this.playerDirectionImage.put(Arrays.asList(0, 1), Orientation.SOUTH);
+  }
 
   private int[] getPlayerAnimationPosition(
       Player player, int initialXPosition, int initialYPosition) {
@@ -289,13 +333,20 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     return new int[] {posX, posY};
   }
 
-  private int[] getPlayerDirection() {
+  private int[] getPlayerDirection(Player player) {
     int posX, posY;
-    posX =
-        Integer.compare(playerAnimationFuturePoint.getCol(), playerAnimationPreviousPoint.getCol());
-    posY =
-        Integer.compare(playerAnimationFuturePoint.getRow(), playerAnimationPreviousPoint.getRow());
 
+    if (playerPositionInProgress && player.equals(playerToAnimate)) {
+      posX =
+          Integer.compare(
+              playerAnimationFuturePoint.getCol(), playerAnimationPreviousPoint.getCol());
+      posY =
+          Integer.compare(
+              playerAnimationFuturePoint.getRow(), playerAnimationPreviousPoint.getRow());
+    } else {
+      posX = 0;
+      posY = 0;
+    }
     return new int[] {posX, posY};
   }
 
@@ -408,6 +459,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
         playerAnimationFuturePoint = lastPlayerMovedPath.get(index + 1);
       } else {
         playerPositionInProgress = false;
+        frameCount = 0;
       }
     }
     animationOffset = 0;

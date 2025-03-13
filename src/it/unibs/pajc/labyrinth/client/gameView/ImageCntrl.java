@@ -1,5 +1,6 @@
 package it.unibs.pajc.labyrinth.client.gameView;
 
+import it.unibs.pajc.labyrinth.core.utility.Orientation;
 import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
@@ -8,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import javax.imageio.ImageIO;
 
 public enum ImageCntrl {
@@ -40,10 +42,10 @@ public enum ImageCntrl {
   GOAL_MOUSE("mouse.png"),
   GOAL_FAIRY("fairy.png"),
   GOAL_CARD("goal.png"),
-  PLAYER1("player1_sprite.png"),
-  PLAYER2("player2_sprite.png"),
-  PLAYER3("player3_sprite.png"),
-  PLAYER4("player4_sprite.png"),
+  RED_PLAYER_SPRITE("red_player_sprite.png"),
+  BLACK_PLAYER_SPRITE("black_player_sprite.png"),
+  PINK_PLAYER_SPRITE("pink_player_sprite.png"),
+  GREEN_PLAYER_SPRITE("green_player_sprite.png"),
   ;
 
   private static final int IMAGE_SIZE = 72;
@@ -76,6 +78,29 @@ public enum ImageCntrl {
     }
 
     return image.getSubimage(xGrid * IMAGE_SIZE, yGrid * IMAGE_SIZE, IMAGE_SIZE, IMAGE_SIZE);
+  }
+
+  public HashMap<Orientation, BufferedImage[]> getAnimationSprite() {
+    HashMap<Orientation, BufferedImage[]> playerAnimation =
+        new HashMap<Orientation, BufferedImage[]>();
+
+    BufferedImage[] down = {getSprite(0, 0), getSprite(1, 0), getSprite(2, 0), getSprite(3, 0)};
+    playerAnimation.put(Orientation.SOUTH, down);
+
+    BufferedImage[] left = {getSprite(0, 1), getSprite(1, 1), getSprite(2, 1), getSprite(3, 1)};
+    playerAnimation.put(Orientation.WEST, left);
+
+    BufferedImage[] right = {getSprite(0, 2), getSprite(1, 2), getSprite(2, 2), getSprite(3, 2)};
+    playerAnimation.put(Orientation.EAST, right);
+
+    BufferedImage[] up = {getSprite(0, 3), getSprite(1, 3), getSprite(2, 3), getSprite(3, 3)};
+    playerAnimation.put(Orientation.NORD, up);
+
+    return playerAnimation;
+  }
+
+  public BufferedImage getStandingAnimationImage() {
+    return getSprite(1, 0);
   }
 
   public BufferedImage rotateImage(double angle) {

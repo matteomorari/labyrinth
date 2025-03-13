@@ -72,6 +72,8 @@ public class Labyrinth extends BaseModel {
       Player player = it.next();
       Position corner = cornerPositions[cornerIndices[i]];
       player.setPosition(corner.getRow(), corner.getCol());
+      //MA MORARIIII! SVEGLIA!!
+      player.setStartPosition(corner.getRow(), corner.getCol());
     }
   }
 
