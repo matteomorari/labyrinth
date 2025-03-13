@@ -11,48 +11,51 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import javax.swing.JPanel;
 
-public class GoalStatusPnl extends JPanel {
+public class GoalsPlayersPnl extends JPanel {
   private LabyrinthController controller;
-  private final Font titleFont = new Font("Times New Roman", Font.BOLD, 20);
+  private final Font titleFont = new Font("Times New Roman", Font.BOLD, 25);
   private final Font playerFont = new Font("Times New Roman", Font.PLAIN, 16);
 
-  public GoalStatusPnl(LabyrinthController controller) {
+  public GoalsPlayersPnl(LabyrinthController controller) {
     this.controller = controller;
-    setBackground(Color.LIGHT_GRAY);
-    setPreferredSize(new Dimension(300, 100));
   }
 
   @Override
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
 
-    Graphics2D g2d = (Graphics2D) g;
-    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    g2d.setRenderingHint(
+    Graphics2D g2 = (Graphics2D) g;
+    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    g2.setRenderingHint(
         RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+    // draw background
+    g2.setColor(Color.LIGHT_GRAY);
+    g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
 
     // Calculate dimensions
     int width = getWidth();
-    int currentY = 15; // Starting Y position
+    int currentY = 30; // Starting Y position
     int lineHeight = 20;
 
     // Draw title
-    g2d.setFont(titleFont);
-    FontMetrics titleMetrics = g2d.getFontMetrics();
+    g2.setFont(titleFont);
+    g2.setColor(Color.DARK_GRAY);
+    FontMetrics titleMetrics = g2.getFontMetrics();
     String titleLine1 = "CARTE";
     String titleLine2 = "RIMANENTI";
 
     int titleWidth1 = titleMetrics.stringWidth(titleLine1);
     int titleWidth2 = titleMetrics.stringWidth(titleLine2);
 
-    g2d.drawString(titleLine1, (width - titleWidth1) / 2, currentY);
+    g2.drawString(titleLine1, (width - titleWidth1) / 2, currentY);
     currentY += lineHeight;
-    g2d.drawString(titleLine2, (width - titleWidth2) / 2, currentY);
-    currentY += lineHeight + 5; // Add some spacing after title
+    g2.drawString(titleLine2, (width - titleWidth2) / 2, currentY);
+    currentY += lineHeight + 30; // Add some spacing after title
 
     // Draw player information
-    g2d.setFont(playerFont);
-    FontMetrics playerMetrics = g2d.getFontMetrics();
+    g2.setFont(playerFont);
+    FontMetrics playerMetrics = g2.getFontMetrics();
 
     if (controller != null && controller.getPlayers() != null) {
       for (Player player : controller.getPlayers()) {
@@ -60,9 +63,10 @@ public class GoalStatusPnl extends JPanel {
             "- " + player.getName() + " " + player.getGoals().size() + " goals left";
         int textWidth = playerMetrics.stringWidth(playerText);
 
-        g2d.drawString(playerText, (width - textWidth) / 2, currentY);
-        currentY += lineHeight;
+        g2.drawString(playerText, (width - textWidth) / 2, currentY);
+        currentY += lineHeight + 10;
       }
     }
+    setPreferredSize(new Dimension(300, currentY));
   }
 }

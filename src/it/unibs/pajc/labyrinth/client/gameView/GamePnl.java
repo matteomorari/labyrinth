@@ -9,6 +9,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 public class GamePnl extends JPanel {
   LabyrinthController controller;
@@ -16,19 +17,38 @@ public class GamePnl extends JPanel {
   public GamePnl(LabyrinthController controller) {
     this.controller = controller;
 
-    setLayout(new BorderLayout(10, 10));
+    setLayout(new BorderLayout(10, 10)); // set 10px padding between components
     this.setBorder(
         BorderFactory.createEmptyBorder(10, 10, 10, 10)); // 20px padding around the frame
 
     // Left panel (2 vertical components)
-    JPanel leftPanel = new JPanel(new GridLayout(2, 1, 10, 10));
+    JPanel leftPanel = new JPanel();
     leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
-   
-    leftPanel.add(new GoalPnl(controller));
-    leftPanel.add(Box.createVerticalStrut(20));
-    leftPanel.add(new GoalStatusPnl(controller));
-    leftPanel.setPreferredSize(new Dimension(300, 350));
-    add(leftPanel, BorderLayout.WEST);
+
+    // Create components for left panel
+    CurrentGoalPnl goalsPnl = new CurrentGoalPnl(controller);
+    goalsPnl.setAlignmentX(CENTER_ALIGNMENT);
+
+    GoalsPlayersPnl currentGoalPnl = new GoalsPlayersPnl(controller);
+    currentGoalPnl.setAlignmentX(CENTER_ALIGNMENT);
+
+    // Add components to left panel with flexible spacing
+    leftPanel.add(goalsPnl);
+    leftPanel.add(Box.createVerticalStrut(10));
+    leftPanel.add(currentGoalPnl);
+    leftPanel.revalidate();
+
+    // Set minimum width but let height be determined by content
+    leftPanel.setPreferredSize(new Dimension(300, 0));
+
+    // Wrap the leftPanel in a JScrollPane to handle overflow
+    JScrollPane leftScrollPane = new JScrollPane(leftPanel);
+    leftScrollPane.setPreferredSize(new Dimension(300, leftPanel.getPreferredSize().height));
+    leftScrollPane.setBorder(BorderFactory.createEmptyBorder());
+    leftScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+    leftScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+    add(leftScrollPane, BorderLayout.WEST);
 
     // Right panel (3 vertical components)
     JPanel rightPanel = new JPanel(new GridLayout(3, 1, 10, 10));
@@ -43,49 +63,6 @@ public class GamePnl extends JPanel {
     add(gameBoardPanel, BorderLayout.CENTER);
   }
 
-  // public GamePnl() {
-  //     setLayout(new GridBagLayout());
-  //     GridBagConstraints gbc = new GridBagConstraints();
-  //     gbc.insets = new Insets(10, 10, 10, 10);
-
-  //     // Left panel (2 vertical components)
-  //     JPanel leftPanel = new JPanel(new GridLayout(2, 1, 10, 10));
-  //     leftPanel.add(createPanel());
-  //     leftPanel.add(createPanel());
-  //     leftPanel.setPreferredSize(new Dimension(200, leftPanel.getPreferredSize().height));
-  //     gbc.gridx = 0;
-  //     gbc.gridy = 0;
-  //     gbc.anchor = GridBagConstraints.WEST;
-  //     gbc.fill = GridBagConstraints.VERTICAL;
-  //     gbc.weightx = 0;
-  //     gbc.weighty = 1.0;
-  //     add(leftPanel, gbc);
-
-  //     // Right panel (3 vertical components)
-  //     JPanel rightPanel = new JPanel(new GridLayout(3, 1, 10, 10));
-  //     rightPanel.add(createPanel());
-  //     rightPanel.add(createPanel());
-  //     rightPanel.add(createPanel());
-  //     rightPanel.setPreferredSize(new Dimension(200, rightPanel.getPreferredSize().height));
-  //     gbc.gridx = 2;
-  //     gbc.gridy = 0;
-  //     gbc.anchor = GridBagConstraints.EAST;
-  //     gbc.fill = GridBagConstraints.VERTICAL;
-  //     gbc.weightx = 0;
-  //     gbc.weighty = 1.0;
-  //     add(rightPanel, gbc);
-
-  //     // Center panel
-  //     JPanel centerPanel = new BoardPnl();
-  //     gbc.gridx = 1;
-  //     gbc.gridy = 0;
-  //     gbc.anchor = GridBagConstraints.CENTER;
-  //     gbc.fill = GridBagConstraints.BOTH;
-  //     gbc.weightx = 1.0;
-  //     gbc.weighty = 1.0;
-  //     add(centerPanel, gbc);
-  // }
-
   // Utility method to create a placeholder panel with a label
   private static JPanel createPanel() {
     JPanel panel = new JPanel();
@@ -93,3 +70,6 @@ public class GamePnl extends JPanel {
     return panel;
   }
 }
+
+
+// gridBagLayout
