@@ -41,7 +41,7 @@ public enum ImageCntrl {
   GOAL_MAP("map.png"),
   GOAL_MOUSE("mouse.png"),
   GOAL_FAIRY("fairy.png"),
-  GOAL_CARD("goal.png"),
+  GOAL_CARD_BG("goal_card_bg.png"),
   RED_PLAYER_SPRITE("red_player_sprite.png"),
   BLACK_PLAYER_SPRITE("black_player_sprite.png"),
   PINK_PLAYER_SPRITE("pink_player_sprite.png"),
