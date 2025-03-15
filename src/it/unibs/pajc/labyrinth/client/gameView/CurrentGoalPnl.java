@@ -36,7 +36,7 @@ public class CurrentGoalPnl extends JPanel {
 
   public CurrentGoalPnl(LabyrinthController controller) {
     this.controller = controller;
-    goalCardBgCntrl = ImageCntrl.GOAL_CARD_BG;
+    goalCardBgCntrl = ImageCntrl.GOAL_CARD;
   }
 
   private void updatePanelSize(int width) {
