@@ -3,6 +3,7 @@ package it.unibs.pajc.labyrinth.client.gameView;
 import it.unibs.pajc.labyrinth.core.utility.Orientation;
 import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -23,7 +24,6 @@ public enum ImageCntrl {
   GOAL_GEM("gem.png"),
   GOAL_KEYS("keys.png"),
   GOAL_SCARAB("scarab.png"),
-  GOAL_SWORD2("sword2.png"),
   GOAL_RING("ring.png"),
   GOAL_TREASURE("treasure.png"),
   GOAL_OWL("owl.png"),
@@ -41,7 +41,7 @@ public enum ImageCntrl {
   GOAL_MAP("map.png"),
   GOAL_MOUSE("mouse.png"),
   GOAL_FAIRY("fairy.png"),
-  GOAL_CARD("goal.png"),
+  GOAL_CARD_BG("goal_card_bg.png"),
   RED_PLAYER_SPRITE("red_player_sprite.png"),
   BLACK_PLAYER_SPRITE("black_player_sprite.png"),
   PINK_PLAYER_SPRITE("pink_player_sprite.png"),
@@ -124,5 +124,44 @@ public enum ImageCntrl {
     g2d.dispose();
 
     return rotatedImage;
+  }
+
+  /**
+   * Scales a BufferedImage to the specified dimensions while maintaining quality.
+   *
+   * @param original The original BufferedImage to scale
+   * @param targetWidth The desired width
+   * @param targetHeight The desired height
+   * @return A new BufferedImage scaled to the target dimensions
+   */
+  public BufferedImage scaleBufferedImage(
+      BufferedImage original, int targetWidth, int targetHeight) {
+    // Return original if invalid dimensions
+    if (original == null || targetWidth <= 0 || targetHeight <= 0) {
+      return original;
+    }
+
+    // Create a new BufferedImage with the target size
+    BufferedImage scaledImage =
+        new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+
+    // Create graphics context for the new image
+    Graphics2D g2d = scaledImage.createGraphics();
+
+    // Set high quality rendering hints
+    g2d.setRenderingHint(
+        RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+    g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+    // Draw the original image scaled to the new dimensions
+    g2d.drawImage(original, 0, 0, targetWidth, targetHeight, null);
+    g2d.dispose();
+
+    return scaledImage;
+  }
+
+  public BufferedImage scaleBufferedImage(int targetWidth, int targetHeight) {
+    return scaleBufferedImage(image, targetWidth, targetHeight);
   }
 }

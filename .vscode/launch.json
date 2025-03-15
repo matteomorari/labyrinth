@@ -6,6 +6,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "ThreeColumnLayout",
+      "request": "launch",
+      "mainClass": "it.unibs.pajc.labyrinth.client.ThreeColumnLayout",
+      "projectName": "labyrinth"
+    },
+    {
+      "type": "java",
       "name": "Launch Client",
       "request": "launch",
       "mainClass": "it.unibs.pajc.labyrinth.client.LabyrinthClientMain"
