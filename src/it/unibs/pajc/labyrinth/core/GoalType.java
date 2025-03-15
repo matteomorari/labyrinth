@@ -7,7 +7,6 @@ public enum GoalType {
   GEM,
   KEYS,
   SCARAB,
-  SWORD2,
   RING,
   TREASURE,
   OWL,
