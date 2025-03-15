@@ -14,9 +14,10 @@ public class Card extends Node {
   private boolean isWestOpen;
   private Orientation orientation;
   private Goal goal;
+  private Power power;
   private ArrayList<Player> players;
 
-  public Card(CardType type, String uniqueID) {
+  public Card(CardType type, String uniFqueID) {
     this.type = type;
     this.isNordOpen = type.isNordOpen();
     this.isEastOpen = type.isEastOpen();
@@ -77,6 +78,14 @@ public class Card extends Node {
 
   public Goal getGoal() {
     return this.goal;
+  }
+
+  public Power getPower() {
+    return this.power;
+  }
+
+  public void setPower(Power power) {
+    this.power = power;
   }
 
   public ArrayList<Orientation> getOpenOrientation() {

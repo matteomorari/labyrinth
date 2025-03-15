@@ -13,7 +13,7 @@ import java.util.Random;
 import java.util.UUID;
 
 public class Labyrinth extends BaseModel {
-  private static final int GOALS_FOR_PLAYER = 2;
+  private static final int GOALS_FOR_PLAYER = 1;
   private final transient Random random = new Random();
 
   private int boardSize;
@@ -24,6 +24,7 @@ public class Labyrinth extends BaseModel {
   private ArrayList<Position> lastPlayerMovedPath;
   // TODO: to move to the player class?
   private boolean hasCurrentPlayerInserted = false;
+  private boolean hasDoubleTurn = false;
 
   public Labyrinth() {
     this(7);
@@ -72,7 +73,6 @@ public class Labyrinth extends BaseModel {
       Player player = it.next();
       Position corner = cornerPositions[cornerIndices[i]];
       player.setPosition(corner.getRow(), corner.getCol());
-      //MA MORARIIII! SVEGLIA!!
       player.setStartPosition(corner.getRow(), corner.getCol());
     }
   }
@@ -103,7 +103,7 @@ public class Labyrinth extends BaseModel {
   public Player nextPlayer() {
     this.players.add(this.players.poll());
     this.hasCurrentPlayerInserted = false;
-    //in case due to card insertion the player change position and the goal is found
+    // in case due to card insertion the player changes position and the goal is found
     isGoalFound(getCurrentPlayer());
     System.out.println("Current player: " + this.getCurrentPlayer().getName());
     return this.getCurrentPlayer();
@@ -114,18 +114,21 @@ public class Labyrinth extends BaseModel {
     this.initializePlayerPositions();
 
     // shuffle goals
-    ArrayList<GoalType> goalsList = new ArrayList<>(Arrays.asList(GoalType.values()));
-    Collections.shuffle(goalsList);
+    ArrayList<GoalType> goalList = new ArrayList<>(Arrays.asList(GoalType.values()));
+    Collections.shuffle(goalList);
+
+    // shuffle powers
+    ArrayList<PowerType> PowerList = new ArrayList<>(Arrays.asList(PowerType.values()));
 
     // assign goals for each player
     for (Player player : this.players) {
       for (int i = 0; i < GOALS_FOR_PLAYER; i++) {
-        player.addGoal(new Goal(goalsList.getFirst()));
-        goalsList.removeFirst();
+        player.addGoal(new Goal(goalList.getFirst()));
+        goalList.removeFirst();
       }
     }
 
-    // assign goals to the card
+    // assign goals to the cards
     // TODO: improve
     for (Player player : this.players) {
       for (Goal goal : player.getGoals()) {
@@ -142,11 +145,30 @@ public class Labyrinth extends BaseModel {
         }
       }
     }
+
+    // assign powers to the cards
+    while (!PowerList.isEmpty()) {
+      int row = random.nextInt(this.boardSize);
+      int col = random.nextInt(this.boardSize);
+      Card card = this.board.get(row).get(col);
+
+      if (card.getPower() == null && isPowerPositionValid(row, col)) {
+        // Power power = new Power(PowersList.remove(0));
+        Power power = new Power(PowerList.removeFirst());
+        card.setPower(power);
+        power.setPosition(card.getPosition());
+        System.out.println("potere inserito in carta" + card.getPosition());
+      }
+    }
     this.fireChangeListener();
   }
 
   private boolean isGoalPositionValid(int row, int col) {
     return !isCornerPosition(row, col);
+  }
+
+  private boolean isPowerPositionValid(int row, int col) {
+    return (row == 1 || row == 3 || row == 5 || col == 1 || col == 3 || col == 5);
   }
 
   private boolean isCornerPosition(int row, int col) {
@@ -266,8 +288,35 @@ public class Labyrinth extends BaseModel {
 
     this.updateCardPosition(availableCard, insertPosition);
     this.availableCard = nextAvailableCard;
-
     this.lastInsertedCardPosition = insertPosition;
+
+    if (availableCard.getPower() != null) {
+
+      System.out.println(availableCard.getPower().getType().toString());
+      System.out.println();
+
+      if (availableCard.getPower().getType().toString().equalsIgnoreCase("DOUBLE_CARD_INSERTION")) {
+        hasCurrentPlayerInserted = false;
+      }
+
+      if (availableCard.getPower().getType().toString().equalsIgnoreCase("SWAP_PLAYER_POSITION")) {
+        this.fireChangeListener();
+
+        swapPlayerPosition(players.getLast());
+        nextPlayer();
+      }
+
+      if (availableCard.getPower().getType().toString().equalsIgnoreCase("DOUBLE_TURN")) {
+        hasDoubleTurn = true;
+        if (getCardOpenDirection(getPlayerCard(getCurrentPlayer())).isEmpty()) {
+          hasDoubleTurn = false;
+          hasCurrentPlayerInserted = false;
+        }
+      }
+      this.fireChangeListener();
+      return;
+    }
+
     // if the player can't move, go to the next player immediately
     if (getCardOpenDirection(getPlayerCard(getCurrentPlayer())).isEmpty()) {
       nextPlayer();
@@ -321,6 +370,9 @@ public class Labyrinth extends BaseModel {
     if (card.getGoal() != null) {
       card.getGoal().setPosition(new Position(-1, -1));
     }
+    if (card.getPower() != null) {
+      card.getPower().setPosition(new Position(-1, -1));
+    }
   }
 
   private void moveCards(Position endPosition, int rowDirection, int colDirection) {
@@ -360,6 +412,9 @@ public class Labyrinth extends BaseModel {
     card.move(newPosition);
     if (card.getGoal() != null) {
       card.getGoal().setPosition(newPosition);
+    }
+    if (card.getPower() != null) {
+      card.getPower().setPosition(newPosition);
     }
   }
 
@@ -517,9 +572,62 @@ public class Labyrinth extends BaseModel {
 
     this.lastPlayerMovedPath = path;
     isGoalFound(currentPlayer);
-    nextPlayer();
+
+    if (hasDoubleTurn) {
+      hasCurrentPlayerInserted = false;
+      hasDoubleTurn = false;
+    } else {
+      nextPlayer();
+    }
+
     isGameFinished();
     this.fireChangeListener();
+  }
+
+  // MORARO PENSACI TU
+  public void swapPlayerPosition(Player player) {
+    // IL MIO AMICO PEGGIO DI GOZZETTI
+    Position currentPlayerPos = this.getCurrentPlayer().getPosition();
+    Position otherPlayerPos = player.getPosition();
+
+    // Log the positions before the swap
+    System.out.println("Swapping positions between:");
+    System.out.println(
+        "Current Player: " + this.getCurrentPlayer().getName() + " at " + currentPlayerPos);
+    System.out.println("Other Player: " + player.getName() + " at " + otherPlayerPos);
+
+    // Retrieve the cards where the players are
+    Card currentPlayerCard = getCardAtPosition(currentPlayerPos);
+    Card otherPlayerCard = getCardAtPosition(otherPlayerPos);
+
+    // Make sure the cards are not null
+    if (currentPlayerCard == null || otherPlayerCard == null) {
+      System.out.println("Error: One or both cards are null!");
+      return;
+    }
+
+    // Remove the players from their respective cards
+    currentPlayerCard.removePlayer(this.getCurrentPlayer());
+    otherPlayerCard.removePlayer(player);
+
+    // Add players to the new cards (swapping the cards)
+    currentPlayerCard.addPlayer(player);
+    otherPlayerCard.addPlayer(this.getCurrentPlayer());
+
+    // Now we update the players' positions
+    this.getCurrentPlayer().setPosition(otherPlayerPos.getRow(), otherPlayerPos.getCol());
+    player.setPosition(currentPlayerPos.getRow(), currentPlayerPos.getCol());
+
+    // Log the new positions to confirm
+    System.out.println("New Current Player Position: " + this.getCurrentPlayer().getPosition());
+    System.out.println("New Other Player Position: " + player.getPosition());
+  }
+
+  //MORARO PENSACI TU
+  private Card getCardAtPosition(Position pos) {
+    // FATTO DA GOZZETTI ANCHE QUESTO
+    // Make sure this method works as expected
+    return this.board.get(pos.getCol()).get(pos.getRow());
   }
 
   public ArrayList<Position> getLastPlayerMovedPath() {

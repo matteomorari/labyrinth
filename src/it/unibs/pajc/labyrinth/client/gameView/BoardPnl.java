@@ -169,8 +169,24 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     for (int i = 0; i < boardSize; i++) {
       for (int j = 0; j < boardSize; j++) {
         drawCard(g2, i, j, initialXPosition, initialYPosition);
+        // drawArrows(g2, i, j, initialXPosition, initialYPosition);
+      }
+    }
+
+    for (int i = 0; i < boardSize; i++) {
+      for (int j = 0; j < boardSize; j++) {
+        // drawCard(g2, i, j, initialXPosition, initialYPosition);
         drawArrows(g2, i, j, initialXPosition, initialYPosition);
       }
+    }
+
+    for (Player player : controller.getPlayers()) {
+      Position startPos = player.getStartPosition();
+      int startX = initialXPosition + startPos.getCol() * cellSize;
+      int startY = initialYPosition + startPos.getRow() * cellSize;
+
+      g2.setColor(player.getColor());
+      g2.fillOval(startX + cellSize / 3, startY + cellSize / 3, cellSize / 3, cellSize / 3);
     }
   }
 
@@ -194,49 +210,86 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
       CardImage goalImage = new CardImage(goalImageCntrl, g2).rotate(angles);
       goalImage.draw(posX + cellSize / 4, posY + cellSize / 4, cellSize / 2, cellSize / 2);
     }
+
+    if (card.getPower() != null) {
+      int powerX = initialXPosition + card.getPower().getPosition().getCol() * cellSize;
+      int powerY = initialYPosition + card.getPower().getPosition().getRow() * cellSize;
+
+      g2.setColor(Color.ORANGE);
+      g2.fillOval(powerX + cellSize / 3, powerY + cellSize / 3, cellSize / 3, cellSize / 3);
+    }
   }
 
   private void drawArrows(Graphics2D g2, int i, int j, int initialXPosition, int initialYPosition) {
     g2.setColor(Color.BLUE);
-    if (i == 0 && j != 0 && j != boardSize - 1) {
+    int offset = cellSize / 10;
+
+    if (i == 0 && j != 0 && j != 2 && j != 4 && j != boardSize - 1) {
       paintArrow(
           g2,
-          initialXPosition + i * cellSize - (PADDING - cellSize / 4) / 2,
+          initialXPosition + i * cellSize - (PADDING - cellSize / 4) / 2 - offset,
           initialYPosition + j * cellSize + cellSize / 2,
-          cellSize / 2,
+          (int) (cellSize / 1.9),
           (float) Math.toRadians(-90));
     }
-    if (i == boardSize - 1 && j != 0 && j != boardSize - 1) {
+    if (i == boardSize - 1 && j != 0 && j != 2 && j != 4 && j != boardSize - 1) {
       paintArrow(
           g2,
-          initialXPosition + i * cellSize + cellSize + (PADDING - cellSize / 4) / 2,
+          initialXPosition + i * cellSize + cellSize + (PADDING - cellSize / 4) / 2 + offset,
           initialYPosition + j * cellSize + cellSize / 2,
-          cellSize / 2,
+          (int) (cellSize / 1.9),
           (float) Math.toRadians(90));
     }
-    if (j == 0 && i != 0 && i != boardSize - 1) {
+    if (j == 0 && i != 0 && i != 2 && i != 4 && i != boardSize - 1) {
       paintArrow(
           g2,
           initialXPosition + i * cellSize + cellSize / 2,
-          initialYPosition + j * cellSize - (PADDING - cellSize / 4) / 2,
-          cellSize / 2,
+          initialYPosition + j * cellSize - (PADDING - cellSize / 4) / 2 - offset,
+          (int) (cellSize / 1.9),
           (float) Math.toRadians(0));
     }
-    if (j == boardSize - 1 && i != 0 && i != boardSize - 1) {
+    if (j == boardSize - 1 && i != 0 && i != 2 && i != 4 && i != boardSize - 1) {
       paintArrow(
           g2,
           initialXPosition + i * cellSize + cellSize / 2,
-          initialYPosition + j * cellSize + cellSize + (PADDING - cellSize / 4) / 2,
-          cellSize / 2,
+          initialYPosition + j * cellSize + cellSize + (PADDING - cellSize / 4) / 2 + offset,
+          (int) (cellSize / 1.9),
           (float) Math.toRadians(180));
     }
   }
 
-  // non serve
-  // private void setPlayersImage() {
+  // private void drawPlayers(Graphics2D g2) {
+  //   int size = Math.min(getWidth(), getHeight());
+  //   int initialXPosition = (getWidth() - size) / 2 + PADDING;
+  //   int initialYPosition = (getHeight() - size) / 2 + PADDING;
+  //   // this.setPlayersImage();
+  //   this.setAnimationDirection();
+
   //   for (Player player : controller.getPlayers()) {
-  //     this.playerAnimationImage.put(
-  //         player.getName(), ImageCntrl.valueOf(player.getName() + "_PLAYER_SPRITE"));
+
+  //     int[] playerPosition = getPlayerAnimationPosition(player, initialXPosition,
+  // initialYPosition);
+  //     int[] playerDirection = getPlayerDirection(player);
+
+  //     if (playerDirection[0] == 0 && playerDirection[1] == 0) {
+  //       g2.drawImage(
+  //           ImageCntrl.valueOf(player.getName() + "_PLAYER_SPRITE").getStandingAnimationImage(),
+  //           // playerAnimationImage.get(player.getName()).getStandingImage(),
+  //           playerPosition[0],
+  //           playerPosition[1],
+  //           null);
+  //     } else {
+  //       g2.drawImage(
+  //           PlayerAnimation(
+  //               ImageCntrl.valueOf(player.getName() + "_PLAYER_SPRITE")
+  //                   .getAnimationSprite()
+  //                   .get(
+  //                       playerDirectionImage.get(
+  //                           Arrays.asList(playerDirection[0], playerDirection[1])))),
+  //           playerPosition[0],
+  //           playerPosition[1],
+  //           null);
+  //     }
   //   }
   // }
 
@@ -244,20 +297,21 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     int size = Math.min(getWidth(), getHeight());
     int initialXPosition = (getWidth() - size) / 2 + PADDING;
     int initialYPosition = (getHeight() - size) / 2 + PADDING;
-    // this.setPlayersImage();
     this.setAnimationDirection();
 
-    for (Player player : controller.getPlayers()) {
+    int playerSize = (int) (cellSize * 0.8);
 
+    for (Player player : controller.getPlayers()) {
       int[] playerPosition = getPlayerAnimationPosition(player, initialXPosition, initialYPosition);
       int[] playerDirection = getPlayerDirection(player);
 
       if (playerDirection[0] == 0 && playerDirection[1] == 0) {
         g2.drawImage(
             ImageCntrl.valueOf(player.getName() + "_PLAYER_SPRITE").getStandingAnimationImage(),
-            // playerAnimationImage.get(player.getName()).getStandingImage(),
-            playerPosition[0],
+            playerPosition[0] + cellSize / 10,
             playerPosition[1],
+            playerSize,
+            playerSize,
             null);
       } else {
         g2.drawImage(
@@ -267,14 +321,11 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
                     .get(
                         playerDirectionImage.get(
                             Arrays.asList(playerDirection[0], playerDirection[1])))),
-            playerPosition[0],
+            playerPosition[0] + cellSize / 10,
             playerPosition[1],
+            playerSize,
+            playerSize,
             null);
-        // g2.fillOval(
-        //     playerPosition[0] + cellSize / 3,
-        //     playerPosition[1] + cellSize / 3,
-        //     cellSize / 3,
-        //     cellSize / 3);
       }
     }
   }
@@ -424,7 +475,11 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
   @Override
   public void mouseExited(MouseEvent e) {}
 
-  public void paintArrow(Graphics2D g2, int x, int y, int size, float angolo) {
+  public void paintArrow(Graphics2D g2, int x, int y, int size, float angle) {
+
+    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
     int[] xPoints = {0, 1, -1, 0};
     int[] yPoints = {2, -2, -2, 2};
     int nPoints = xPoints.length;
@@ -434,7 +489,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
 
     AffineTransform at = new AffineTransform();
     at.translate(x, y);
-    at.rotate(angolo);
+    at.rotate(angle);
     at.scale(size / 6.0, size / 6.0);
     shape = at.createTransformedShape(shape);
 

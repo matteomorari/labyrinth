@@ -67,11 +67,11 @@ public class LabyrinthClientMain {
       labyrinthModel.addPlayer(player1);
 
       Player player2 = new Player("BLACK");
-      player2.setColor(Color.BLACK);
+      player2.setColor(Color.DARK_GRAY);
       labyrinthModel.addPlayer(player2);
 
       Player player3 = new Player("PINK");
-      player3.setColor(Color.PINK);
+      player3.setColor(Color.MAGENTA);
       labyrinthModel.addPlayer(player3);
 
       Player player4 = new Player("GREEN");

@@ -102,7 +102,19 @@ public class GoalPnl extends JPanel {
 
               // Draw the goal image centered on the default card
               g.drawImage(goal, x, y, goalWidth, goalHeight, this);
-            }
+            }else {
+                // // ImageCntrl goalImageCntrl = ImageCntrl.valueOf("L");
+  
+                // Color playerColor = controller.getCurrentPlayer().getColor();
+                // int ovalWidth = getWidth() / 3;
+                // int ovalHeight = getHeight() / 6;
+  
+                // int x = (getWidth() - ovalWidth) / 2;
+                // int y = (getHeight() - ovalHeight) / 2;
+  
+                // g.setColor(playerColor);
+                // g.fillOval(x, y, ovalWidth, ovalHeight);
+               }
           }
         };
 

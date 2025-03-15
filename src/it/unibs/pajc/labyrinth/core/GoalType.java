@@ -24,5 +24,6 @@ public enum GoalType {
   LIZARD,
   MAP,
   MOUSE,
-  FAIRY,;
+  FAIRY,
+  ;
 }
