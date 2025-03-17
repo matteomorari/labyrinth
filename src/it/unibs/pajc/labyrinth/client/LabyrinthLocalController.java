@@ -1,6 +1,7 @@
 package it.unibs.pajc.labyrinth.client;
 
 import it.unibs.pajc.labyrinth.core.Card;
+import it.unibs.pajc.labyrinth.core.Goal;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Player;
@@ -54,4 +55,5 @@ public class LabyrinthLocalController implements LabyrinthController {
   public Card getAvailableCard() {
     return model.getAvailableCard();
   }
+
 }

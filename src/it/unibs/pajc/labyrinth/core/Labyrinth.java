@@ -7,13 +7,14 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.UUID;
 
 public class Labyrinth extends BaseModel {
-  private static final int GOALS_FOR_PLAYER = 1;
+  private static final int GOALS_FOR_PLAYER = 4;
   private final transient Random random = new Random();
 
   private int boardSize;
@@ -291,37 +292,138 @@ public class Labyrinth extends BaseModel {
     this.lastInsertedCardPosition = insertPosition;
 
     if (availableCard.getPower() != null) {
-
       System.out.println(availableCard.getPower().getType().toString());
       System.out.println();
 
-      if (availableCard.getPower().getType().toString().equalsIgnoreCase("DOUBLE_CARD_INSERTION")) {
-        hasCurrentPlayerInserted = false;
-      }
+      // Define a map of power types to corresponding actions
+      HashMap<PowerType, Runnable> powerActions = createPowerActionsMap();
+      powerActions.getOrDefault(availableCard.getPower().getType(), () -> {}).run();
 
-      if (availableCard.getPower().getType().toString().equalsIgnoreCase("SWAP_PLAYER_POSITION")) {
-        this.fireChangeListener();
-
-        swapPlayerPosition(players.getLast());
-        nextPlayer();
-      }
-
-      if (availableCard.getPower().getType().toString().equalsIgnoreCase("DOUBLE_TURN")) {
-        hasDoubleTurn = true;
-        if (getCardOpenDirection(getPlayerCard(getCurrentPlayer())).isEmpty()) {
-          hasDoubleTurn = false;
-          hasCurrentPlayerInserted = false;
-        }
-      }
       this.fireChangeListener();
       return;
     }
 
-    // if the player can't move, go to the next player immediately
+    checkAndProceedToNextPlayer();
+    this.fireChangeListener();
+  }
+
+  // if the player can't move, go to the next player immediately
+  public void checkAndProceedToNextPlayer() {
     if (getCardOpenDirection(getPlayerCard(getCurrentPlayer())).isEmpty()) {
       nextPlayer();
     }
-    this.fireChangeListener();
+  }
+
+  public HashMap<PowerType, Runnable> createPowerActionsMap() {
+    // Define a map of power types to corresponding actions
+    HashMap<PowerType, Runnable> powerActions = new HashMap<>();
+
+    powerActions.put(
+        PowerType.SWAP_PLAYER_POSITION,
+        () -> {
+          // Notify the controller to show a pop-up for player swap
+          // notifySwapPlayers();
+          swapPlayers(players.getLast());
+          checkAndProceedToNextPlayer();
+        });
+    powerActions.put(
+        PowerType.DOUBLE_TURN,
+        () -> {
+          hasDoubleTurn = true;
+          if (getCardOpenDirection(getPlayerCard(getCurrentPlayer())).isEmpty()) {
+            hasDoubleTurn = false;
+            hasCurrentPlayerInserted = false;
+          }
+        });
+    powerActions.put(
+        PowerType.DOUBLE_CARD_INSERTION,
+        () -> {
+          hasCurrentPlayerInserted = false;
+        });
+    powerActions.put(
+        PowerType.CHOSE_SECOND_GOAL,
+        () -> {
+          // The actual goal selection will be handled by the controller
+          // Here we just set a flag or call a method to notify the controller
+          // notifyChoseSecondGoal();
+          showGoal();
+          changeSecondGoal();
+          showGoal();
+          checkAndProceedToNextPlayer();
+        });
+    powerActions.put(
+        PowerType.CHOSE_GOAL,
+        () -> {
+          // The actual goal selection will be handled by the controller
+          // Here we just set a flag or call a method to notify the controller
+          // notifyChoseGoal();
+          showGoal();
+          changeGoal(getCurrentPlayer().getGoals().getLast());
+          showGoal();
+          checkAndProceedToNextPlayer();
+        });
+
+    return powerActions;
+  }
+
+  private void notifySwapPlayers() {
+    // Notify the controller to handle the player swap
+    // This could be done via an observer pattern, event bus, or direct method call
+    // Example:
+    // controller.handleSwapPlayers();
+  }
+
+  private void notifyChoseSecondGoal() {
+    // Notify the controller to handle the second goal choice
+    // This could be done via an observer pattern, event bus, or direct method call
+    // Example:
+    // controller.handleChoseSecondGoal();
+  }
+
+  private void notifyChoseGoal() {
+    // Notify the controller to handle the goal choice
+    // This could be done via an observer pattern, event bus, or direct method call
+    // Example:
+    // controller.handleChoseGoal();
+  }
+
+  public void changeSecondGoal() {
+    Player player = getCurrentPlayer();
+    if (getCurrentPlayer() == null || player.getGoals().size() < 2) {
+      return;
+    }
+    Goal Firstgoal = player.getGoals().removeFirst();
+    Goal Secondgoal = player.getGoals().removeFirst();
+
+    player.getGoals().addFirst(Firstgoal);
+    player.getGoals().addFirst(Secondgoal);
+  }
+
+  // TEST
+  public void showGoal() {
+    System.out.println();
+    Player player = getCurrentPlayer();
+    for (Goal goal : player.getGoals()) {
+      System.out.println(goal.getType().toString());
+    }
+  }
+
+  public void changeGoal(Goal goal) {
+    if (getCurrentPlayer() == null || getCurrentPlayer().getGoals().size() < 2) {
+      return;
+    }
+    if (goal == null) {
+      throw new IllegalArgumentException("Goal cannot be null");
+    }
+    Iterator<Goal> it = getCurrentPlayer().getGoals().iterator();
+    while (it.hasNext()) {
+      Goal g = it.next();
+      if (g.getType() == goal.getType()) {
+        it.remove();
+        break;
+      }
+    }
+    getCurrentPlayer().getGoals().addFirst(goal);
   }
 
   // TODO: there is a duplicate
@@ -584,50 +686,46 @@ public class Labyrinth extends BaseModel {
     this.fireChangeListener();
   }
 
-  // MORARO PENSACI TU
-  public void swapPlayerPosition(Player player) {
-    // IL MIO AMICO PEGGIO DI GOZZETTI
-    Position currentPlayerPos = this.getCurrentPlayer().getPosition();
-    Position otherPlayerPos = player.getPosition();
-
-    // Log the positions before the swap
-    System.out.println("Swapping positions between:");
-    System.out.println(
-        "Current Player: " + this.getCurrentPlayer().getName() + " at " + currentPlayerPos);
-    System.out.println("Other Player: " + player.getName() + " at " + otherPlayerPos);
-
-    // Retrieve the cards where the players are
-    Card currentPlayerCard = getCardAtPosition(currentPlayerPos);
-    Card otherPlayerCard = getCardAtPosition(otherPlayerPos);
-
-    // Make sure the cards are not null
-    if (currentPlayerCard == null || otherPlayerCard == null) {
-      System.out.println("Error: One or both cards are null!");
+  public void swapPlayers(Player playerToSwap) {
+    Player currentPlayer = getCurrentPlayer();
+    if (currentPlayer == null || playerToSwap == null) {
       return;
     }
 
-    // Remove the players from their respective cards
-    currentPlayerCard.removePlayer(this.getCurrentPlayer());
-    otherPlayerCard.removePlayer(player);
+    Position currentPlayerPosition = currentPlayer.getPosition();
+    System.out.println("Current player position" + currentPlayerPosition);
+    System.out.println("swap player position " + playerToSwap.getPosition());
 
-    // Add players to the new cards (swapping the cards)
-    currentPlayerCard.addPlayer(player);
-    otherPlayerCard.addPlayer(this.getCurrentPlayer());
+    int x = playerToSwap.getPosition().getRow();
+    int y = playerToSwap.getPosition().getCol();
+    // Position playerToSwapPosition = playerToSwap.getPosition();
+    // System.out.println("swap player position" + playerToSwapPosition);
 
-    // Now we update the players' positions
-    this.getCurrentPlayer().setPosition(otherPlayerPos.getRow(), otherPlayerPos.getCol());
-    player.setPosition(currentPlayerPos.getRow(), currentPlayerPos.getCol());
+    // Get the cards at the current positions
+    Card currentPlayerCard = getPlayerCard(currentPlayer);
+    Card playerToSwapCard = getPlayerCard(playerToSwap);
 
-    // Log the new positions to confirm
-    System.out.println("New Current Player Position: " + this.getCurrentPlayer().getPosition());
-    System.out.println("New Other Player Position: " + player.getPosition());
+    playerToSwap.setPosition(currentPlayerPosition.getRow(), currentPlayerPosition.getCol());
+    currentPlayer.setPosition(x, y);
+
+    // Add players to their new cards
+    currentPlayerCard.addPlayer(playerToSwap);
+    playerToSwapCard.addPlayer(currentPlayer);
+
+    // Remove players from their current cards
+    currentPlayerCard.removePlayer(currentPlayer);
+    playerToSwapCard.removePlayer(playerToSwap);
+
+    // currentPlayerCard.updatePlayersPosition();
+    // playerToSwapCard.updatePlayersPosition();
+    System.out.println("current player position " + currentPlayer.getPosition());
+    System.out.println("swap player position" + playerToSwap.getPosition());
+
+    this.fireChangeListener();
   }
 
-  //MORARO PENSACI TU
-  private Card getCardAtPosition(Position pos) {
-    // FATTO DA GOZZETTI ANCHE QUESTO
-    // Make sure this method works as expected
-    return this.board.get(pos.getCol()).get(pos.getRow());
+  private Card findCardAtPosition(Position pos) {
+    return this.board.get(pos.getRow()).get(pos.getCol());
   }
 
   public ArrayList<Position> getLastPlayerMovedPath() {

@@ -20,24 +20,24 @@ public class GoalsPlayersPnl extends JPanel {
   private static final String FONT_FAMILY = "Times New Roman";
   private static final int TITLE_FONT_SIZE = 25;
   private static final int PLAYER_FONT_SIZE = 20;
-  
+
   // Layout constants
   private static final int CORNER_RADIUS = 20;
   private static final int STARTING_Y = 50;
   private static final int LINE_HEIGHT = 25;
   private static final int TITLE_BOTTOM_SPACING = 30;
   private static final int PLAYER_BOTTOM_SPACING = 20;
-  private static final int OVAL_SIZE = 16;
+  private static final int PLAYER_SIZE = 48;
   private static final int TEXT_OVAL_SPACING = 10;
   private static final int OVAL_Y_ADJUSTMENT = 2;
-  
+
   // Panel dimension constants
   private static final int PARENT_WIDTH_PADDING = 20;
   private static final int SCROLLBAR_WIDTH = 25;
   private static final int MIN_WIDTH = 100;
   private static final int BASE_PANEL_HEIGHT = 150;
   private static final int PLAYER_HEIGHT = 40;
-  
+
   private LabyrinthController controller;
   private ArrayList<Player> players;
   private final Font titleFont = new Font(FONT_FAMILY, Font.BOLD, TITLE_FONT_SIZE);
@@ -74,7 +74,8 @@ public class GoalsPlayersPnl extends JPanel {
         // If direct parent doesn't have width yet, try to get it from the scroll pnl
         Container ancestor = SwingUtilities.getAncestorOfClass(JScrollPane.class, this);
         if (ancestor != null && ancestor.getWidth() > 0) {
-          containerWidth = ancestor.getWidth() - SCROLLBAR_WIDTH; // Account for scrollbar and insets
+          containerWidth =
+              ancestor.getWidth() - SCROLLBAR_WIDTH; // Account for scrollbar and insets
         } else {
           // Fallback to a reasonable default if no ancestor with width is found
           containerWidth = MIN_WIDTH * 2;
@@ -139,29 +140,40 @@ public class GoalsPlayersPnl extends JPanel {
     // Draw player information
     g2.setFont(playerFont);
 
+    // Find the maximum width of player text
+    int maxTextWidth = 0;
     for (Player player : players) {
-      // TODO: the longest name should be used to center the full text, than the shorter names
-      // should be aligned to the left
       String playerText = player.getName() + " " + player.getGoals().size() + " goals left";
-
-      // Calculate the width of the text
       FontMetrics fm = g2.getFontMetrics();
       int textWidth = fm.stringWidth(playerText);
+      if (textWidth > maxTextWidth) {
+        maxTextWidth = textWidth;
+      }
+    }
 
-      // Calculate the total width needed (oval + spacing + text)
-      int totalWidth = OVAL_SIZE + TEXT_OVAL_SPACING + textWidth;
+    for (Player player : players) {
+      String playerText = player.getName() + " " + player.getGoals().size() + " goals left";
+
+      // Calculate the total width needed (oval + spacing + max text width)
+      int totalWidth = PLAYER_SIZE + TEXT_OVAL_SPACING + maxTextWidth;
 
       // Calculate left position to center the entire element
       int leftPosition = (width - totalWidth) / 2;
 
       // Draw colored oval at the centered position
-      int ovalY = currentY - OVAL_SIZE / 2 - OVAL_Y_ADJUSTMENT; // Align vertically with text center
-      g2.setColor(player.getColor());
-      g2.fillOval(leftPosition, ovalY, OVAL_SIZE, OVAL_SIZE);
+      int playerY =
+          currentY - PLAYER_SIZE / 2 - OVAL_Y_ADJUSTMENT; // Align vertically with text center
+      g2.drawImage(
+          ImageCntrl.valueOf(player.getName() + "_PLAYER_SPRITE").getStandingAnimationImage(),
+          leftPosition,
+          playerY - 20,
+          PLAYER_SIZE,
+          PLAYER_SIZE,
+          null);
 
       // Draw player text to the right of the oval
       g2.setColor(Color.DARK_GRAY);
-      g2.drawString(playerText, leftPosition + OVAL_SIZE + TEXT_OVAL_SPACING, currentY);
+      g2.drawString(playerText, leftPosition + PLAYER_SIZE + TEXT_OVAL_SPACING, currentY);
 
       currentY += LINE_HEIGHT + PLAYER_BOTTOM_SPACING;
     }

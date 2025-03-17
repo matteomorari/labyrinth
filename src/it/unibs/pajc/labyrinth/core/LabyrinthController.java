@@ -24,4 +24,10 @@ public interface LabyrinthController {
   Position lastInsertedCardPosition();
 
   Card getAvailableCard();
+
+  // void swapPlayers(Player player);
+
+  // void changeGoal(Goal goal);
+
+  // void changeSecondGoal(Goal goal);
 }
