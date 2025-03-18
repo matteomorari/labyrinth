@@ -26,7 +26,7 @@ public class Labyrinth extends BaseModel {
   // TODO: to move to the player class?
   private boolean hasCurrentPlayerInserted = false;
   private boolean hasDoubleTurn = false;
-  private HashMap<PowerType, Runnable> powerActions;
+  private transient HashMap<PowerType, Runnable> powerActions;
 
   public Labyrinth() {
     this(7);

@@ -3,6 +3,7 @@ package it.unibs.pajc.labyrinth.core;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.awt.Color;
 import java.util.ArrayDeque;
+import java.util.UUID;
 
 public class Player {
   private ArrayDeque<Goal> goalsQueue;
@@ -10,9 +11,15 @@ public class Player {
   private Position startPosition;
   private Color color;
   private String name;
+  private String uniqueID;
 
-  public Player(String name) {
+  public Player() {
+    this(null, UUID.randomUUID().toString());
+  }
+
+  public Player(String name, String uniqueID) {
     this.name = name;
+    this.uniqueID = uniqueID;
     this.goalsQueue = new ArrayDeque<>();
     this.position = new Position();
     this.startPosition = new Position();
@@ -61,5 +68,17 @@ public class Player {
 
   public String getName() {
     return this.name;
+  }
+
+  public void setUniqueID(String uniqueID) {
+    this.uniqueID = uniqueID;
+  }
+
+  public String getUniqueID() {
+    return uniqueID;
+  }
+
+  public ArrayDeque<Goal> getGoalsQueue() {
+    return goalsQueue;
   }
 }

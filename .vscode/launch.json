@@ -6,9 +6,9 @@
   "configurations": [
     {
       "type": "java",
-      "name": "ThreeColumnLayout",
+      "name": "Launch Server",
       "request": "launch",
-      "mainClass": "it.unibs.pajc.labyrinth.client.ThreeColumnLayout",
+      "mainClass": "it.unibs.pajc.labyrinth.server.LabyrinthServer",
       "projectName": "labyrinth"
     },
     {
@@ -22,6 +22,6 @@
       "name": "Current File",
       "request": "launch",
       "mainClass": "${file}"
-    }
+    },
   ]
 }
