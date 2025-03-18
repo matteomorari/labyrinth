@@ -26,6 +26,7 @@ public class Labyrinth extends BaseModel {
   // TODO: to move to the player class?
   private boolean hasCurrentPlayerInserted = false;
   private boolean hasDoubleTurn = false;
+  private HashMap<PowerType, Runnable> powerActions;
 
   public Labyrinth() {
     this(7);
@@ -38,6 +39,7 @@ public class Labyrinth extends BaseModel {
     this.availableCard = null;
     this.lastInsertedCardPosition = null;
     this.lastPlayerMovedPath = new ArrayList<>();
+    this.powerActions = createPowerActionsMap();
   }
 
   public int getBoardSize() {
@@ -46,6 +48,14 @@ public class Labyrinth extends BaseModel {
 
   public void addPlayer(Player player) {
     this.players.add(player);
+  }
+
+  public boolean getHasCurrentPlayerInserted() {
+    return hasCurrentPlayerInserted;
+  }
+
+  public boolean getHasDoubleTurn() {
+    return hasDoubleTurn;
   }
 
   public void initializePlayerPositions() {
@@ -99,6 +109,7 @@ public class Labyrinth extends BaseModel {
 
   public void skipTurn() {
     nextPlayer();
+    this.fireChangeListener();
   }
 
   public Player nextPlayer() {
@@ -118,7 +129,7 @@ public class Labyrinth extends BaseModel {
     ArrayList<GoalType> goalList = new ArrayList<>(Arrays.asList(GoalType.values()));
     Collections.shuffle(goalList);
 
-    // shuffle powers
+    // powers
     ArrayList<PowerType> PowerList = new ArrayList<>(Arrays.asList(PowerType.values()));
 
     // assign goals for each player
@@ -291,16 +302,9 @@ public class Labyrinth extends BaseModel {
     this.availableCard = nextAvailableCard;
     this.lastInsertedCardPosition = insertPosition;
 
+    // solo per ora per il meme
     if (availableCard.getPower() != null) {
-      System.out.println(availableCard.getPower().getType().toString());
-      System.out.println();
-
-      // Define a map of power types to corresponding actions
-      HashMap<PowerType, Runnable> powerActions = createPowerActionsMap();
-      powerActions.getOrDefault(availableCard.getPower().getType(), () -> {}).run();
-
-      this.fireChangeListener();
-      return;
+      usePower(availableCard.getPower().getType());
     }
 
     checkAndProceedToNextPlayer();
@@ -314,12 +318,20 @@ public class Labyrinth extends BaseModel {
     }
   }
 
+  public void usePower(PowerType powerType) {
+    System.out.println(availableCard.getPower().getType().toString());
+    System.out.println();
+    powerActions.getOrDefault(availableCard.getPower().getType(), () -> {}).run();
+
+    this.fireChangeListener();
+  }
+
   public HashMap<PowerType, Runnable> createPowerActionsMap() {
     // Define a map of power types to corresponding actions
     HashMap<PowerType, Runnable> powerActions = new HashMap<>();
 
     powerActions.put(
-        PowerType.SWAP_PLAYER_POSITION,
+        PowerType.SWAP_POSITION,
         () -> {
           // Notify the controller to show a pop-up for player swap
           // notifySwapPlayers();
@@ -341,7 +353,7 @@ public class Labyrinth extends BaseModel {
           hasCurrentPlayerInserted = false;
         });
     powerActions.put(
-        PowerType.CHOSE_SECOND_GOAL,
+        PowerType.CHOOSE_SECOND_GOAL,
         () -> {
           // The actual goal selection will be handled by the controller
           // Here we just set a flag or call a method to notify the controller
@@ -352,7 +364,7 @@ public class Labyrinth extends BaseModel {
           checkAndProceedToNextPlayer();
         });
     powerActions.put(
-        PowerType.CHOSE_GOAL,
+        PowerType.CHOOSE_GOAL,
         () -> {
           // The actual goal selection will be handled by the controller
           // Here we just set a flag or call a method to notify the controller
@@ -364,27 +376,6 @@ public class Labyrinth extends BaseModel {
         });
 
     return powerActions;
-  }
-
-  private void notifySwapPlayers() {
-    // Notify the controller to handle the player swap
-    // This could be done via an observer pattern, event bus, or direct method call
-    // Example:
-    // controller.handleSwapPlayers();
-  }
-
-  private void notifyChoseSecondGoal() {
-    // Notify the controller to handle the second goal choice
-    // This could be done via an observer pattern, event bus, or direct method call
-    // Example:
-    // controller.handleChoseSecondGoal();
-  }
-
-  private void notifyChoseGoal() {
-    // Notify the controller to handle the goal choice
-    // This could be done via an observer pattern, event bus, or direct method call
-    // Example:
-    // controller.handleChoseGoal();
   }
 
   public void changeSecondGoal() {
@@ -724,10 +715,6 @@ public class Labyrinth extends BaseModel {
     this.fireChangeListener();
   }
 
-  private Card findCardAtPosition(Position pos) {
-    return this.board.get(pos.getRow()).get(pos.getCol());
-  }
-
   public ArrayList<Position> getLastPlayerMovedPath() {
     return lastPlayerMovedPath;
   }
@@ -762,5 +749,13 @@ public class Labyrinth extends BaseModel {
     }
 
     return false;
+  }
+
+  public void setHasCurrentPlayerInserted(boolean hasCurrentPlayerInserted) {
+    this.hasCurrentPlayerInserted = hasCurrentPlayerInserted;
+  }
+
+  public void setCurrentPlayerHasDoubleTurn(boolean hasDoubleTurn) {
+    this.hasDoubleTurn = hasDoubleTurn;
   }
 }

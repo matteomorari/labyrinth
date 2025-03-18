@@ -56,4 +56,43 @@ public class LabyrinthLocalController implements LabyrinthController {
     return model.getAvailableCard();
   }
 
+  public void swapPlayers(Player player) {
+    model.swapPlayers(player);
+  }
+
+  public void changeGoal(Goal goal) {
+    model.changeGoal(goal);
+  }
+
+  public void changeSecondGoal() {
+    model.changeSecondGoal();
+  }
+
+  public void nextPlayer() {
+    model.nextPlayer();
+  }
+
+  public boolean getHasCurrentPlayerInserted() {
+    return model.getHasCurrentPlayerInserted();
+  }
+
+  public boolean getHasCurrentPlayerDoubleTurn() {
+    return model.getHasDoubleTurn();
+  }
+
+  public void setHasCurrentPlayerInserted(boolean hasCurrentPlayerInserted) {
+    model.setHasCurrentPlayerInserted(hasCurrentPlayerInserted);
+  }
+
+  public void setHasCurrentPlayerDoubleTurn(boolean hasDoubleTurn) {
+    model.setCurrentPlayerHasDoubleTurn(hasDoubleTurn);
+  }
+
+  public void skipTurn() {
+    model.skipTurn();
+  }
+
+  // public boolean getHasCurrentPlayerMoved() {
+  //   return model.getHasCurrentPlayerMoved();
+  // }
 }

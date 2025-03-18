@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import javax.imageio.ImageIO;
 
+
 public enum ImageCntrl {
   // load images
   CARD_L("L.png"),
@@ -46,6 +47,11 @@ public enum ImageCntrl {
   BLACK_PLAYER_SPRITE("black_player_sprite.png"),
   PINK_PLAYER_SPRITE("pink_player_sprite.png"),
   GREEN_PLAYER_SPRITE("green_player_sprite.png"),
+  CHOOSE_SECOND_GOAL("choose_second_goal.png"),
+  CHOOSE_GOAL("choose_goal.png"),
+  DOUBLE_CARD_INSERTION("double_card_insertion.png"),
+  DOUBLE_TURN("double_turn.png"),
+  SWAP_POSITION("swap_position.png"),
   ;
 
   private static final int IMAGE_SIZE = 72;

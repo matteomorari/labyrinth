@@ -25,9 +25,23 @@ public interface LabyrinthController {
 
   Card getAvailableCard();
 
-  // void swapPlayers(Player player);
+  void swapPlayers(Player player);
 
-  // void changeGoal(Goal goal);
+  void changeGoal(Goal goal);
 
-  // void changeSecondGoal(Goal goal);
+  void changeSecondGoal();
+
+  void nextPlayer();
+
+  boolean getHasCurrentPlayerInserted();
+
+  boolean getHasCurrentPlayerDoubleTurn();
+
+  void setHasCurrentPlayerDoubleTurn(boolean hasDoubleTurn);
+
+  void setHasCurrentPlayerInserted(boolean hasInserted);
+
+  void skipTurn();
+
+  // boolean getHasCurrentPlayerMoved();
 }

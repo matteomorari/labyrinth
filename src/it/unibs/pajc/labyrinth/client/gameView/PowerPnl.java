@@ -4,15 +4,16 @@ import it.unibs.pajc.labyrinth.core.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Player;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+
+import it.unibs.pajc.labyrinth.core.Card;
 import javax.swing.*;
 import java.awt.FontMetrics;
 
-public class CurrentGoalPnl extends JPanel {
-
+public class PowerPnl extends JPanel {
   // UI Constants
   private static final int DEFAULT_CARD_WIDTH = 200;
   private static final int MIN_CONTAINER_WIDTH = 200;
-  private static final int PANEL_VERTICAL_PADDING = 120;
+  private static final int PANEL_VERTICAL_PADDING = 45;
   private static final int PARENT_CONTAINER_MARGIN = 20;
   private static final int SCROLL_BAR_WIDTH = 25;
   private static final int CARD_HORIZONTAL_MARGIN = 80;
@@ -23,26 +24,24 @@ public class CurrentGoalPnl extends JPanel {
   private static final int TITLE_FONT_SIZE = 25;
   private static final String TITLE_FONT_FAMILY = "Times New Roman";
   private static final float OVAL_STROKE_WIDTH = 3.0f;
-  
+
   // Image scaling constants
   private static final int OVERLAY_WIDTH_DIVISOR = 2;
   private static final int OVERLAY_HEIGHT_DIVISOR = 3;
 
   private LabyrinthController controller;
-  private ImageCntrl goalCardBgCntrl;
-  private BufferedImage currentGoalImage;
+  private BufferedImage powerImage;
   private int cardWidth = DEFAULT_CARD_WIDTH;
   private final Font titleFont = new Font(TITLE_FONT_FAMILY, Font.BOLD, TITLE_FONT_SIZE);
   private int panelWidth;
 
-  public CurrentGoalPnl(LabyrinthController controller) {
+  public PowerPnl(LabyrinthController controller) {
     this.controller = controller;
-    goalCardBgCntrl = ImageCntrl.GOAL_CARD_BG;
   }
 
   private void updatePanelSize(int width) {
     this.panelWidth = width;
-    int panelHeight = currentGoalImage.getHeight() + PANEL_VERTICAL_PADDING;
+    int panelHeight =  ImageCntrl.valueOf("SWAP_POSITION").getImage().getWidth() + PANEL_VERTICAL_PADDING;
     setPreferredSize(new Dimension(width, panelHeight));
     setMaximumSize(new Dimension(width, panelHeight));
   }
@@ -56,7 +55,8 @@ public class CurrentGoalPnl extends JPanel {
         // If direct parent doesn't have width yet, try to get it from the scroll pnl
         Container ancestor = SwingUtilities.getAncestorOfClass(JScrollPane.class, this);
         if (ancestor != null && ancestor.getWidth() > 0) {
-          containerWidth = ancestor.getWidth() - SCROLL_BAR_WIDTH; // Account for scrollbar and insets
+          containerWidth =
+              ancestor.getWidth() - SCROLL_BAR_WIDTH; // Account for scrollbar and insets
         } else {
           // Fallback to a reasonable default if no ancestor with width is found
           containerWidth = MIN_CONTAINER_WIDTH;
@@ -93,65 +93,30 @@ public class CurrentGoalPnl extends JPanel {
 
     // Use FontMetrics to center the text properly
     FontMetrics fm = g2.getFontMetrics();
-    String line1 = "PROSSIMO";
-    String line2 = "OBBIETTIVO";
+    String line1 = "POTERE";
 
     int textX1 = (getWidth() - fm.stringWidth(line1)) / 2;
-    int textX2 = (getWidth() - fm.stringWidth(line2)) / 2;
     int textY1 = TITLE_TEXT_TOP_MARGIN; // Position from top
-    int textY2 = textY1 + fm.getHeight() + TITLE_TEXT_LINE_SPACING; // Add some spacing between lines
+    int textY2 =
+        textY1 + fm.getHeight() + TITLE_TEXT_LINE_SPACING; // Add some spacing between lines
 
     g2.drawString(line1, textX1, textY1);
-    g2.drawString(line2, textX2, textY2);
 
     updateGoalImage();
-    int imageX = (getWidth() - currentGoalImage.getWidth(null)) / 2;
+    int imageX = (getWidth() - ImageCntrl.valueOf("SWAP_POSITION").getImage().getWidth(null)) / 2;
     int imageY = textY2 + GOAL_IMAGE_TOP_MARGIN; // Position below the text with some padding
-    g2.drawImage(currentGoalImage, imageX, imageY, null);
+    g2.drawImage(powerImage, imageX, imageY, null);
   }
 
   public void updateGoalImage() {
     // Check if we need to recreate the scaled background
     cardWidth = Math.max(DEFAULT_CARD_WIDTH, panelWidth - CARD_HORIZONTAL_MARGIN);
-    BufferedImage goalCardBackground =
-        scaleImage(goalCardBgCntrl.getImage(), cardWidth, Integer.MAX_VALUE);
+    Card card= controller.getAvailableCard();
 
-    Player player = controller.getCurrentPlayer();
-    int goalCardWidth = goalCardBackground.getWidth();
-    int goalCardHeight = goalCardBackground.getHeight();
-
-    if (!player.getGoals().isEmpty()) {
-      ImageCntrl goalImageCntrl =
-          ImageCntrl.valueOf("GOAL_" + player.getCurrentGoal().getType().name());
-
-      // Create a combined image
-      currentGoalImage =
-          createCombinedImage(
-              goalCardBackground, goalImageCntrl.getImage(), goalCardWidth, goalCardHeight);
-    } else {
-      // Create an image with the background and an oval when goals are empty
-      BufferedImage combined =
-          new BufferedImage(goalCardWidth, goalCardHeight, BufferedImage.TYPE_INT_ARGB);
-      Graphics2D g2 = combined.createGraphics();
-      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-      // Draw background
-      g2.drawImage(goalCardBackground, 0, 0, null);
-
-      // Draw an oval in the center
-      int ovalWidth = goalCardWidth / OVERLAY_WIDTH_DIVISOR;
-      int ovalHeight = goalCardHeight / OVERLAY_HEIGHT_DIVISOR;
-      int x = (goalCardWidth - ovalWidth) / 2;
-      int y = (goalCardHeight - ovalHeight) / 2;
-
-      g2.setColor(player.getColor());
-      g2.setStroke(new BasicStroke(OVAL_STROKE_WIDTH));
-      g2.fillOval(x, y, ovalWidth, ovalHeight);
-
-      g2.dispose();
-      currentGoalImage = combined;
+    
+    if(card.getPower()!=null){
+      powerImage = scaleImage(ImageCntrl.valueOf(card.getPower().getType().toString()).getImage(), cardWidth, cardWidth);
     }
-
     repaint();
   }
 
@@ -172,30 +137,12 @@ public class CurrentGoalPnl extends JPanel {
       width = (int) (height * aspectRatio);
     }
 
-    BufferedImage scaledImage = goalCardBgCntrl.scaleBufferedImage(original, width, height);
+    Image tmp = original.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+    BufferedImage scaledImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g2d = scaledImage.createGraphics();
+    g2d.drawImage(tmp, 0, 0, null);
+    g2d.dispose();
 
     return scaledImage;
-  }
-
-  private BufferedImage createCombinedImage(
-      BufferedImage background, BufferedImage overlay, int width, int height) {
-    BufferedImage combined = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-    Graphics2D g2 = combined.createGraphics();
-
-    g2.drawImage(background, 0, 0, null);
-
-    // Scale the overlay image
-    int overlayWidth = width / OVERLAY_WIDTH_DIVISOR;
-    int overlayHeight = height / OVERLAY_HEIGHT_DIVISOR;
-    BufferedImage scaledOverlay =
-        goalCardBgCntrl.scaleBufferedImage(overlay, overlayWidth, overlayHeight);
-
-    // Draw the overlay centered
-    int x = (width - overlayWidth) / 2;
-    int y = (height - overlayHeight) / 2;
-    g2.drawImage(scaledOverlay, x, y, null);
-
-    g2.dispose();
-    return combined;
   }
 }
