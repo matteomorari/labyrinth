@@ -52,6 +52,7 @@ public enum ImageCntrl {
   DOUBLE_CARD_INSERTION("double_card_insertion.png"),
   DOUBLE_TURN("double_turn.png"),
   SWAP_POSITION("swap_position.png"),
+  NO_POWER("no_power.png"),
   ;
 
   private static final int IMAGE_SIZE = 72;

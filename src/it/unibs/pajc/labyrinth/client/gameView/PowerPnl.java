@@ -1,47 +1,47 @@
 package it.unibs.pajc.labyrinth.client.gameView;
 
+import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.LabyrinthController;
-import it.unibs.pajc.labyrinth.core.Player;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-
-import it.unibs.pajc.labyrinth.core.Card;
 import javax.swing.*;
-import java.awt.FontMetrics;
 
 public class PowerPnl extends JPanel {
   // UI Constants
   private static final int DEFAULT_CARD_WIDTH = 200;
   private static final int MIN_CONTAINER_WIDTH = 200;
-  private static final int PANEL_VERTICAL_PADDING = 45;
+  private static final int PANEL_VERTICAL_PADDING = 35;
   private static final int PARENT_CONTAINER_MARGIN = 20;
   private static final int SCROLL_BAR_WIDTH = 25;
   private static final int CARD_HORIZONTAL_MARGIN = 80;
   private static final int PANEL_CORNER_RADIUS = 20;
-  private static final int TITLE_TEXT_TOP_MARGIN = 40;
+  private static final int TITLE_TEXT_TOP_MARGIN = 30;
   private static final int TITLE_TEXT_LINE_SPACING = 5;
-  private static final int GOAL_IMAGE_TOP_MARGIN = 20;
+  // private static final int GOAL_IMAGE_TOP_MARGIN = 2;
+  private static final int BUTTON_TOP_MARGIN = 20;
   private static final int TITLE_FONT_SIZE = 25;
   private static final String TITLE_FONT_FAMILY = "Times New Roman";
-  private static final float OVAL_STROKE_WIDTH = 3.0f;
-
-  // Image scaling constants
-  private static final int OVERLAY_WIDTH_DIVISOR = 2;
-  private static final int OVERLAY_HEIGHT_DIVISOR = 3;
 
   private LabyrinthController controller;
   private BufferedImage powerImage;
   private int cardWidth = DEFAULT_CARD_WIDTH;
   private final Font titleFont = new Font(TITLE_FONT_FAMILY, Font.BOLD, TITLE_FONT_SIZE);
   private int panelWidth;
+  private JButton useButton;
 
   public PowerPnl(LabyrinthController controller) {
     this.controller = controller;
+
+    useButton = new JButton("Use");
+    useButton.addActionListener(e -> usePower());
+    setLayout(null);
+    add(useButton);
   }
 
   private void updatePanelSize(int width) {
     this.panelWidth = width;
-    int panelHeight =  ImageCntrl.valueOf("SWAP_POSITION").getImage().getWidth() + PANEL_VERTICAL_PADDING;
+    int panelHeight =
+        ImageCntrl.valueOf("SWAP_POSITION").getImage().getWidth() + PANEL_VERTICAL_PADDING;
     setPreferredSize(new Dimension(width, panelHeight));
     setMaximumSize(new Dimension(width, panelHeight));
   }
@@ -103,19 +103,35 @@ public class PowerPnl extends JPanel {
     g2.drawString(line1, textX1, textY1);
 
     updateGoalImage();
-    int imageX = (getWidth() - ImageCntrl.valueOf("SWAP_POSITION").getImage().getWidth(null)) / 2;
-    int imageY = textY2 + GOAL_IMAGE_TOP_MARGIN; // Position below the text with some padding
-    g2.drawImage(powerImage, imageX, imageY, null);
+    // Center the power image
+    if (powerImage != null) {
+      int imageX = (getWidth() - powerImage.getWidth()) / 2;
+      int imageY = textY2; // + GOAL_IMAGE_TOP_MARGIN; // Position below the text with some padding
+      g2.drawImage(powerImage, imageX, imageY, null);
+
+      // Position the use button below the image with some padding
+      int buttonY = imageY + powerImage.getHeight() + BUTTON_TOP_MARGIN;
+      useButton.setBounds(
+          (getWidth() - useButton.getPreferredSize().width) / 2,
+          buttonY,
+          useButton.getPreferredSize().width,
+          useButton.getPreferredSize().height);
+    }
   }
 
   public void updateGoalImage() {
     // Check if we need to recreate the scaled background
     cardWidth = Math.max(DEFAULT_CARD_WIDTH, panelWidth - CARD_HORIZONTAL_MARGIN);
-    Card card= controller.getAvailableCard();
+    Card card = controller.getAvailableCard();
 
-    
-    if(card.getPower()!=null){
-      powerImage = scaleImage(ImageCntrl.valueOf(card.getPower().getType().toString()).getImage(), cardWidth, cardWidth);
+    if (card.getPower() != null) {
+      powerImage =
+          scaleImage(
+              ImageCntrl.valueOf(card.getPower().getType().toString()).getImage(),
+              cardWidth,
+              cardWidth);
+    } else {
+      powerImage = scaleImage(ImageCntrl.valueOf("NO_POWER").getImage(), cardWidth, cardWidth);
     }
     repaint();
   }
@@ -144,5 +160,11 @@ public class PowerPnl extends JPanel {
     g2d.dispose();
 
     return scaledImage;
+  }
+
+  private void usePower() {
+    // Implement the logic to use the power
+    // For example, you can call a method on the controller to use the power
+    // controller.usePower();
   }
 }

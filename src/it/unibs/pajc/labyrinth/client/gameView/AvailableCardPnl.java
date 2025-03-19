@@ -21,7 +21,7 @@ public class AvailableCardPnl extends JPanel {
   // UI Constants
   private static final int DEFAULT_CARD_WIDTH = 100;
   private static final int MIN_CONTAINER_WIDTH = 200;
-  private static final int PANEL_VERTICAL_PADDING = 180;
+  private static final int PANEL_VERTICAL_PADDING = 165;
   private static final int PARENT_CONTAINER_MARGIN = 20;
   private static final int SCROLL_BAR_WIDTH = 25;
   private static final int CARD_HORIZONTAL_MARGIN = 80;
@@ -152,9 +152,8 @@ public class AvailableCardPnl extends JPanel {
     cardWidth = Math.max(DEFAULT_CARD_WIDTH, panelWidth - CARD_HORIZONTAL_MARGIN);
 
     // if (controller.getHasCurrentPlayerInserted()) {
-      availableCardImage = getCorrectCardImage();
-      // ImageCntrl.valueOf("CARD_" + controller.getAvailableCard().getType()).getImage();
-    // }
+    availableCardImage = getCorrectCardImage();
+    // ImageCntrl.valueOf("CARD_" + controller.getAvailableCard().getType()).getImage();
     availableCardImage = scaleImage(availableCardImage, cardWidth, Integer.MAX_VALUE);
 
     repaint();
@@ -200,23 +199,12 @@ public class AvailableCardPnl extends JPanel {
   }
 
   private void rotateCard() {
-    // Implement the logic to rotate the card
-    // For example, you can update the availableCardImage and repaint the panel
-    // if (controller.getHasCurrentPlayerInserted()) {
-    //   return;
-    //   // ImageCntrl.valueOf("CARD_" + controller.getAvailableCard().getType()).rotateImage(90);
-    // }
     controller.getAvailableCard().rotate();
     availableCardImage = rotateClockwise90(availableCardImage);
-    // controller.getAvailableCard().rotate();
-    // isRotated = !isRotated;
-    // updateCardImage();
     repaint();
   }
 
   private void skipTurn() {
-    // Implement the logic to skip the turn
-    // For example, you can call a method on the controller to skip the turn
     if (controller.getHasCurrentPlayerInserted() && controller.getHasCurrentPlayerDoubleTurn()) {
       controller.setHasCurrentPlayerInserted(false);
       controller.setHasCurrentPlayerDoubleTurn(false);
