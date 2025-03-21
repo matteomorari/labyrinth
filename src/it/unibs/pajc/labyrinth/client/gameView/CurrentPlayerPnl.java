@@ -25,7 +25,7 @@ public class CurrentPlayerPnl extends JPanel {
   private static final int PADDING_X = 15;
   private static final int PADDING_Y = 7;
   private static final int PLAYER_BOTTOM_SPACING = 20;
-  private static final int PLAYER_SIZE = 48;
+  private static final int PLAYER_SIZE = 35;
   private static final int TEXT_OVAL_SPACING = 10;
   private static final int OVAL_Y_ADJUSTMENT = 2;
 
@@ -147,7 +147,7 @@ public class CurrentPlayerPnl extends JPanel {
     int playerY =
         currentY - PLAYER_SIZE / 2 - OVAL_Y_ADJUSTMENT; // Align vertically with text center
     g2.drawImage(
-        ImageCntrl.valueOf(controller.getCurrentPlayer().getName() + "_PLAYER_SPRITE")
+        ImageCntrl.valueOf(controller.getCurrentPlayer().getColorName() + "_PLAYER_SPRITE")
             .getStandingAnimationImage(),
         leftPosition + textWidth + TEXT_OVAL_SPACING,
         playerY - 20,

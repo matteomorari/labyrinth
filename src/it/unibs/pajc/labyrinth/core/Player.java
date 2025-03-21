@@ -2,20 +2,20 @@ package it.unibs.pajc.labyrinth.core;
 
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.awt.Color;
+import java.awt.PageAttributes.ColorType;
 import java.util.ArrayDeque;
 
 public class Player {
   private ArrayDeque<Goal> goalsQueue;
   private Position position;
   private Position startPosition;
-  private Color color;
-  private String name;
+  private PlayerColor color;
 
-  public Player(String name) {
-    this.name = name;
+  public Player(PlayerColor color) {
     this.goalsQueue = new ArrayDeque<>();
     this.position = new Position();
     this.startPosition = new Position();
+    this.color = color;
   }
 
   public void addGoal(Goal goal) {
@@ -34,6 +34,14 @@ public class Player {
     this.position.setPosition(x, y);
   }
 
+  public String getColorName() {
+    return this.color.getColorName();
+  }
+
+  public Color getColor() {
+    return this.color.getColor();
+  }
+
   public Position getPosition() {
     return this.position;
   }
@@ -47,19 +55,7 @@ public class Player {
     return this.startPosition;
   }
 
-  public void setColor(Color color) {
+  public void setColor(PlayerColor color) {
     this.color = color;
-  }
-
-  public Color getColor() {
-    return color;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getName() {
-    return this.name;
   }
 }

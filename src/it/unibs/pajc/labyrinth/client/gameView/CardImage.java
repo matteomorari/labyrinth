@@ -3,6 +3,7 @@ package it.unibs.pajc.labyrinth.client.gameView;
 import it.unibs.pajc.labyrinth.client.animation.Animatable;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 public class CardImage implements Animatable {
   private ImageCntrl imageCntrl;
@@ -24,6 +25,11 @@ public class CardImage implements Animatable {
   public void draw(int posX, int posY, int width, int height) {
     this.image = this.image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
     g2.drawImage(image, posX, posY, null);
+  }
+
+  public BufferedImage getImage() {
+    // TODO: fix
+    return (BufferedImage)image;
   }
 
   public void setImage(Image image) {

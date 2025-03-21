@@ -13,7 +13,6 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import javax.imageio.ImageIO;
 
-
 public enum ImageCntrl {
   // load images
   CARD_L("L.png"),
@@ -43,19 +42,26 @@ public enum ImageCntrl {
   GOAL_MOUSE("mouse.png"),
   GOAL_FAIRY("fairy.png"),
   GOAL_CARD_BG("goal_card_bg.png"),
-  RED_PLAYER_SPRITE("red_player_sprite.png"),
-  BLACK_PLAYER_SPRITE("black_player_sprite.png"),
+  RED_PLAYER_SPRITE("red_sprite.png"),
+  GRAY_PLAYER_SPRITE("gray_player_sprite.png"),
   PINK_PLAYER_SPRITE("pink_player_sprite.png"),
-  GREEN_PLAYER_SPRITE("green_player_sprite.png"),
+  GREEN_PLAYER_SPRITE("green_sprite.png"),
   CHOOSE_SECOND_GOAL("choose_second_goal.png"),
   CHOOSE_GOAL("choose_goal.png"),
   DOUBLE_CARD_INSERTION("double_card_insertion.png"),
   DOUBLE_TURN("double_turn.png"),
   SWAP_POSITION("swap_position.png"),
   NO_POWER("no_power.png"),
+  BLACK_PLAYER_SPRITE("black_sprite.png"),
+  ORANGE_PLAYER_SPRITE("orange_sprite.png"),
+  YELLOW_PLAYER_SPRITE("yellow_player_sprite.png"),
+  BLUE_PLAYER_SPRITE("blue_sprite.png"),
+  ROTATE_CARD("rotate_card.png"),
+  SKIP_TURN("skip_turn.png"),
   ;
 
-  private static final int IMAGE_SIZE = 72;
+  // private static final int IMAGE_SIZE = 72;
+  private static final int IMAGE_SIZE = 32;
   private final Path path;
   private BufferedImage image;
 
@@ -91,16 +97,16 @@ public enum ImageCntrl {
     HashMap<Orientation, BufferedImage[]> playerAnimation =
         new HashMap<Orientation, BufferedImage[]>();
 
-    BufferedImage[] down = {getSprite(0, 0), getSprite(1, 0), getSprite(2, 0), getSprite(3, 0)};
+    BufferedImage[] down = {getSprite(0, 0), getSprite(1, 0), getSprite(2, 0), getSprite(1, 0)};
     playerAnimation.put(Orientation.SOUTH, down);
 
-    BufferedImage[] left = {getSprite(0, 1), getSprite(1, 1), getSprite(2, 1), getSprite(3, 1)};
+    BufferedImage[] left = {getSprite(0, 1), getSprite(1, 1), getSprite(2, 1), getSprite(1, 1)};
     playerAnimation.put(Orientation.WEST, left);
 
-    BufferedImage[] right = {getSprite(0, 2), getSprite(1, 2), getSprite(2, 2), getSprite(3, 2)};
+    BufferedImage[] right = {getSprite(0, 2), getSprite(1, 2), getSprite(2, 2), getSprite(1, 2)};
     playerAnimation.put(Orientation.EAST, right);
 
-    BufferedImage[] up = {getSprite(0, 3), getSprite(1, 3), getSprite(2, 3), getSprite(3, 3)};
+    BufferedImage[] up = {getSprite(0, 3), getSprite(1, 3), getSprite(2, 3), getSprite(1, 3)};
     playerAnimation.put(Orientation.NORD, up);
 
     return playerAnimation;

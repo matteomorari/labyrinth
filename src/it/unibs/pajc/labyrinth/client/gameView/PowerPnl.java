@@ -3,6 +3,7 @@ package it.unibs.pajc.labyrinth.client.gameView;
 import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.LabyrinthController;
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 
@@ -10,7 +11,7 @@ public class PowerPnl extends JPanel {
   // UI Constants
   private static final int DEFAULT_CARD_WIDTH = 200;
   private static final int MIN_CONTAINER_WIDTH = 200;
-  private static final int PANEL_VERTICAL_PADDING = 35;
+  private static final int PANEL_VERTICAL_PADDING = 60;
   private static final int PARENT_CONTAINER_MARGIN = 20;
   private static final int SCROLL_BAR_WIDTH = 25;
   private static final int CARD_HORIZONTAL_MARGIN = 80;
@@ -32,8 +33,8 @@ public class PowerPnl extends JPanel {
   public PowerPnl(LabyrinthController controller) {
     this.controller = controller;
 
-    useButton = new JButton("Use");
-    useButton.addActionListener(e -> usePower());
+    useButton = new CircularButton(new ImageIcon("resource\\images\\use_power.png"));
+    useButton.addActionListener(e -> HandleUsePowerBtn());
     setLayout(null);
     add(useButton);
   }
@@ -66,7 +67,7 @@ public class PowerPnl extends JPanel {
       }
 
       panelWidth = containerWidth;
-      updateGoalImage();
+      updatePowerImage();
       updatePanelSize(containerWidth);
       revalidate();
       repaint();
@@ -102,7 +103,7 @@ public class PowerPnl extends JPanel {
 
     g2.drawString(line1, textX1, textY1);
 
-    updateGoalImage();
+    updatePowerImage();
     // Center the power image
     if (powerImage != null) {
       int imageX = (getWidth() - powerImage.getWidth()) / 2;
@@ -119,7 +120,7 @@ public class PowerPnl extends JPanel {
     }
   }
 
-  public void updateGoalImage() {
+  public void updatePowerImage() {
     // Check if we need to recreate the scaled background
     cardWidth = Math.max(DEFAULT_CARD_WIDTH, panelWidth - CARD_HORIZONTAL_MARGIN);
     Card card = controller.getAvailableCard();
@@ -162,9 +163,44 @@ public class PowerPnl extends JPanel {
     return scaledImage;
   }
 
-  private void usePower() {
-    // Implement the logic to use the power
-    // For example, you can call a method on the controller to use the power
-    // controller.usePower();
+  private void HandleUsePowerBtn() {
+    if (controller.getAvailableCard().getPower() != null && !controller.getHasUsedPower()) {
+      controller.usePower();
+    }
+  }
+
+  private static class CircularButton extends JButton {
+    public CircularButton(ImageIcon icon) {
+      super(icon);
+      setPreferredSize(new Dimension(50, 50)); // Set the button size to be square
+      setContentAreaFilled(false);
+      setFocusPainted(false);
+      setBorderPainted(false);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+      Graphics2D g2 = (Graphics2D) g.create();
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+      // Draw the circular background
+      if (getModel().isArmed()) {
+        g2.setColor(Color.LIGHT_GRAY);
+      } else {
+        g2.setColor(getBackground());
+      }
+      g2.fill(new Ellipse2D.Float(0, 0, getWidth(), getHeight()));
+
+      // Draw the icon
+      g2.setClip(new Ellipse2D.Float(0, 0, getWidth(), getHeight()));
+      super.paintComponent(g2);
+      g2.dispose();
+    }
+
+    @Override
+    public boolean contains(int x, int y) {
+      Ellipse2D ellipse = new Ellipse2D.Float(0, 0, getWidth(), getHeight());
+      return ellipse.contains(x, y);
+    }
   }
 }

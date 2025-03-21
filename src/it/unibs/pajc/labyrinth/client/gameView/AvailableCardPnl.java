@@ -1,5 +1,8 @@
 package it.unibs.pajc.labyrinth.client.gameView;
 
+import it.unibs.pajc.labyrinth.client.animation.Animatable;
+import it.unibs.pajc.labyrinth.client.animation.Animator;
+import it.unibs.pajc.labyrinth.client.animation.EasingFunction;
 import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.LabyrinthController;
 import java.awt.Color;
@@ -11,12 +14,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
-public class AvailableCardPnl extends JPanel {
+public class AvailableCardPnl extends JPanel implements Animatable {
 
   // UI Constants
   private static final int DEFAULT_CARD_WIDTH = 100;
@@ -40,22 +44,45 @@ public class AvailableCardPnl extends JPanel {
   private int panelWidth;
   private JButton rotateButton;
   private JButton skipTurnButton;
+  private Animator animator;
+  private int animationCardAngle;
+  private boolean isRotating = false;
 
   public AvailableCardPnl(LabyrinthController controller) {
     this.controller = controller;
     availableCardImage = getCorrectCardImage();
 
     // Initialize the rotate button
-    rotateButton = new JButton("Rotate");
-    rotateButton.addActionListener(e -> rotateCard());
+    rotateButton = createCustomButton("resource\\images\\rotate_card.png");
+    rotateButton.addActionListener(e -> handleRotationCardBtn());
 
     // Initialize the skip turn button
-    skipTurnButton = new JButton("Skip Turn");
-    skipTurnButton.addActionListener(e -> skipTurn());
+    skipTurnButton = createCustomButton("resource\\images\\skip_turn.png");
+    skipTurnButton.addActionListener(e -> handleSkipTurnBtn());
 
     // Set layout and add buttons
     add(rotateButton);
     add(skipTurnButton);
+
+    // set animation
+    animationCardAngle = 0;
+    animator =
+        new Animator(
+            this,
+            1000,
+            EasingFunction.EASE_OUT_BOUNCE,
+            () -> {
+              onAnimationEnded();
+            });
+  }
+
+  private JButton createCustomButton(String imagePath) {
+    JButton button = new JButton(new ImageIcon(imagePath));
+    button.setPreferredSize(new Dimension(50, 50)); // Set the button size to be square
+    button.setContentAreaFilled(false);
+    button.setFocusPainted(false);
+    button.setBorderPainted(false);
+    return button;
   }
 
   private void updatePanelSize(int width) {
@@ -188,43 +215,33 @@ public class AvailableCardPnl extends JPanel {
 
   private BufferedImage getCorrectCardImage() {
     Card card = controller.getAvailableCard();
-    BufferedImage availableCardImage = ImageCntrl.valueOf("CARD_" + card.getType()).getImage();
-    Card card2 = new Card(card.getType(), null);
-
-    while (card.getOrientation() != card2.getOrientation()) {
-      card2.rotate();
-      availableCardImage = rotateClockwise90(availableCardImage);
-    }
-    return availableCardImage;
+    // BufferedImage availableCardImage = ;
+    CardImage cardImage =
+        new CardImage(
+            ImageCntrl.valueOf("CARD_" + card.getType()), (Graphics2D) this.getGraphics());
+    cardImage.rotate(card.getOrientation().ordinal() * 90 + animationCardAngle);
+    return cardImage.getImage();
   }
 
-  private void rotateCard() {
+  private void handleRotationCardBtn() {
     controller.getAvailableCard().rotate();
-    availableCardImage = rotateClockwise90(availableCardImage);
-    repaint();
+    isRotating = true;
+    animator.initializeAnimation(new int[] {-90}, new int[] {0});
+    animator.start();
   }
 
-  private void skipTurn() {
-    if (controller.getHasCurrentPlayerInserted() && controller.getHasCurrentPlayerDoubleTurn()) {
-      controller.setHasCurrentPlayerInserted(false);
-      controller.setHasCurrentPlayerDoubleTurn(false);
-    } else if (controller.getHasCurrentPlayerInserted()) {
-      controller.skipTurn();
-    }
+  private void handleSkipTurnBtn() {
+    controller.skipTurn();
   }
 
-  // utility method
-  public static BufferedImage rotateClockwise90(BufferedImage src) {
-    int width = src.getWidth();
-    int height = src.getHeight();
+  @Override
+  public void updateAnimation(int[] values) {
+    animationCardAngle = values[0];
+  }
 
-    BufferedImage dest = new BufferedImage(height, width, src.getType());
-
-    Graphics2D graphics2D = dest.createGraphics();
-    graphics2D.translate((height - width) / 2, (height - width) / 2);
-    graphics2D.rotate(Math.PI / 2, height / 2, width / 2);
-    graphics2D.drawRenderedImage(src, null);
-
-    return dest;
+  private boolean onAnimationEnded() {
+    //TODO: ?
+    // animationCardAngle = -90;
+    return isRotating = false;
   }
 }

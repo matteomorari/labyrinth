@@ -33,15 +33,11 @@ public interface LabyrinthController {
 
   void nextPlayer();
 
-  boolean getHasCurrentPlayerInserted();
-
-  boolean getHasCurrentPlayerDoubleTurn();
-
-  void setHasCurrentPlayerDoubleTurn(boolean hasDoubleTurn);
-
-  void setHasCurrentPlayerInserted(boolean hasInserted);
-
   void skipTurn();
+
+  void usePower();
+
+  boolean getHasUsedPower();
 
   // boolean getHasCurrentPlayerMoved();
 }

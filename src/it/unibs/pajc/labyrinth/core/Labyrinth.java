@@ -25,7 +25,8 @@ public class Labyrinth extends BaseModel {
   private ArrayList<Position> lastPlayerMovedPath;
   // TODO: to move to the player class?
   private boolean hasCurrentPlayerInserted = false;
-  private boolean hasDoubleTurn = false;
+  private boolean hasCurrentPlayerDoubleTurn = false;
+  private boolean hasUsedPower = false;
   private HashMap<PowerType, Runnable> powerActions;
 
   public Labyrinth() {
@@ -54,8 +55,8 @@ public class Labyrinth extends BaseModel {
     return hasCurrentPlayerInserted;
   }
 
-  public boolean getHasDoubleTurn() {
-    return hasDoubleTurn;
+  public boolean getHasCurrentPlayerDoubleTurn() {
+    return hasCurrentPlayerDoubleTurn;
   }
 
   public void initializePlayerPositions() {
@@ -108,16 +109,22 @@ public class Labyrinth extends BaseModel {
   }
 
   public void skipTurn() {
-    nextPlayer();
+    if (hasCurrentPlayerInserted && hasCurrentPlayerDoubleTurn) {
+      setHasCurrentPlayerInserted(false);
+      setHasCurrentPlayerHasDoubleTurn(false);
+    } else if (hasCurrentPlayerInserted) {
+      nextPlayer();
+    }
     this.fireChangeListener();
   }
 
   public Player nextPlayer() {
     this.players.add(this.players.poll());
     this.hasCurrentPlayerInserted = false;
+    setHasUsedPower(!hasUsedPower);
     // in case due to card insertion the player changes position and the goal is found
     isGoalFound(getCurrentPlayer());
-    System.out.println("Current player: " + this.getCurrentPlayer().getName());
+    System.out.println("Current player: " + this.getCurrentPlayer().getColorName());
     return this.getCurrentPlayer();
   }
 
@@ -302,11 +309,6 @@ public class Labyrinth extends BaseModel {
     this.availableCard = nextAvailableCard;
     this.lastInsertedCardPosition = insertPosition;
 
-    // solo per ora per il meme
-    if (availableCard.getPower() != null) {
-      usePower(availableCard.getPower().getType());
-    }
-
     checkAndProceedToNextPlayer();
     this.fireChangeListener();
   }
@@ -314,6 +316,11 @@ public class Labyrinth extends BaseModel {
   // if the player can't move, go to the next player immediately
   public void checkAndProceedToNextPlayer() {
     if (getCardOpenDirection(getPlayerCard(getCurrentPlayer())).isEmpty()) {
+      if (availableCard.getPower() != null
+          && !hasUsedPower &&(availableCard.getPower().getType() == PowerType.DOUBLE_TURN
+              || availableCard.getPower().getType() == PowerType.DOUBLE_CARD_INSERTION)) {
+        return;
+      }
       nextPlayer();
     }
   }
@@ -322,6 +329,7 @@ public class Labyrinth extends BaseModel {
     System.out.println(availableCard.getPower().getType().toString());
     System.out.println();
     powerActions.getOrDefault(availableCard.getPower().getType(), () -> {}).run();
+    setHasUsedPower(true);
 
     this.fireChangeListener();
   }
@@ -341,9 +349,9 @@ public class Labyrinth extends BaseModel {
     powerActions.put(
         PowerType.DOUBLE_TURN,
         () -> {
-          hasDoubleTurn = true;
+          hasCurrentPlayerDoubleTurn = true;
           if (getCardOpenDirection(getPlayerCard(getCurrentPlayer())).isEmpty()) {
-            hasDoubleTurn = false;
+            hasCurrentPlayerDoubleTurn = false;
             hasCurrentPlayerInserted = false;
           }
         });
@@ -666,9 +674,9 @@ public class Labyrinth extends BaseModel {
     this.lastPlayerMovedPath = path;
     isGoalFound(currentPlayer);
 
-    if (hasDoubleTurn) {
+    if (hasCurrentPlayerDoubleTurn) {
       hasCurrentPlayerInserted = false;
-      hasDoubleTurn = false;
+      hasCurrentPlayerDoubleTurn = false;
     } else {
       nextPlayer();
     }
@@ -755,7 +763,15 @@ public class Labyrinth extends BaseModel {
     this.hasCurrentPlayerInserted = hasCurrentPlayerInserted;
   }
 
-  public void setCurrentPlayerHasDoubleTurn(boolean hasDoubleTurn) {
-    this.hasDoubleTurn = hasDoubleTurn;
+  public void setHasCurrentPlayerHasDoubleTurn(boolean hasDoubleTurn) {
+    this.hasCurrentPlayerDoubleTurn = hasDoubleTurn;
+  }
+
+  public boolean getHasUsedPower() {
+    return hasUsedPower;
+  }
+
+  public void setHasUsedPower(boolean hasUsedPower) {
+    this.hasUsedPower = hasUsedPower;
   }
 }

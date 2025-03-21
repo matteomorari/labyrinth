@@ -72,27 +72,17 @@ public class LabyrinthLocalController implements LabyrinthController {
     model.nextPlayer();
   }
 
-  public boolean getHasCurrentPlayerInserted() {
-    return model.getHasCurrentPlayerInserted();
-  }
-
-  public boolean getHasCurrentPlayerDoubleTurn() {
-    return model.getHasDoubleTurn();
-  }
-
-  public void setHasCurrentPlayerInserted(boolean hasCurrentPlayerInserted) {
-    model.setHasCurrentPlayerInserted(hasCurrentPlayerInserted);
-  }
-
-  public void setHasCurrentPlayerDoubleTurn(boolean hasDoubleTurn) {
-    model.setCurrentPlayerHasDoubleTurn(hasDoubleTurn);
-  }
-
   public void skipTurn() {
     model.skipTurn();
   }
 
-  // public boolean getHasCurrentPlayerMoved() {
-  //   return model.getHasCurrentPlayerMoved();
-  // }
+  @Override
+  public void usePower() {
+    model.usePower(getAvailableCard().getPower().getType());
+  }
+
+  @Override
+  public boolean getHasUsedPower() {
+    return model.getHasUsedPower();
+  }
 }

@@ -27,7 +27,7 @@ public class GoalsPlayersPnl extends JPanel {
   private static final int LINE_HEIGHT = 25;
   private static final int TITLE_BOTTOM_SPACING = 30;
   private static final int PLAYER_BOTTOM_SPACING = 20;
-  private static final int PLAYER_SIZE = 48;
+  private static final int PLAYER_SIZE = 35;
   private static final int TEXT_OVAL_SPACING = 10;
   private static final int OVAL_Y_ADJUSTMENT = 2;
 
@@ -143,7 +143,7 @@ public class GoalsPlayersPnl extends JPanel {
     // Find the maximum width of player text
     int maxTextWidth = 0;
     for (Player player : players) {
-      String playerText = player.getName() + " " + player.getGoals().size() + " goals left";
+      String playerText = " " + player.getGoals().size() + " goals left";
       FontMetrics fm = g2.getFontMetrics();
       int textWidth = fm.stringWidth(playerText);
       if (textWidth > maxTextWidth) {
@@ -152,7 +152,7 @@ public class GoalsPlayersPnl extends JPanel {
     }
 
     for (Player player : players) {
-      String playerText = player.getName() + " " + player.getGoals().size() + " goals left";
+      String playerText = " " + player.getGoals().size() + " goals left";
 
       // Calculate the total width needed (oval + spacing + max text width)
       int totalWidth = PLAYER_SIZE + TEXT_OVAL_SPACING + maxTextWidth;
@@ -164,11 +164,11 @@ public class GoalsPlayersPnl extends JPanel {
       int playerY =
           currentY - PLAYER_SIZE / 2 - OVAL_Y_ADJUSTMENT; // Align vertically with text center
       g2.drawImage(
-          ImageCntrl.valueOf(player.getName() + "_PLAYER_SPRITE").getStandingAnimationImage(),
+          ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE").getStandingAnimationImage(),
           leftPosition,
-          playerY - 20,
+          playerY - 10,
           PLAYER_SIZE,
-          PLAYER_SIZE,
+          PLAYER_SIZE ,
           null);
 
       // Draw player text to the right of the oval
