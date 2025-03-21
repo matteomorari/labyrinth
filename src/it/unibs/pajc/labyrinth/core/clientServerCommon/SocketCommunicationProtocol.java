@@ -41,7 +41,7 @@ public class SocketCommunicationProtocol {
         Consumer<LabyrinthEvent> commandExe =
             e.getCommand() != null && commandMap.containsKey(e.getCommand())
                 ? commandMap.get(e.getCommand())
-                : commandMap.get("@debug@");
+                : commandMap.get("@debug@"); // TODO: ??
 
         if (commandExe != null) commandExe.accept(e);
         else System.out.println("comando non riconosciuto");
@@ -55,7 +55,6 @@ public class SocketCommunicationProtocol {
   }
 
   private synchronized void close() {
-
     try {
       isRunning = false;
       outputStream.close();

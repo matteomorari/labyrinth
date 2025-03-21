@@ -16,17 +16,17 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
     implements LabyrinthController {
 
   Labyrinth model;
+  Player player;
 
   static {
     commandMap = new HashMap<>();
 
     commandMap.put(
-        "@STATUS",
+        "new_player",
         e -> {
           try {
-
             LabyrinthClientController cntrl = (LabyrinthClientController) e.getSender();
-            // cntrl.model.deserialize(e.getParameters());
+            
           } catch (Exception exc) {
 
             exc.printStackTrace();

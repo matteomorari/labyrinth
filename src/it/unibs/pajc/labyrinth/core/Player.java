@@ -10,16 +10,19 @@ public class Player {
   private Position position;
   private Position startPosition;
   private Color color;
-  private String name;
-  private String uniqueID;
+  private String name; //TODO: remove
+  private String id;
 
   public Player() {
     this(null, UUID.randomUUID().toString());
   }
+  public Player(String uniqueID) {
+    this(null, uniqueID);
+  }
 
   public Player(String name, String uniqueID) {
     this.name = name;
-    this.uniqueID = uniqueID;
+    this.id = uniqueID;
     this.goalsQueue = new ArrayDeque<>();
     this.position = new Position();
     this.startPosition = new Position();
@@ -70,12 +73,12 @@ public class Player {
     return this.name;
   }
 
-  public void setUniqueID(String uniqueID) {
-    this.uniqueID = uniqueID;
+  public void setId(String id) {
+    this.id = id;
   }
 
-  public String getUniqueID() {
-    return uniqueID;
+  public String getId() {
+    return id;
   }
 
   public ArrayDeque<Goal> getGoalsQueue() {

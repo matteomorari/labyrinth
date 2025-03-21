@@ -5,11 +5,8 @@ import it.unibs.pajc.labyrinth.core.clientServerCommon.SocketCommunicationProtoc
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 public class LabyrinthServer {
-  private ArrayList<GameLobby> games = new ArrayList<>();
-  private ArrayList<SocketCommunicationProtocol> playersInGameSearch = new ArrayList<>();
 
   public static void main(String[] args) {
     LabyrinthServer trisServer = new LabyrinthServer();
@@ -33,13 +30,11 @@ public class LabyrinthServer {
   }
 
   public SocketCommunicationProtocol addPlayer(Socket playerSocket) {
-    // TrisGame game = findFreeGame();
-    Player player = new Player(null, null);
+    Player player = new Player();
 
     LabyrinthServerProtocol playerProtocol = new LabyrinthServerProtocol(player, playerSocket);
 
     new Thread(() -> playerProtocol.run()).start();
-    // game.addPlayerConnection(playerProtocol);
 
     return playerProtocol;
   }
