@@ -1,42 +1,83 @@
 package it.unibs.pajc.labyrinth.client;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import it.unibs.pajc.labyrinth.core.Card;
+import it.unibs.pajc.labyrinth.core.GameLobby;
 import it.unibs.pajc.labyrinth.core.Goal;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.LabyrinthController;
+import it.unibs.pajc.labyrinth.core.OnlineGameManager;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.clientServerCommon.SocketCommunicationProtocol;
+import it.unibs.pajc.labyrinth.core.utility.GameLobbyGson;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.net.Socket;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class LabyrinthClientController extends SocketCommunicationProtocol
     implements LabyrinthController {
 
-  Labyrinth model;
+  // ! TODO: what a shame to have more than one model
+  Labyrinth labyrinthModel;
+  OnlineGameManager onlineGameManager;
   Player player;
 
-  static {
-    commandMap = new HashMap<>();
+  public LabyrinthClientController(OnlineGameManager onlineGameManager) {
+    super(null);
+    this.labyrinthModel = null;
+    this.onlineGameManager = onlineGameManager;
+    this.player = null;
+    createCommandMap();
+  }
 
+  private void createCommandMap() {
     commandMap.put(
         "new_player",
         e -> {
           try {
             LabyrinthClientController cntrl = (LabyrinthClientController) e.getSender();
-            
+            setLocalPlayer(e.getParameters().get("player_id").toString());
           } catch (Exception exc) {
-
             exc.printStackTrace();
           }
         });
-  }
+    commandMap.put(
+        "send_lobbies",
+        e -> {
+          try {
+            LabyrinthClientController cntrl = (LabyrinthClientController) e.getSender();
+            ArrayList<GameLobby> availableLobbies = new ArrayList<>();
+            JsonElement lobbiesParameters = e.getParameters().get("lobbies");
 
-  public LabyrinthClientController() {
-    super(null);
-    this.model = new Labyrinth();
+            JsonElement parsedLobbies = JsonParser.parseString(lobbiesParameters.getAsString());
+            for (JsonElement gameLobbyElement : parsedLobbies.getAsJsonArray()) {
+              GameLobby lobby = GameLobbyGson.fromJson(gameLobbyElement.toString());
+              availableLobbies.add(lobby);
+            }
+            onlineGameManager.setAvailableLobbies(availableLobbies);
+
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
+    commandMap.put(
+        "update_lobby",
+        e -> {
+          try {
+            LabyrinthClientController cntrl = (LabyrinthClientController) e.getSender();
+            JsonElement lobbyParameters = e.getParameters().get("lobby");
+            JsonElement parsedLobbyData = JsonParser.parseString(lobbyParameters.getAsString());
+
+            GameLobby lobby = GameLobbyGson.fromJson(parsedLobbyData.toString());
+            onlineGameManager.setSelectedLobby(lobby);
+
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
   }
 
   public boolean connect(String serverAddress, int serverPort) {
@@ -48,6 +89,29 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
       return false;
     }
     return true;
+  }
+
+  public void setLocalPlayer(String playerId) {
+    this.player = new Player(playerId);
+  }
+
+  public void fetchLobbyOptions() {
+    sendMsg(this, createMessage("fetch_lobbies", null));
+  }
+
+  public OnlineGameManager getOnlineGameManager() {
+    return onlineGameManager;
+  }
+
+  public void joinLobby(String lobbyId) {
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "join_lobby");
+
+    JsonObject parameters = new JsonObject();
+    parameters.addProperty("lobby_id", lobbyId);
+
+    msg.add("parameters", parameters);
+    sendMsg(this, msg.toString());
   }
 
   @Override

@@ -7,13 +7,12 @@ import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
 import java.awt.Color;
 
-public class MyGson {
+public class LabyrinthGson {
   Gson gson;
 
-  public MyGson() {
+  public LabyrinthGson() {
     gson =
         new GsonBuilder()
-            // .registerTypeAdapter(Goal.class, new GoalAdapter())
             .registerTypeAdapter(Color.class, new ColorAdapter())
             .setPrettyPrinting()
             .create();

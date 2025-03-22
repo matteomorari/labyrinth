@@ -31,10 +31,11 @@ public class LabyrinthServer {
 
   public SocketCommunicationProtocol addPlayer(Socket playerSocket) {
     Player player = new Player();
-
+    System.out.println("New player: " + player.getId());
     LabyrinthServerProtocol playerProtocol = new LabyrinthServerProtocol(player, playerSocket);
 
     new Thread(() -> playerProtocol.run()).start();
+    playerProtocol.sendNewPlayerMsg();
 
     return playerProtocol;
   }

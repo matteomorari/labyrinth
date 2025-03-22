@@ -1,6 +1,6 @@
 package it.unibs.pajc.labyrinth.core;
 
-import it.unibs.pajc.labyrinth.core.utility.MyGson;
+import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
 import it.unibs.pajc.labyrinth.core.utility.Orientation;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ public class Bot {
 
   Labyrinth model;
   Player player;
-  MyGson myGson = new MyGson();
+  LabyrinthGson myGson = new LabyrinthGson();
 
   public Bot(Labyrinth model, Player player) {
     this.model = model;

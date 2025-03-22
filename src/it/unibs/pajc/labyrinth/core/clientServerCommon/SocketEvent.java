@@ -9,12 +9,15 @@ public class SocketEvent<T> {
   protected T sender;
   protected JsonObject message;
   protected String command;
-  protected ArrayList<String> parameters = new ArrayList<>();
+  protected JsonObject parameters;
 
   public SocketEvent(T sender, String message) {
     this.sender = sender;
     this.message = JsonParser.parseString(message).getAsJsonObject();
     this.command = this.message.get("command").getAsString();
+    if (this.message.has("parameters") && !this.message.get("parameters").isJsonNull()) {
+      this.parameters = this.message.getAsJsonObject("parameters");
+    }
   }
 
   // private static ArrayList<String> parseParameters(String message) {
@@ -30,9 +33,14 @@ public class SocketEvent<T> {
   //   return parameters;
   // }
 
-  // public static String createMessage(String command, String... params) {
-  //   return String.format("@%s", command, String.join(":", params));
-  // }
+  public static String createMessage(String comand, JsonObject parameters) {
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", comand);
+    if (parameters != null){
+      msg.add("parameters", parameters);
+    }
+    return msg.toString();
+  }
 
   public T getSender() {
     return sender;
@@ -46,9 +54,9 @@ public class SocketEvent<T> {
     return message;
   }
 
-  // public ArrayList<String> getParameters() {
-  //   return parameters;
-  // }
+  public JsonObject getParameters() {
+    return parameters;
+  }
 
   // public int getParametersCount() {
   //   return parameters.size();

@@ -3,8 +3,9 @@ package it.unibs.pajc.labyrinth.client;
 import it.unibs.pajc.labyrinth.client.gameView.GamePnl;
 import it.unibs.pajc.labyrinth.core.Bot;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
+import it.unibs.pajc.labyrinth.core.OnlineGameManager;
 import it.unibs.pajc.labyrinth.core.Player;
-import it.unibs.pajc.labyrinth.core.utility.MyGson;
+import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -76,7 +77,7 @@ public class LocalOnlineGameSelectionPnl extends JPanel {
         e.printStackTrace();
       }
 
-      MyGson myGson = new MyGson();
+      LabyrinthGson myGson = new LabyrinthGson();
       labyrinthModel = myGson.fromJson(deepCopy);
     } else {
       labyrinthModel = new Labyrinth();
@@ -104,7 +105,7 @@ public class LocalOnlineGameSelectionPnl extends JPanel {
     JPanel tempPnl = new JPanel();
     tempPnl.setLayout(new BorderLayout());
 
-    JPanel gamePanel = new GamePnl(controller);
+    GamePnl gamePanel = new GamePnl(controller);
     labyrinthModel.addChangeListener(e -> gamePanel.repaint());
     tempPnl.add(gamePanel, BorderLayout.CENTER);
     tempPnl.setVisible(true);
@@ -126,7 +127,18 @@ public class LocalOnlineGameSelectionPnl extends JPanel {
 
   /** Opens the online game finder UI */
   private void findOnlineGame() {
-    LabyrinthClientController clientCntrl = new LabyrinthClientController();
+    OnlineGameManager onlineGameManager = new OnlineGameManager();
+
+    LabyrinthClientController clientCntrl = new LabyrinthClientController(onlineGameManager);
     clientCntrl.connect("localhost", 1234);
+
+    FindOnlineGamePnl findOnlineGamePnl = new FindOnlineGamePnl(clientCntrl);
+    onlineGameManager.addChangeListener(e -> findOnlineGamePnl.updateData());
+    JPanel parent = (JPanel) getParent();
+    parent.removeAll();
+    parent.setLayout(new BorderLayout());
+    parent.add(findOnlineGamePnl, BorderLayout.CENTER);
+    parent.revalidate();
+    parent.repaint();
   }
 }

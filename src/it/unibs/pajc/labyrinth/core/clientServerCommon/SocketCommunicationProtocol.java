@@ -1,9 +1,12 @@
 package it.unibs.pajc.labyrinth.core.clientServerCommon;
 
+import com.google.gson.JsonObject;
+import it.unibs.pajc.labyrinth.server.LabyrinthServerProtocol;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
@@ -11,11 +14,14 @@ public class SocketCommunicationProtocol {
   protected Socket remoteHost;
   protected BufferedReader inputStream;
   protected PrintWriter outputStream;
-  protected static HashMap<String, Consumer<LabyrinthEvent>> commandMap;
+  protected HashMap<String, Consumer<LabyrinthEvent>> commandMap;
   protected boolean isRunning = false;
+  private static ArrayList<SocketCommunicationProtocol> connectedPlayers = new ArrayList<>();
 
   public SocketCommunicationProtocol(Socket client) {
+    commandMap = new HashMap<>();
     connect(client);
+    connectedPlayers.add(this);
   }
 
   public void connect(Socket client) {
@@ -48,6 +54,7 @@ public class SocketCommunicationProtocol {
       }
 
       System.out.printf("Collegamento terminato\n");
+      connectedPlayers.remove(this);
       close();
     } catch (Exception ex) {
       ex.printStackTrace();
@@ -81,11 +88,14 @@ public class SocketCommunicationProtocol {
     }
   }
 
-  public String createMessage(String command) {
-    return String.format("@%s", command);
+  public static String createMessage(String comand, JsonObject parameters) {
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", comand);
+    msg.add("parameters", parameters);
+    return msg.toString();
   }
 
-  public String createMessage(String command, String... params) {
-    return String.format("@%s:%s", command, String.join(":", params));
+  public static ArrayList<SocketCommunicationProtocol> getConnectedPlayers() {
+    return connectedPlayers;
   }
 }
