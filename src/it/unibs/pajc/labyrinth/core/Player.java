@@ -10,12 +10,14 @@ public class Player {
   private Position position;
   private Position startPosition;
   private Color color;
-  private String name; //TODO: remove
+  private String name; // TODO: remove
   private String id;
+  private Boolean isReadyToPlay = false;
 
   public Player() {
     this(null, UUID.randomUUID().toString());
   }
+
   public Player(String uniqueID) {
     this(null, uniqueID);
   }
@@ -83,5 +85,13 @@ public class Player {
 
   public ArrayDeque<Goal> getGoalsQueue() {
     return goalsQueue;
+  }
+
+  public void setIsReadyToPlay(Boolean isReadyToPlay) {
+    this.isReadyToPlay = isReadyToPlay;
+  }
+
+  public Boolean isReadyToPlay() {
+    return isReadyToPlay;
   }
 }

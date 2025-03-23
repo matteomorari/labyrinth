@@ -31,10 +31,22 @@ public class LabyrinthServer {
 
   public SocketCommunicationProtocol addPlayer(Socket playerSocket) {
     Player player = new Player();
-    System.out.println("New player: " + player.getId());
     LabyrinthServerProtocol playerProtocol = new LabyrinthServerProtocol(player, playerSocket);
 
     new Thread(() -> playerProtocol.run()).start();
+
+    // Wait until the protocol thread is initialized
+    synchronized (playerProtocol) {
+      while (!playerProtocol.isInitialized()) {
+        try {
+          playerProtocol.wait();
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          System.err.println("Interrupted while waiting for protocol thread initialization.");
+        }
+      }
+    }
+
     playerProtocol.sendNewPlayerMsg();
 
     return playerProtocol;

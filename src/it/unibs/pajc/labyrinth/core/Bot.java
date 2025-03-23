@@ -10,7 +10,6 @@ public class Bot {
 
   Labyrinth model;
   Player player;
-  LabyrinthGson myGson = new LabyrinthGson();
 
   public Bot(Labyrinth model, Player player) {
     this.model = model;
@@ -31,7 +30,7 @@ public class Bot {
     HashMap<Move, PositionDistance> closestGoalPositionsMap = new HashMap<>();
     for (Position cardInsertionPosition : availableCardInsertionPoint) {
       for (int i = 0; i < Orientation.values().length; i++) {
-        Labyrinth modelCopy = myGson.createCopy(model);
+        Labyrinth modelCopy = LabyrinthGson.createCopy(model);
         modelCopy.getAvailableCard().rotate(i);
         modelCopy.insertCard(cardInsertionPosition);
 

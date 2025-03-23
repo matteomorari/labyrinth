@@ -29,7 +29,7 @@
       "name": "Start Server and Client",
       "configurations": [
         "Launch Server",
-        "Launch Client"
+        "Launch Client",
       ]
     }
   ],

@@ -1,13 +1,12 @@
 package it.unibs.pajc.labyrinth.core.clientServerCommon;
 
 import com.google.gson.JsonObject;
-import it.unibs.pajc.labyrinth.server.LabyrinthServerProtocol;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 public class SocketCommunicationProtocol {
@@ -16,7 +15,9 @@ public class SocketCommunicationProtocol {
   protected PrintWriter outputStream;
   protected HashMap<String, Consumer<LabyrinthEvent>> commandMap;
   protected boolean isRunning = false;
-  private static ArrayList<SocketCommunicationProtocol> connectedPlayers = new ArrayList<>();
+  private static CopyOnWriteArrayList<SocketCommunicationProtocol> connectedPlayers =
+      new CopyOnWriteArrayList<>();
+  private volatile boolean initialized = false;
 
   public SocketCommunicationProtocol(Socket client) {
     commandMap = new HashMap<>();
@@ -38,6 +39,10 @@ public class SocketCommunicationProtocol {
       System.out.printf("Player collegato\n");
 
       isRunning = true;
+      synchronized (this) {
+        initialized = true;
+        notifyAll();
+      }
       String request;
       while (isRunning && (request = inputStream.readLine()) != null) {
         System.out.printf("Processing request: %s\n", request);
@@ -59,6 +64,10 @@ public class SocketCommunicationProtocol {
     } catch (Exception ex) {
       ex.printStackTrace();
     }
+  }
+
+  public boolean isInitialized() {
+    return initialized;
   }
 
   private synchronized void close() {
@@ -85,6 +94,8 @@ public class SocketCommunicationProtocol {
       System.out.printf("invio messaggio: %s\n", msg);
       outputStream.println(msg);
       outputStream.flush();
+    } else {
+      System.out.printf("impossibile inviare messaggio, outputStream nullo\n");
     }
   }
 
@@ -95,7 +106,7 @@ public class SocketCommunicationProtocol {
     return msg.toString();
   }
 
-  public static ArrayList<SocketCommunicationProtocol> getConnectedPlayers() {
+  public static CopyOnWriteArrayList<SocketCommunicationProtocol> getConnectedPlayers() {
     return connectedPlayers;
   }
 }

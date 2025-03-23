@@ -102,6 +102,7 @@ public class LocalOnlineGameSelectionPnl extends JPanel {
       controller.initGame();
     }
 
+    // TODO: to remove
     JPanel tempPnl = new JPanel();
     tempPnl.setLayout(new BorderLayout());
 
@@ -131,6 +132,18 @@ public class LocalOnlineGameSelectionPnl extends JPanel {
 
     LabyrinthClientController clientCntrl = new LabyrinthClientController(onlineGameManager);
     clientCntrl.connect("localhost", 1234);
+
+    // Wait until the protocol thread is initialized
+    synchronized (clientCntrl) {
+      while (!clientCntrl.isInitialized()) {
+        try {
+          clientCntrl.wait();
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          System.err.println("Interrupted while waiting for protocol thread initialization.");
+        }
+      }
+    }
 
     FindOnlineGamePnl findOnlineGamePnl = new FindOnlineGamePnl(clientCntrl);
     onlineGameManager.addChangeListener(e -> findOnlineGamePnl.updateData());

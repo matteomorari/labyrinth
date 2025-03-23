@@ -1,31 +1,37 @@
 package it.unibs.pajc.labyrinth.core;
 
 import it.unibs.pajc.labyrinth.server.LabyrinthServerProtocol;
+import java.awt.Color;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class GameLobby {
-  private transient HashMap<Player, LabyrinthServerProtocol> players;
-  private ArrayList<Player> playersList;
-  private Labyrinth labyrinth;
-  private String lobbyName;
-  private String lobbyId;
+  private final transient ReentrantLock lock = new ReentrantLock();
+  private transient ConcurrentHashMap<Player, LabyrinthServerProtocol> players;
+  private CopyOnWriteArrayList<Player> playersList;
+  private volatile Labyrinth labyrinth;
+  private volatile String lobbyName;
+  private final String LOBBY_ID;
+  private Boolean gameInProgress;
 
-  public GameLobby(Labyrinth labyrinth, String lobbyName) {
+  public GameLobby(String lobbyName) {
+    this.players = new ConcurrentHashMap<>();
+    this.playersList = new CopyOnWriteArrayList<>();
+    this.LOBBY_ID = UUID.randomUUID().toString();
     this.lobbyName = lobbyName;
-    this.labyrinth = labyrinth;
-    this.lobbyId = UUID.randomUUID().toString();
-    this.players = new HashMap<>();
-    this.playersList = new ArrayList<>();
+    this.labyrinth = new Labyrinth();
+    this.gameInProgress = false;
   }
 
-  public void addPlayer(Player player, LabyrinthServerProtocol playerSocket) {
+  public synchronized void addPlayer(Player player, LabyrinthServerProtocol playerSocket) {
     this.players.put(player, playerSocket);
     this.playersList.add(player);
   }
 
-  public void removePlayer(Player player) {
+  public synchronized void removePlayer(Player player) {
     this.players.remove(player);
     this.playersList.remove(player);
   }
@@ -34,11 +40,11 @@ public class GameLobby {
     return new ArrayList<>(this.playersList);
   }
 
-  public HashMap<Player, LabyrinthServerProtocol> getPlayersSockets() {
+  public ConcurrentHashMap<Player, LabyrinthServerProtocol> getPlayersSockets() {
     return this.players;
   }
 
-  public void setModel(Labyrinth labyrinth) {
+  public synchronized void setModel(Labyrinth labyrinth) {
     this.labyrinth = labyrinth;
   }
 
@@ -46,7 +52,7 @@ public class GameLobby {
     return this.labyrinth;
   }
 
-  public void setLobbyName(String lobbyName) {
+  public synchronized void setLobbyName(String lobbyName) {
     this.lobbyName = lobbyName;
   }
 
@@ -54,11 +60,22 @@ public class GameLobby {
     return lobbyName;
   }
 
-  public void startGame() {
-    for (Player player : this.players.keySet()) {
-      this.labyrinth.addPlayer(player);
+  public synchronized void startGame() {
+    lock.lock();
+    // TODO: to remove, this is just for testing purposes
+    playersList.get(0).setColor(Color.RED);
+    playersList.get(0).setName("RED");
+    playersList.get(1).setColor(Color.MAGENTA);
+    playersList.get(1).setName("PINK");
+
+    try {
+      for (Player player : this.players.keySet()) {
+        this.labyrinth.addPlayer(player);
+      }
+      this.labyrinth.initGame();
+    } finally {
+      lock.unlock();
     }
-    this.labyrinth.initGame();
   }
 
   public int getPlayerCount() {
@@ -68,7 +85,15 @@ public class GameLobby {
     return this.playersList.size();
   }
 
-  public String getLobbyId() {
-    return lobbyId;
+  public String getLOBBY_ID() {
+    return LOBBY_ID;
+  }
+
+  public void setGameInProgress(Boolean gameInProgress) {
+    this.gameInProgress = gameInProgress;
+  }
+
+  public Boolean isGameInProgress() {
+    return gameInProgress;
   }
 }

@@ -12,6 +12,7 @@ import it.unibs.pajc.labyrinth.core.OnlineGameManager;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.clientServerCommon.SocketCommunicationProtocol;
 import it.unibs.pajc.labyrinth.core.utility.GameLobbyGson;
+import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.net.Socket;
 import java.util.ArrayDeque;
@@ -78,6 +79,23 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
             exc.printStackTrace();
           }
         });
+    commandMap.put(
+        "game_started",
+        e -> {
+          try {
+            LabyrinthClientController cntrl = (LabyrinthClientController) e.getSender();
+            JsonElement labyrinthParameters = e.getParameters().get("labyrinth");
+            JsonElement parsedLabyrinthData =
+                JsonParser.parseString(labyrinthParameters.getAsString());
+
+            Labyrinth labyrinth = LabyrinthGson.fromJson(parsedLabyrinthData.toString());
+            this.labyrinthModel = labyrinth;
+            onlineGameManager.getSelectedLobby().setModel(labyrinth);
+            onlineGameManager.setGameInProgress();
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
   }
 
   public boolean connect(String serverAddress, int serverPort) {
@@ -114,6 +132,18 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
     sendMsg(this, msg.toString());
   }
 
+  public void togglePlayerReadyToPlay() {
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "toggle_player_ready");
+
+    JsonObject parameters = new JsonObject();
+    parameters.addProperty("player_id", this.player.getId().toString());
+    parameters.addProperty("lobby_id", this.onlineGameManager.getSelectedLobby().getLOBBY_ID());
+
+    msg.add("parameters", parameters);
+    sendMsg(this, msg.toString());
+  }
+
   @Override
   public void initGame() {
     // TODO Auto-generated method stub
@@ -122,26 +152,22 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
 
   @Override
   public int getBoardSize() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getBoardSize'");
+    return labyrinthModel.getBoardSize();
   }
 
   @Override
   public ArrayList<ArrayList<Card>> getBoard() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getBoard'");
+    return labyrinthModel.getBoard();
   }
 
   @Override
   public Player getCurrentPlayer() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getCurrentPlayer'");
+    return labyrinthModel.getCurrentPlayer();
   }
 
   @Override
   public ArrayDeque<Player> getPlayers() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getPlayers'");
+    return labyrinthModel.getPlayers();
   }
 
   @Override
@@ -170,8 +196,7 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
 
   @Override
   public Card getAvailableCard() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getAvailableCard'");
+    return labyrinthModel.getAvailableCard();
   }
 
   @Override

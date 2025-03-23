@@ -12,8 +12,7 @@ public class OnlineGameManager extends BaseModel {
   }
 
   public void createLobby(String lobbyName) {
-    Labyrinth labyrinth = new Labyrinth();
-    GameLobby newLobby = new GameLobby(labyrinth, lobbyName);
+    GameLobby newLobby = new GameLobby(lobbyName);
     this.availableLobbies.add(newLobby);
   }
 
@@ -33,5 +32,10 @@ public class OnlineGameManager extends BaseModel {
 
   public GameLobby getSelectedLobby() {
     return selectedLobby;
+  }
+
+  public void setGameInProgress() {
+    this.selectedLobby.setGameInProgress(true);
+    this.fireChangeListener();
   }
 }
