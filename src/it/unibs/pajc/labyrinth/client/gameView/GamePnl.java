@@ -2,7 +2,6 @@ package it.unibs.pajc.labyrinth.client.gameView;
 
 import it.unibs.pajc.labyrinth.core.LabyrinthController;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ComponentAdapter;
@@ -229,13 +228,5 @@ public class GamePnl extends JPanel {
 
     revalidate();
     repaint();
-  }
-
-  // Utility method to create a placeholder panel
-  private static JPanel createPanel() {
-    JPanel panel = new JPanel();
-    panel.setBackground(Color.LIGHT_GRAY);
-    panel.setPreferredSize(new Dimension(RIGHT_COLUMN_WIDTH, 100));
-    return panel;
   }
 }

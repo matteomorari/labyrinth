@@ -3,23 +3,23 @@ package it.unibs.pajc.labyrinth.client.gameView;
 import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.LabyrinthController;
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
+import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 
 public class PowerPnl extends JPanel {
   // UI Constants
-  private static final int DEFAULT_CARD_WIDTH = 200;
+  private static final int DEFAULT_CARD_WIDTH = 100;
   private static final int MIN_CONTAINER_WIDTH = 200;
-  private static final int PANEL_VERTICAL_PADDING = 60;
+  private static final int PANEL_VERTICAL_PADDING = 150;
   private static final int PARENT_CONTAINER_MARGIN = 20;
   private static final int SCROLL_BAR_WIDTH = 25;
   private static final int CARD_HORIZONTAL_MARGIN = 80;
   private static final int PANEL_CORNER_RADIUS = 20;
-  private static final int TITLE_TEXT_TOP_MARGIN = 30;
-  private static final int TITLE_TEXT_LINE_SPACING = 5;
+  private static final int TITLE_TEXT_TOP_MARGIN = 40;
+  // private static final int TITLE_TEXT_LINE_SPACING = 10;
   // private static final int GOAL_IMAGE_TOP_MARGIN = 2;
-  private static final int BUTTON_TOP_MARGIN = 20;
+  private static final int BUTTON_TOP_MARGIN = 10;
   private static final int TITLE_FONT_SIZE = 25;
   private static final String TITLE_FONT_FAMILY = "Times New Roman";
 
@@ -33,7 +33,7 @@ public class PowerPnl extends JPanel {
   public PowerPnl(LabyrinthController controller) {
     this.controller = controller;
 
-    useButton = new CircularButton(new ImageIcon("resource\\images\\use_power.png"));
+    useButton = new CircularButton("resource\\images\\power.svg");
     useButton.addActionListener(e -> HandleUsePowerBtn());
     setLayout(null);
     add(useButton);
@@ -41,8 +41,7 @@ public class PowerPnl extends JPanel {
 
   private void updatePanelSize(int width) {
     this.panelWidth = width;
-    int panelHeight =
-        ImageCntrl.valueOf("SWAP_POSITION").getImage().getWidth() + PANEL_VERTICAL_PADDING;
+    int panelHeight = powerImage.getHeight() + PANEL_VERTICAL_PADDING;
     setPreferredSize(new Dimension(width, panelHeight));
     setMaximumSize(new Dimension(width, panelHeight));
   }
@@ -98,26 +97,28 @@ public class PowerPnl extends JPanel {
 
     int textX1 = (getWidth() - fm.stringWidth(line1)) / 2;
     int textY1 = TITLE_TEXT_TOP_MARGIN; // Position from top
-    int textY2 =
-        textY1 + fm.getHeight() + TITLE_TEXT_LINE_SPACING; // Add some spacing between lines
+    int textY2 = textY1 + fm.getHeight(); // Add some spacing between lines
 
     g2.drawString(line1, textX1, textY1);
 
     updatePowerImage();
+    cardWidth = Math.max(DEFAULT_CARD_WIDTH, panelWidth - CARD_HORIZONTAL_MARGIN);
     // Center the power image
+    int imageY = textY2; // + GOAL_IMAGE_TOP_MARGIN; // Position below the text with some padding
     if (powerImage != null) {
       int imageX = (getWidth() - powerImage.getWidth()) / 2;
-      int imageY = textY2; // + GOAL_IMAGE_TOP_MARGIN; // Position below the text with some padding
       g2.drawImage(powerImage, imageX, imageY, null);
-
-      // Position the use button below the image with some padding
-      int buttonY = imageY + powerImage.getHeight() + BUTTON_TOP_MARGIN;
-      useButton.setBounds(
-          (getWidth() - useButton.getPreferredSize().width) / 2,
-          buttonY,
-          useButton.getPreferredSize().width,
-          useButton.getPreferredSize().height);
+    } else {
+      g2.setColor(Color.gray);
+      g2.fill(new RoundRectangle2D.Float(0, 0, cardWidth, cardWidth, 80, 80));
     }
+    // Position the use button below the image with some padding
+    int buttonY = imageY + powerImage.getHeight() + BUTTON_TOP_MARGIN;
+    useButton.setBounds(
+        (getWidth() - useButton.getPreferredSize().width) / 2,
+        buttonY + 10,
+        useButton.getPreferredSize().width,
+        useButton.getPreferredSize().height);
   }
 
   public void updatePowerImage() {
@@ -130,9 +131,28 @@ public class PowerPnl extends JPanel {
           scaleImage(
               ImageCntrl.valueOf(card.getPower().getType().toString()).getImage(),
               cardWidth,
-              cardWidth);
+              Integer.MAX_VALUE);
+      if (controller.getHasUsedPower()) {
+        // Make the border of the image green
+        Graphics2D g2d = powerImage.createGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setColor(Color.RED);
+        g2d.setStroke(new BasicStroke(7));
+        g2d.draw(
+            new RoundRectangle2D.Float(
+                0, -2, powerImage.getWidth(), powerImage.getHeight(), 100, 100));
+        g2d.dispose();
+      }
     } else {
-      powerImage = scaleImage(ImageCntrl.valueOf("NO_POWER").getImage(), cardWidth, cardWidth);
+      // Create a white rounded rectangle with dashed borders the size of the swap player power card
+      powerImage = new BufferedImage(cardWidth, cardWidth, BufferedImage.TYPE_INT_ARGB);
+      Graphics2D g2d = powerImage.createGraphics();
+      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      g2d.setColor(Color.gray);
+      g2d.fill(new RoundRectangle2D.Float(2, 2, cardWidth - 2, cardWidth - 2, 80, 80));
+      g2d.setColor(Color.BLACK);
+
+      g2d.dispose();
     }
     repaint();
   }
@@ -164,43 +184,8 @@ public class PowerPnl extends JPanel {
   }
 
   private void HandleUsePowerBtn() {
-    if (controller.getAvailableCard().getPower() != null && !controller.getHasUsedPower()) {
+    if (controller.getAvailableCard().getPower() != null) {
       controller.usePower();
-    }
-  }
-
-  private static class CircularButton extends JButton {
-    public CircularButton(ImageIcon icon) {
-      super(icon);
-      setPreferredSize(new Dimension(50, 50)); // Set the button size to be square
-      setContentAreaFilled(false);
-      setFocusPainted(false);
-      setBorderPainted(false);
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-      Graphics2D g2 = (Graphics2D) g.create();
-      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-      // Draw the circular background
-      if (getModel().isArmed()) {
-        g2.setColor(Color.LIGHT_GRAY);
-      } else {
-        g2.setColor(getBackground());
-      }
-      g2.fill(new Ellipse2D.Float(0, 0, getWidth(), getHeight()));
-
-      // Draw the icon
-      g2.setClip(new Ellipse2D.Float(0, 0, getWidth(), getHeight()));
-      super.paintComponent(g2);
-      g2.dispose();
-    }
-
-    @Override
-    public boolean contains(int x, int y) {
-      Ellipse2D ellipse = new Ellipse2D.Float(0, 0, getWidth(), getHeight());
-      return ellipse.contains(x, y);
     }
   }
 }

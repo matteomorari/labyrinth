@@ -27,7 +27,7 @@ public class Labyrinth extends BaseModel {
   private boolean hasCurrentPlayerInserted = false;
   private boolean hasCurrentPlayerDoubleTurn = false;
   private boolean hasUsedPower = false;
-  private HashMap<PowerType, Runnable> powerActions;
+  private transient HashMap<PowerType, Runnable> powerActions;
 
   public Labyrinth() {
     this(7);
@@ -121,7 +121,7 @@ public class Labyrinth extends BaseModel {
   public Player nextPlayer() {
     this.players.add(this.players.poll());
     this.hasCurrentPlayerInserted = false;
-    setHasUsedPower(!hasUsedPower);
+    setHasUsedPower(false);
     // in case due to card insertion the player changes position and the goal is found
     isGoalFound(getCurrentPlayer());
     System.out.println("Current player: " + this.getCurrentPlayer().getColorName());
@@ -317,8 +317,8 @@ public class Labyrinth extends BaseModel {
   public void checkAndProceedToNextPlayer() {
     if (getCardOpenDirection(getPlayerCard(getCurrentPlayer())).isEmpty()) {
       if (availableCard.getPower() != null
-          && !hasUsedPower &&(availableCard.getPower().getType() == PowerType.DOUBLE_TURN
-              || availableCard.getPower().getType() == PowerType.DOUBLE_CARD_INSERTION)) {
+          && !hasUsedPower
+          && (availableCard.getPower() != null)) {
         return;
       }
       nextPlayer();
@@ -328,9 +328,10 @@ public class Labyrinth extends BaseModel {
   public void usePower(PowerType powerType) {
     System.out.println(availableCard.getPower().getType().toString());
     System.out.println();
-    powerActions.getOrDefault(availableCard.getPower().getType(), () -> {}).run();
-    setHasUsedPower(true);
-
+    if (hasCurrentPlayerInserted && !hasUsedPower && availableCard.getPower() != null) {
+      powerActions.getOrDefault(availableCard.getPower().getType(), () -> {}).run();
+      setHasUsedPower(true);
+    }
     this.fireChangeListener();
   }
 

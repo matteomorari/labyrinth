@@ -39,5 +39,7 @@ public interface LabyrinthController {
 
   boolean getHasUsedPower();
 
+  boolean getHasCurrentPlayerInserted();
+
   // boolean getHasCurrentPlayerMoved();
 }

@@ -14,7 +14,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -25,13 +24,14 @@ public class AvailableCardPnl extends JPanel implements Animatable {
   // UI Constants
   private static final int DEFAULT_CARD_WIDTH = 100;
   private static final int MIN_CONTAINER_WIDTH = 200;
-  private static final int PANEL_VERTICAL_PADDING = 165;
+  private static final int PANEL_VERTICAL_PADDING = 185;
   private static final int PARENT_CONTAINER_MARGIN = 20;
   private static final int SCROLL_BAR_WIDTH = 25;
   private static final int CARD_HORIZONTAL_MARGIN = 80;
   private static final int PANEL_CORNER_RADIUS = 20;
   private static final int TITLE_TEXT_TOP_MARGIN = 40;
   private static final int TITLE_TEXT_LINE_SPACING = 5;
+  private static final int BUTTON_HORIZONTAL_GAP = 20;
   private static final int GOAL_IMAGE_TOP_MARGIN = 20;
   private static final int BUTTON_TOP_MARGIN = 20;
   private static final int TITLE_FONT_SIZE = 25;
@@ -53,11 +53,11 @@ public class AvailableCardPnl extends JPanel implements Animatable {
     availableCardImage = getCorrectCardImage();
 
     // Initialize the rotate button
-    rotateButton = createCustomButton("resource\\images\\rotate_card.png");
+    rotateButton = new CircularButton("resource\\images\\rotate.svg");
     rotateButton.addActionListener(e -> handleRotationCardBtn());
 
     // Initialize the skip turn button
-    skipTurnButton = createCustomButton("resource\\images\\skip_turn.png");
+    skipTurnButton = new CircularButton("resource\\images\\skip.svg");
     skipTurnButton.addActionListener(e -> handleSkipTurnBtn());
 
     // Set layout and add buttons
@@ -74,15 +74,6 @@ public class AvailableCardPnl extends JPanel implements Animatable {
             () -> {
               onAnimationEnded();
             });
-  }
-
-  private JButton createCustomButton(String imagePath) {
-    JButton button = new JButton(new ImageIcon(imagePath));
-    button.setPreferredSize(new Dimension(50, 50)); // Set the button size to be square
-    button.setContentAreaFilled(false);
-    button.setFocusPainted(false);
-    button.setBorderPainted(false);
-    return button;
   }
 
   private void updatePanelSize(int width) {
@@ -157,9 +148,11 @@ public class AvailableCardPnl extends JPanel implements Animatable {
     g2.drawImage(availableCardImage, imageX, imageY, null);
 
     // Position the rotate and skip turn buttons below the image with some padding
-    int buttonY = imageY + availableCardImage.getHeight() + BUTTON_TOP_MARGIN;
+    int buttonY = imageY + availableCardImage.getWidth() + BUTTON_TOP_MARGIN;
     int totalButtonWidth =
-        rotateButton.getPreferredSize().width + skipTurnButton.getPreferredSize().width + 10;
+        rotateButton.getPreferredSize().width
+            + skipTurnButton.getPreferredSize().width
+            + BUTTON_HORIZONTAL_GAP;
     int buttonX = (getWidth() - totalButtonWidth) / 2;
 
     rotateButton.setBounds(
@@ -168,7 +161,7 @@ public class AvailableCardPnl extends JPanel implements Animatable {
         rotateButton.getPreferredSize().width,
         rotateButton.getPreferredSize().height);
     skipTurnButton.setBounds(
-        buttonX + rotateButton.getPreferredSize().width + 10,
+        buttonX + rotateButton.getPreferredSize().width + BUTTON_HORIZONTAL_GAP,
         buttonY,
         skipTurnButton.getPreferredSize().width,
         skipTurnButton.getPreferredSize().height);
@@ -226,6 +219,7 @@ public class AvailableCardPnl extends JPanel implements Animatable {
   private void handleRotationCardBtn() {
     controller.getAvailableCard().rotate();
     isRotating = true;
+    animationCardAngle = -90;
     animator.initializeAnimation(new int[] {-90}, new int[] {0});
     animator.start();
   }
@@ -240,8 +234,6 @@ public class AvailableCardPnl extends JPanel implements Animatable {
   }
 
   private boolean onAnimationEnded() {
-    //TODO: ?
-    // animationCardAngle = -90;
     return isRotating = false;
   }
 }

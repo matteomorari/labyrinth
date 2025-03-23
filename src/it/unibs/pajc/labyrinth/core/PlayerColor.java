@@ -7,10 +7,12 @@ public enum PlayerColor {
   BLUE("BLUE", Color.BLUE),
   GREEN("GREEN", Color.GREEN),
   YELLOW("YELLOW", Color.YELLOW),
-  PINK("PINK", Color.MAGENTA),
+  PINK("PINK", Color.pink),
   BLACK("BLACK", Color.darkGray),
   GRAY("GRAY", Color.GRAY),
-  ORANGE("ORANGE", Color.ORANGE),;
+  ORANGE("ORANGE", Color.ORANGE),
+  WHITE("WHITE", Color.LIGHT_GRAY),
+  MAGENTA("MAGENTA", Color.MAGENTA);
 
   private final String colorName;
   private final Color color;

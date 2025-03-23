@@ -85,4 +85,9 @@ public class LabyrinthLocalController implements LabyrinthController {
   public boolean getHasUsedPower() {
     return model.getHasUsedPower();
   }
+
+  @Override
+  public boolean getHasCurrentPlayerInserted() {
+    return model.getHasCurrentPlayerInserted();
+  }
 }
