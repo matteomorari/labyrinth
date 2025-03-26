@@ -25,11 +25,9 @@ public interface LabyrinthController {
 
   Card getAvailableCard();
 
-  void swapPlayers(Player player);
+  void setPlayerToSwap(Player player);
 
-  void changeGoal(Goal goal);
-
-  void changeSecondGoal();
+  void setGoalToSwap(Goal goal);
 
   void nextPlayer();
 
@@ -41,5 +39,7 @@ public interface LabyrinthController {
 
   boolean getHasCurrentPlayerInserted();
 
-  // boolean getHasCurrentPlayerMoved();
+  Player getPlayerToSwap();
+
+  Goal getGoalToSwap();
 }

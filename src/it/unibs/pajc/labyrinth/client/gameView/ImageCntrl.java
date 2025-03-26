@@ -57,8 +57,8 @@ public enum ImageCntrl {
   GREEN_PLAYER_SPRITE("green_sprite.png"),
   WHITE_PLAYER_SPRITE("white_sprite.png"),
   MAGENTA_PLAYER_SPRITE("magenta_sprite.png"),
-  
-  ;
+  BROWN_PLAYER_SPRITE("brown_sprite.png"),
+  SKYBLUE_PLAYER_SPRITE("skyblue_sprite.png"),;
 
   // private static final int IMAGE_SIZE = 72;
   private static final int IMAGE_SIZE = 32;

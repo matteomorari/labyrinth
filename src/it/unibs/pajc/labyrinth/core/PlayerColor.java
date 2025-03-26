@@ -12,12 +12,14 @@ public enum PlayerColor {
   GRAY("GRAY", Color.GRAY),
   ORANGE("ORANGE", Color.ORANGE),
   WHITE("WHITE", Color.LIGHT_GRAY),
-  MAGENTA("MAGENTA", Color.MAGENTA);
+  MAGENTA("MAGENTA", Color.MAGENTA),
+  BROWN("BROWN", new Color(139, 69, 19)),
+  SKYBLUE("SKYBLUE", new Color(135, 206, 235)),;
 
   private final String colorName;
   private final Color color;
 
-  PlayerColor(String colorName, Color color) {
+  PlayerColor(String colorName, Color color) {  
     this.colorName = colorName;
     this.color = color;
   }

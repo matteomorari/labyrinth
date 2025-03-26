@@ -18,7 +18,7 @@ public class CircularButton extends JButton {
   private BufferedImage svgImage;
 
   public CircularButton(String svgFilePath) {
-    setPreferredSize(new Dimension(40, 40)); // Set the button size to be square
+    setPreferredSize(new Dimension(45, 45)); // Set the button size to be square
     setContentAreaFilled(false);
     setFocusPainted(false);
     setBorderPainted(false);
@@ -52,7 +52,7 @@ public class CircularButton extends JButton {
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
     // Draw the circular background
-    g2.setColor(Color.LIGHT_GRAY);
+    g2.setColor(Color.WHITE);
     g2.fill(new Ellipse2D.Float(0, 0, getWidth(), getHeight()));
 
     // Draw the SVG icon
