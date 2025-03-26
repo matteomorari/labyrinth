@@ -6,10 +6,13 @@ import it.unibs.pajc.labyrinth.core.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.PowerType;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Iterator;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 public class PowerPnl extends JPanel {
   // UI Constants
@@ -24,8 +27,9 @@ public class PowerPnl extends JPanel {
   private static final int BUTTON_TOP_MARGIN = 10;
   private static final int TITLE_FONT_SIZE = 25;
   private static final String TITLE_FONT_FAMILY = "Times New Roman";
-  // private static final Dimension POPUP_SIZE = new Dimension(400, 200);
   private static final int POPUP_IMAGE_SIZE = 100; // New constant for player image size
+  private static final int BUTTON_PADDING = 10;
+  private static final int LINE_THICKNESS = 5;
 
   private LabyrinthController controller;
   private BufferedImage powerImage;
@@ -187,14 +191,14 @@ public class PowerPnl extends JPanel {
     return scaledImage;
   }
 
-  private BufferedImage scaleImage(BufferedImage original, int size) {
-    Image tmp = original.getScaledInstance(size, size, Image.SCALE_SMOOTH);
-    BufferedImage scaledImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-    Graphics2D g2d = scaledImage.createGraphics();
-    g2d.drawImage(tmp, 0, 0, null);
-    g2d.dispose();
-    return scaledImage;
-  }
+  // private BufferedImage scaleImage(BufferedImage original, int size) {
+  //   Image tmp = original.getScaledInstance(size, size, Image.SCALE_SMOOTH);
+  //   BufferedImage scaledImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+  //   Graphics2D g2d = scaledImage.createGraphics();
+  //   g2d.drawImage(tmp, 0, 0, null);
+  //   g2d.dispose();
+  //   return scaledImage;
+  // }
 
   private void HandleUsePowerBtn() {
     if (controller.getAvailableCard().getPower() != null
@@ -215,82 +219,138 @@ public class PowerPnl extends JPanel {
 
   private void showSwapPlayerPopup() {
     JPanel panel = new JPanel(new GridLayout(1, controller.getPlayers().size() - 1));
-    // panel.setPreferredSize(POPUP_SIZE);
+    panel.setPreferredSize(new Dimension(400, 200));
     panel.setBackground(Color.LIGHT_GRAY);
     Player currentPlayer = controller.getCurrentPlayer();
+
+    JDialog dialog = new JDialog((Frame) null, null, true);
+    dialog.getContentPane().add(createCustomPanel(panel, "SELECT   PLAYER"));
+    dialog.pack();
+    dialog.setLocationRelativeTo(this);
 
     for (Player player : controller.getPlayers()) {
       if (!player.equals(currentPlayer)) {
         BufferedImage playerImage =
             ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE")
                 .getStandingAnimationImage();
-        playerImage = scaleImage(playerImage, POPUP_IMAGE_SIZE);
+        playerImage = scaleImage(playerImage, POPUP_IMAGE_SIZE, POPUP_IMAGE_SIZE);
         JButton playerButton = new JButton(new ImageIcon(playerImage));
+        playerButton.setFocusPainted(false);
         playerButton.setBackground(Color.LIGHT_GRAY);
+        playerButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
+        playerButton.addMouseListener(new MouseAdapter() {
+          @Override
+          public void mouseEntered(java.awt.event.MouseEvent evt) {
+            playerButton.setBorder(new LineBorder(Color.GREEN, LINE_THICKNESS));
+          }
+  
+          @Override
+          public void mouseExited(java.awt.event.MouseEvent evt) {
+            playerButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
+          }
+        });
         playerButton.addActionListener(
             e -> {
               controller.setPlayerToSwap(player);
+              dialog.dispose();
             });
         panel.add(playerButton);
       }
     }
 
-    // JOptionPane.showMessageDialog(this, panel, "SELECT PLAYER TO SWAP", JOptionPane.PLAIN_MESSAGE);
-    showCustomOptionPane(panel, "SELECT  PLAYER");
+    dialog.setVisible(true);
   }
 
   private void showSwapGoalPopup() {
     JPanel panel =
         new JPanel(new GridLayout(1, controller.getCurrentPlayer().getGoals().size() - 1));
-    // panel.setPreferredSize(POPUP_SIZE);
+    panel.setPreferredSize(new Dimension(400, 200));
     panel.setBackground(Color.LIGHT_GRAY);
     Goal currentGoal = controller.getCurrentPlayer().getGoals().getFirst();
+
+    JDialog dialog = new JDialog((Frame) null, null, true);
+    dialog.getContentPane().add(createCustomPanel(panel, "SELECT   GOAL"));
+    dialog.pack();
+    dialog.setLocationRelativeTo(this);
 
     for (Goal goal : controller.getCurrentPlayer().getGoals()) {
       if (!goal.equals(currentGoal)) {
         BufferedImage goalImage = ImageCntrl.valueOf("GOAL_" + goal.getType()).getImage();
-        goalImage = scaleImage(goalImage, POPUP_IMAGE_SIZE);
+        goalImage = scaleImage(goalImage, POPUP_IMAGE_SIZE, POPUP_IMAGE_SIZE);
         JButton goalButton = new JButton(new ImageIcon(goalImage));
         goalButton.setBackground(Color.LIGHT_GRAY);
+        goalButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
+        goalButton.setFocusPainted(false);
+        goalButton.addMouseListener(new MouseAdapter() {
+          @Override
+          public void mouseEntered(java.awt.event.MouseEvent evt) {
+            goalButton.setBorder(new LineBorder(Color.GREEN, LINE_THICKNESS));
+          }
+  
+          @Override
+          public void mouseExited(java.awt.event.MouseEvent evt) {
+            goalButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
+          }
+        });
         goalButton.addActionListener(
             e -> {
               controller.setGoalToSwap(goal);
+              dialog.dispose();
             });
         panel.add(goalButton);
       }
     }
 
-    showCustomOptionPane(panel, "SELECT  GOAL");
+    dialog.setVisible(true);
   }
 
   private void showSwapSecondGoalPopup() {
     JPanel panel = new JPanel(new GridLayout(1, 2));
-    // panel.setPreferredSize(POPUP_SIZE);
+    panel.setPreferredSize(new Dimension(400, 200));
     panel.setBackground(Color.LIGHT_GRAY);
     Iterator<Goal> it = controller.getCurrentPlayer().getGoals().iterator();
+
+    JDialog dialog = new JDialog((Frame) null, null, true);
+    dialog.getContentPane().add(createCustomPanel(panel, "SELECT   GOAL"));
+    dialog.pack();
+    dialog.setLocationRelativeTo(this);
 
     for (int i = 0; i < 2 && it.hasNext(); i++) {
       Goal goal = it.next();
       BufferedImage goalImage = ImageCntrl.valueOf("GOAL_" + goal.getType()).getImage();
-      goalImage = scaleImage(goalImage, POPUP_IMAGE_SIZE);
+      goalImage = scaleImage(goalImage, POPUP_IMAGE_SIZE, POPUP_IMAGE_SIZE);
       JButton goalButton = new JButton(new ImageIcon(goalImage));
       goalButton.setBackground(Color.LIGHT_GRAY);
+      goalButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
+      goalButton.setFocusPainted(false);
+      goalButton.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseEntered(java.awt.event.MouseEvent evt) {
+          goalButton.setBorder(new LineBorder(Color.GREEN, LINE_THICKNESS));
+        }
+
+        @Override
+        public void mouseExited(java.awt.event.MouseEvent evt) {
+          goalButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
+        }
+      });
       goalButton.addActionListener(
           e -> {
             controller.setGoalToSwap(goal);
+            dialog.dispose();
           });
       panel.add(goalButton);
     }
 
-    showCustomOptionPane(panel, "SELECT   GOAL");
+    dialog.setVisible(true);
   }
 
-  private void showCustomOptionPane(JPanel panel, String title) {
+  private JPanel createCustomPanel(JPanel panel, String title) {
     JLabel messageLabel = new JLabel(title, JLabel.CENTER);
     messageLabel.setFont(new Font("Times New Roman", Font.BOLD, 15));
     JPanel customPanel = new JPanel(new BorderLayout());
     customPanel.add(messageLabel, BorderLayout.NORTH);
     customPanel.add(panel, BorderLayout.CENTER);
-    JOptionPane.showMessageDialog(this, customPanel, null, JOptionPane.PLAIN_MESSAGE);
+    return customPanel;
   }
 }
