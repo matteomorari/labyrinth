@@ -11,8 +11,11 @@
         100
     ],
     "cSpell.words": [
+        "databind",
+        "fasterxml",
         "Gson",
-        "pajc"
+        "pajc",
+        "xmlgraphics"
     ],
     "java.configuration.updateBuildConfiguration": "interactive",
     "[java]": {

@@ -22,10 +22,10 @@ public class CurrentPlayerPnl extends JPanel {
   private static final int CORNER_RADIUS = 20;
   private static final int STARTING_Y = 50;
   private static final int LINE_HEIGHT = 25;
-  private static final int PADDING_X = 15;
+  private static final int PADDING_X = 10;
   private static final int PADDING_Y = 7;
   private static final int PLAYER_BOTTOM_SPACING = 20;
-  private static final int PLAYER_SIZE = 48;
+  private static final int PLAYER_SIZE = 35;
   private static final int TEXT_OVAL_SPACING = 10;
   private static final int OVAL_Y_ADJUSTMENT = 2;
 
@@ -117,9 +117,9 @@ public class CurrentPlayerPnl extends JPanel {
     // Find the maximum width of player text
     int maxTextWidth = 0;
 
-    String playerText = "TURNO GIOCATORE : ";
+    String playerText = "TURNO GIOCATORE :  ";
     FontMetrics fm = g2.getFontMetrics();
-    int textWidth = fm.stringWidth(playerText);
+    int textWidth = fm.stringWidth(playerText) + PLAYER_SIZE;
     if (textWidth > maxTextWidth) {
       maxTextWidth = textWidth;
     }
@@ -132,12 +132,12 @@ public class CurrentPlayerPnl extends JPanel {
       g2.setFont(playerFont.deriveFont(newSize));
       fm = g2.getFontMetrics();
       textWidth = fm.stringWidth(playerText);
-      totalWidth = PLAYER_SIZE + TEXT_OVAL_SPACING + textWidth;
+      totalWidth = PLAYER_SIZE  + textWidth;
     } else {
-      g2.setFont(playerFont.deriveFont((float) PLAYER_FONT_SIZE + 5)); // Increase font size by 5
+      g2.setFont(playerFont.deriveFont((float) PLAYER_FONT_SIZE ));
       fm = g2.getFontMetrics();
-      textWidth = fm.stringWidth(playerText);
-      totalWidth = PLAYER_SIZE + TEXT_OVAL_SPACING + textWidth;
+      textWidth = fm.stringWidth(playerText) ;
+      totalWidth =  textWidth + PLAYER_SIZE;
     }
 
     // Calculate left position to center the entire element
@@ -147,9 +147,9 @@ public class CurrentPlayerPnl extends JPanel {
     int playerY =
         currentY - PLAYER_SIZE / 2 - OVAL_Y_ADJUSTMENT; // Align vertically with text center
     g2.drawImage(
-        ImageCntrl.valueOf(controller.getCurrentPlayer().getName() + "_PLAYER_SPRITE")
+        ImageCntrl.valueOf(controller.getCurrentPlayer().getColorName() + "_PLAYER_SPRITE")
             .getStandingAnimationImage(),
-        leftPosition + textWidth + TEXT_OVAL_SPACING,
+        leftPosition + textWidth + TEXT_OVAL_SPACING - PADDING_X,
         playerY - 20,
         PLAYER_SIZE,
         PLAYER_SIZE,
@@ -157,7 +157,7 @@ public class CurrentPlayerPnl extends JPanel {
 
     // Draw player text to the right of the image
     g2.setColor(Color.DARK_GRAY);
-    g2.drawString(playerText, leftPosition + PADDING_X, currentY - PADDING_Y);
+    g2.drawString(playerText, leftPosition , currentY - PADDING_Y);
 
     currentY += LINE_HEIGHT + PLAYER_BOTTOM_SPACING;
   }

@@ -56,43 +56,42 @@ public class LabyrinthLocalController implements LabyrinthController {
     return model.getAvailableCard();
   }
 
-  public void swapPlayers(Player player) {
-    model.swapPlayers(player);
+  public void setPlayerToSwap(Player player) {
+    model.setPlayerToSwap(player);
   }
 
-  public void changeGoal(Goal goal) {
-    model.changeGoal(goal);
-  }
-
-  public void changeSecondGoal() {
-    model.changeSecondGoal();
+  public void setGoalToSwap(Goal goal) {
+    model.setGoalToSwap(goal);
   }
 
   public void nextPlayer() {
     model.nextPlayer();
   }
 
-  public boolean getHasCurrentPlayerInserted() {
-    return model.getHasCurrentPlayerInserted();
-  }
-
-  public boolean getHasCurrentPlayerDoubleTurn() {
-    return model.getHasDoubleTurn();
-  }
-
-  public void setHasCurrentPlayerInserted(boolean hasCurrentPlayerInserted) {
-    model.setHasCurrentPlayerInserted(hasCurrentPlayerInserted);
-  }
-
-  public void setHasCurrentPlayerDoubleTurn(boolean hasDoubleTurn) {
-    model.setCurrentPlayerHasDoubleTurn(hasDoubleTurn);
-  }
-
   public void skipTurn() {
     model.skipTurn();
   }
 
-  // public boolean getHasCurrentPlayerMoved() {
-  //   return model.getHasCurrentPlayerMoved();
-  // }
+  @Override
+  public void usePower() {
+    model.usePower(getAvailableCard().getPower().getType());
+  }
+
+  @Override
+  public boolean getHasUsedPower() {
+    return model.getHasUsedPower();
+  }
+
+  @Override
+  public boolean getHasCurrentPlayerInserted() {
+    return model.getHasCurrentPlayerInserted();
+  }
+
+  public Player getPlayerToSwap() {
+    return model.getPlayerToSwap();
+  } 
+
+  public Goal getGoalToSwap() {
+    return model.getGoalToSwap();
+  } 
 }

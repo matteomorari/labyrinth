@@ -5,6 +5,7 @@ import it.unibs.pajc.labyrinth.core.Bot;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.OnlineGameManager;
 import it.unibs.pajc.labyrinth.core.Player;
+import it.unibs.pajc.labyrinth.core.PlayerColor;
 import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -81,20 +82,16 @@ public class LocalOnlineGameSelectionPnl extends JPanel {
       labyrinthModel = myGson.fromJson(deepCopy);
     } else {
       labyrinthModel = new Labyrinth();
-      Player player1 = new Player("RED", UUID.randomUUID().toString());
-      player1.setColor(Color.RED);
+      Player player1 = new Player(PlayerColor.RED);
       labyrinthModel.addPlayer(player1);
 
-      Player player2 = new Player("BLACK", UUID.randomUUID().toString());
-      player2.setColor(Color.DARK_GRAY);
+      Player player2 = new Player(PlayerColor.BLACK);
       labyrinthModel.addPlayer(player2);
 
-      Player player3 = new Player("PINK", UUID.randomUUID().toString());
-      player3.setColor(Color.MAGENTA);
+      Player player3 = new Player(PlayerColor.PINK);
       labyrinthModel.addPlayer(player3);
 
-      Player player4 = new Player("GREEN", UUID.randomUUID().toString());
-      player4.setColor(Color.GREEN);
+      Player player4 = new Player(PlayerColor.GREEN);
       labyrinthModel.addPlayer(player4);
     }
     LabyrinthLocalController controller = new LabyrinthLocalController(labyrinthModel);

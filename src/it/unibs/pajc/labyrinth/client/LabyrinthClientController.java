@@ -200,21 +200,15 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
   }
 
   @Override
-  public void swapPlayers(Player player) {
+  public void setPlayerToSwap(Player player) {
     // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'swapPlayers'");
+    throw new UnsupportedOperationException("Unimplemented method 'setPlayerToSwap'");
   }
 
   @Override
-  public void changeGoal(Goal goal) {
+  public void setGoalToSwap(Goal goal) {
     // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'changeGoal'");
-  }
-
-  @Override
-  public void changeSecondGoal() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'changeSecondGoal'");
+    throw new UnsupportedOperationException("Unimplemented method 'setGoalToSwap'");
   }
 
   @Override
@@ -224,32 +218,38 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
   }
 
   @Override
+  public void skipTurn() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'skipTurn'");
+  }
+
+  @Override
+  public void usePower() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'usePower'");
+  }
+
+  @Override
+  public boolean getHasUsedPower() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'getHasUsedPower'");
+  }
+
+  @Override
   public boolean getHasCurrentPlayerInserted() {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'getHasCurrentPlayerInserted'");
   }
 
   @Override
-  public boolean getHasCurrentPlayerDoubleTurn() {
+  public Player getPlayerToSwap() {
     // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getHasCurrentPlayerDoubleTurn'");
+    throw new UnsupportedOperationException("Unimplemented method 'getPlayerToSwap'");
   }
 
   @Override
-  public void setHasCurrentPlayerDoubleTurn(boolean hasDoubleTurn) {
+  public Goal getGoalToSwap() {
     // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'setHasCurrentPlayerDoubleTurn'");
-  }
-
-  @Override
-  public void setHasCurrentPlayerInserted(boolean hasInserted) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'setHasCurrentPlayerInserted'");
-  }
-
-  @Override
-  public void skipTurn() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'skipTurn'");
+    throw new UnsupportedOperationException("Unimplemented method 'getGoalToSwap'");
   }
 }

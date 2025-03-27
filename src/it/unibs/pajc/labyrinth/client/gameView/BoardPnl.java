@@ -299,7 +299,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     int initialYPosition = (getHeight() - size) / 2 + PADDING;
     this.setAnimationDirection();
 
-    int playerSize = (int) (cellSize * 0.8);
+    int playerSize = (int) (cellSize * 0.5);
 
     for (Player player : controller.getPlayers()) {
       int[] playerPosition = getPlayerAnimationPosition(player, initialXPosition, initialYPosition);
@@ -307,22 +307,23 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
 
       if (playerDirection[0] == 0 && playerDirection[1] == 0) {
         g2.drawImage(
-            ImageCntrl.valueOf(player.getName() + "_PLAYER_SPRITE").getStandingAnimationImage(),
-            playerPosition[0] + cellSize / 10,
-            playerPosition[1],
+            ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE")
+                .getStandingAnimationImage(),
+            playerPosition[0] + (cellSize - playerSize) / 2,
+            playerPosition[1] + cellSize/5,
             playerSize,
             playerSize,
             null);
       } else {
         g2.drawImage(
             PlayerAnimation(
-                ImageCntrl.valueOf(player.getName() + "_PLAYER_SPRITE")
+                ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE")
                     .getAnimationSprite()
                     .get(
                         playerDirectionImage.get(
                             Arrays.asList(playerDirection[0], playerDirection[1])))),
-            playerPosition[0] + cellSize / 10,
-            playerPosition[1],
+            playerPosition[0] + (cellSize - playerSize) / 2,
+            playerPosition[1] + cellSize/5,
             playerSize,
             playerSize,
             null);

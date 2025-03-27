@@ -9,25 +9,28 @@ public class Player {
   private ArrayDeque<Goal> goalsQueue;
   private Position position;
   private Position startPosition;
-  private Color color;
-  private String name; // TODO: remove
+  private PlayerColor color;
   private String id;
   private Boolean isReadyToPlay = false;
+
+  public Player(PlayerColor color, String id) {
+    this.goalsQueue = new ArrayDeque<>();
+    this.position = new Position();
+    this.startPosition = new Position();
+    this.color = color;
+    this.id = id;
+  }
+
+  public Player(PlayerColor color) {
+    this(color, UUID.randomUUID().toString());
+  }
 
   public Player() {
     this(null, UUID.randomUUID().toString());
   }
 
-  public Player(String uniqueID) {
-    this(null, uniqueID);
-  }
-
-  public Player(String name, String uniqueID) {
-    this.name = name;
-    this.id = uniqueID;
-    this.goalsQueue = new ArrayDeque<>();
-    this.position = new Position();
-    this.startPosition = new Position();
+  public Player(String id) {
+    this(null, id);
   }
 
   public void addGoal(Goal goal) {
@@ -46,6 +49,14 @@ public class Player {
     this.position.setPosition(x, y);
   }
 
+  public String getColorName() {
+    return this.color.getColorName();
+  }
+
+  public Color getColor() {
+    return this.color.getColor();
+  }
+
   public Position getPosition() {
     return this.position;
   }
@@ -59,20 +70,8 @@ public class Player {
     return this.startPosition;
   }
 
-  public void setColor(Color color) {
+  public void setColor(PlayerColor color) {
     this.color = color;
-  }
-
-  public Color getColor() {
-    return color;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getName() {
-    return this.name;
   }
 
   public void setId(String id) {
@@ -81,10 +80,6 @@ public class Player {
 
   public String getId() {
     return id;
-  }
-
-  public ArrayDeque<Goal> getGoalsQueue() {
-    return goalsQueue;
   }
 
   public void setIsReadyToPlay(Boolean isReadyToPlay) {

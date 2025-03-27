@@ -63,10 +63,8 @@ public class GameLobby {
   public synchronized void startGame() {
     lock.lock();
     // TODO: to remove, this is just for testing purposes
-    playersList.get(0).setColor(Color.RED);
-    playersList.get(0).setName("RED");
-    playersList.get(1).setColor(Color.MAGENTA);
-    playersList.get(1).setName("PINK");
+    playersList.get(0).setColor(PlayerColor.RED);
+    playersList.get(1).setColor(PlayerColor.MAGENTA);
 
     try {
       for (Player player : this.players.keySet()) {
