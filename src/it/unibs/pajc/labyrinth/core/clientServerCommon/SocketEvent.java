@@ -2,7 +2,6 @@ package it.unibs.pajc.labyrinth.core.clientServerCommon;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import java.util.ArrayList;
 
 public class SocketEvent<T> {
 
@@ -20,23 +19,10 @@ public class SocketEvent<T> {
     }
   }
 
-  // private static ArrayList<String> parseParameters(String message) {
-  //   ArrayList<String> parameters = new ArrayList<String>();
-
-  //   if (message.startsWith("@")) {
-
-  //     String[] tokens = message.split(":");
-  //     parameters = new ArrayList<String>();
-  //     parameters.addAll(Arrays.asList(tokens));
-  //   }
-
-  //   return parameters;
-  // }
-
   public static String createMessage(String comand, JsonObject parameters) {
     JsonObject msg = new JsonObject();
     msg.addProperty("command", comand);
-    if (parameters != null){
+    if (parameters != null) {
       msg.add("parameters", parameters);
     }
     return msg.toString();
@@ -57,14 +43,6 @@ public class SocketEvent<T> {
   public JsonObject getParameters() {
     return parameters;
   }
-
-  // public int getParametersCount() {
-  //   return parameters.size();
-  // }
-
-  // public String getParameter(int indx) {
-  //   return parameters.size() > indx ? parameters.get(indx) : "";
-  // }
 
   public String toString() {
     return message.toString();

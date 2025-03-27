@@ -20,10 +20,6 @@ public class LabyrinthLocalController implements LabyrinthController {
     return model.getBoardSize();
   }
 
-  public void initGame() {
-    model.initGame();
-  }
-
   public ArrayList<ArrayList<Card>> getBoard() {
     return model.getBoard();
   }
@@ -56,14 +52,6 @@ public class LabyrinthLocalController implements LabyrinthController {
     return model.getAvailableCard();
   }
 
-  public void setPlayerToSwap(Player player) {
-    model.setPlayerToSwap(player);
-  }
-
-  public void setGoalToSwap(Goal goal) {
-    model.setGoalToSwap(goal);
-  }
-
   public void nextPlayer() {
     model.nextPlayer();
   }
@@ -87,11 +75,19 @@ public class LabyrinthLocalController implements LabyrinthController {
     return model.getHasCurrentPlayerInserted();
   }
 
+  public void setPlayerToSwap(Player player) {
+    model.setPlayerToSwap(player);
+  }
+
+  public void setGoalToSwap(Goal goal) {
+    model.setGoalToSwap(goal);
+  }
+
   public Player getPlayerToSwap() {
     return model.getPlayerToSwap();
-  } 
+  }
 
   public Goal getGoalToSwap() {
     return model.getGoalToSwap();
-  } 
+  }
 }

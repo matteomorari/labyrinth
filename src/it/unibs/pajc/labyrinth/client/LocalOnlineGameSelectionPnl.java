@@ -8,7 +8,6 @@ import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.PlayerColor;
 import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -18,7 +17,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.UUID;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -78,8 +76,7 @@ public class LocalOnlineGameSelectionPnl extends JPanel {
         e.printStackTrace();
       }
 
-      LabyrinthGson myGson = new LabyrinthGson();
-      labyrinthModel = myGson.fromJson(deepCopy);
+      labyrinthModel = LabyrinthGson.fromJson(deepCopy);
     } else {
       labyrinthModel = new Labyrinth();
       Player player1 = new Player(PlayerColor.RED);
@@ -96,7 +93,7 @@ public class LocalOnlineGameSelectionPnl extends JPanel {
     }
     LabyrinthLocalController controller = new LabyrinthLocalController(labyrinthModel);
     if (!LOAD_FROM_FILE) {
-      controller.initGame();
+      labyrinthModel.initGame();
     }
 
     // TODO: to remove

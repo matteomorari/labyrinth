@@ -39,7 +39,6 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
         "new_player",
         e -> {
           try {
-            LabyrinthClientController cntrl = (LabyrinthClientController) e.getSender();
             setLocalPlayer(e.getParameters().get("player_id").toString());
           } catch (Exception exc) {
             exc.printStackTrace();
@@ -49,7 +48,6 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
         "send_lobbies",
         e -> {
           try {
-            LabyrinthClientController cntrl = (LabyrinthClientController) e.getSender();
             ArrayList<GameLobby> availableLobbies = new ArrayList<>();
             JsonElement lobbiesParameters = e.getParameters().get("lobbies");
 
@@ -68,7 +66,6 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
         "update_lobby",
         e -> {
           try {
-            LabyrinthClientController cntrl = (LabyrinthClientController) e.getSender();
             JsonElement lobbyParameters = e.getParameters().get("lobby");
             JsonElement parsedLobbyData = JsonParser.parseString(lobbyParameters.getAsString());
 
@@ -83,7 +80,6 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
         "game_started",
         e -> {
           try {
-            LabyrinthClientController cntrl = (LabyrinthClientController) e.getSender();
             JsonElement labyrinthParameters = e.getParameters().get("labyrinth");
             JsonElement parsedLabyrinthData =
                 JsonParser.parseString(labyrinthParameters.getAsString());
@@ -92,6 +88,31 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
             this.labyrinthModel = labyrinth;
             onlineGameManager.getSelectedLobby().setModel(labyrinth);
             onlineGameManager.setGameInProgress();
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
+
+    commandMap.put(
+        "player_moved",
+        e -> {
+          try {
+            int newRow = e.getParameters().get("row").getAsInt();
+            int newCol = e.getParameters().get("col").getAsInt();
+
+            labyrinthModel.movePlayer(newRow, newCol);
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
+    commandMap.put(
+        "card_inserted",
+        e -> {
+          try {
+            int row = e.getParameters().get("row").getAsInt();
+            int col = e.getParameters().get("col").getAsInt();
+
+            labyrinthModel.insertCard(new Position(row, col));
           } catch (Exception exc) {
             exc.printStackTrace();
           }
@@ -145,12 +166,6 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
   }
 
   @Override
-  public void initGame() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'initGame'");
-  }
-
-  @Override
   public int getBoardSize() {
     return labyrinthModel.getBoardSize();
   }
@@ -172,26 +187,38 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
 
   @Override
   public void movePlayer(int row, int col) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'movePlayer'");
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "move_player");
+
+    JsonObject parameters = new JsonObject();
+    parameters.addProperty("row", row);
+    parameters.addProperty("col", col);
+
+    msg.add("parameters", parameters);
+    sendMsg(this, msg.toString());
   }
 
   @Override
   public void insertCard(Position position) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'insertCard'");
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "insert_card");
+
+    JsonObject parameters = new JsonObject();
+    parameters.addProperty("row", position.getRow());
+    parameters.addProperty("col", position.getCol());
+
+    msg.add("parameters", parameters);
+    sendMsg(this, msg.toString());
   }
 
   @Override
   public ArrayList<Position> getLastPlayerMovedPath() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getLastPlayerMovedPath'");
+    return labyrinthModel.getLastPlayerMovedPath();
   }
 
   @Override
   public Position lastInsertedCardPosition() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'lastInsertedCardPosition'");
+    return labyrinthModel.lastInsertedCardPosition();
   }
 
   @Override
@@ -201,14 +228,12 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
 
   @Override
   public void setPlayerToSwap(Player player) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'setPlayerToSwap'");
+    labyrinthModel.setPlayerToSwap(player);
   }
 
   @Override
   public void setGoalToSwap(Goal goal) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'setGoalToSwap'");
+    labyrinthModel.setGoalToSwap(goal);
   }
 
   @Override
@@ -231,25 +256,21 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
 
   @Override
   public boolean getHasUsedPower() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getHasUsedPower'");
+    return labyrinthModel.getHasUsedPower();
   }
 
   @Override
   public boolean getHasCurrentPlayerInserted() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getHasCurrentPlayerInserted'");
+    return labyrinthModel.getHasCurrentPlayerInserted();
   }
 
   @Override
   public Player getPlayerToSwap() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getPlayerToSwap'");
+    return labyrinthModel.getPlayerToSwap();
   }
 
   @Override
   public Goal getGoalToSwap() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getGoalToSwap'");
+    return labyrinthModel.getGoalToSwap();
   }
 }

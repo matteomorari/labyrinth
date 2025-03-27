@@ -4,10 +4,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import it.unibs.pajc.labyrinth.core.GameLobby;
+import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.clientServerCommon.SocketCommunicationProtocol;
 import it.unibs.pajc.labyrinth.core.utility.GameLobbyGson;
 import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
+import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.net.Socket;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
@@ -37,7 +39,6 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol {
         "fetch_lobbies",
         e -> {
           try {
-            LabyrinthServerProtocol cntrl = (LabyrinthServerProtocol) e.getSender();
             sendAvailableLobbies();
           } catch (Exception exc) {
             exc.printStackTrace();
@@ -47,7 +48,6 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol {
         "join_lobby",
         e -> {
           try {
-            LabyrinthServerProtocol cntrl = (LabyrinthServerProtocol) e.getSender();
             String lobbyId = e.getParameters().get("lobby_id").getAsString();
 
             // Acquire lock to make lobby switching atomic
@@ -78,10 +78,6 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol {
         "toggle_player_ready",
         e -> {
           try {
-            LabyrinthServerProtocol cntrl = (LabyrinthServerProtocol) e.getSender();
-            String lobbyId = e.getParameters().get("lobby_id").getAsString();
-            String playerId = e.getParameters().get("player_id").getAsString();
-
             this.player.setIsReadyToPlay(!this.player.isReadyToPlay());
             sendLobbyStateUpdate(this.selectedLobby);
             checkGameBeStarted();
@@ -89,6 +85,50 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol {
             exc.printStackTrace();
           }
         });
+    commandMap.put(
+        "move_player",
+        e -> {
+          try {
+            LabyrinthServerProtocol sender = (LabyrinthServerProtocol) e.getSender();
+            int newRow = e.getParameters().get("row").getAsInt();
+            int newCol = e.getParameters().get("col").getAsInt();
+
+            Labyrinth labyrinthModel = selectedLobby.getModel();
+
+            // check if the sender is the current player
+            if (sender.player.equals(labyrinthModel.getCurrentPlayer())) {
+              labyrinthModel.movePlayer(newRow, newCol);
+              sendPlayerMoveNotification(newRow, newCol);
+            }
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
+    commandMap.put(
+        "insert_card",
+        e -> {
+          try {
+            LabyrinthServerProtocol sender = (LabyrinthServerProtocol) e.getSender();
+            int row = e.getParameters().get("row").getAsInt();
+            int col = e.getParameters().get("col").getAsInt();
+
+            Labyrinth labyrinthModel = selectedLobby.getModel();
+
+            // check if the sender is the current player
+            if (sender.player.equals(labyrinthModel.getCurrentPlayer())) {
+              labyrinthModel.insertCard(new Position(row, col));
+              sendPlayerCardInsertNotification(row, col);
+            }
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
+  }
+
+  private void sendNotificationToLobbyPlayers(JsonObject msg) {
+    for (SocketCommunicationProtocol playerSocket : selectedLobby.getPlayersSockets().values()) {
+      playerSocket.sendMsg(playerSocket, msg.toString());
+    }
   }
 
   private GameLobby getLobbyById(String lobbyId) {
@@ -140,13 +180,9 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol {
     parameters.addProperty("lobby", GameLobbyGson.toJson(lobby));
     msg.add("parameters", parameters);
 
-    final String messageToSend = msg.toString();
-
     // Use synchronized block when accessing shared collection
     synchronized (lobby) {
-      for (SocketCommunicationProtocol playerSocket : lobby.getPlayersSockets().values()) {
-        playerSocket.sendMsg(playerSocket, messageToSend);
-      }
+      sendNotificationToLobbyPlayers(msg);
     }
   }
 
@@ -179,8 +215,32 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol {
     parameters.addProperty("labyrinth", LabyrinthGson.toJson(lobby.getModel()));
     msg.add("parameters", parameters);
 
-    for (SocketCommunicationProtocol playerSocket : lobby.getPlayersSockets().values()) {
-      playerSocket.sendMsg(playerSocket, msg.toString());
-    }
+    sendNotificationToLobbyPlayers(msg);
+  }
+
+  private void sendPlayerMoveNotification(int newRow, int newCol) {
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "player_moved");
+
+    JsonObject parameters = new JsonObject();
+    parameters.addProperty("row", newRow);
+    parameters.addProperty("col", newCol);
+
+    msg.add("parameters", parameters);
+
+    sendNotificationToLobbyPlayers(msg);
+  }
+
+  private void sendPlayerCardInsertNotification(int row, int col) {
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "card_inserted");
+
+    JsonObject parameters = new JsonObject();
+    parameters.addProperty("row", row);
+    parameters.addProperty("col", col);
+
+    msg.add("parameters", parameters);
+
+    sendNotificationToLobbyPlayers(msg);
   }
 }

@@ -1,7 +1,6 @@
 package it.unibs.pajc.labyrinth.core;
 
 import it.unibs.pajc.labyrinth.server.LabyrinthServerProtocol;
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
