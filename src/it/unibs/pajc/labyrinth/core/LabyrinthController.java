@@ -29,7 +29,7 @@ public interface LabyrinthController {
 
   void setGoalToSwap(Goal goal);
 
-  void nextPlayer();
+  // void nextPlayer();
 
   void skipTurn();
 

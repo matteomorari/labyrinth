@@ -6,6 +6,7 @@ import it.unibs.pajc.labyrinth.client.animation.EasingFunction;
 import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Player;
+import it.unibs.pajc.labyrinth.core.PowerType;
 import it.unibs.pajc.labyrinth.core.utility.Orientation;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.awt.Color;
@@ -293,6 +294,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
   //   }
   // }
 
+  // ora funziona non so se fa cagare
   private void drawPlayers(Graphics2D g2) {
     int size = Math.min(getWidth(), getHeight());
     int initialXPosition = (getWidth() - size) / 2 + PADDING;
@@ -300,7 +302,23 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     this.setAnimationDirection();
 
     int playerSize = (int) (cellSize * 0.5);
-
+    if (controller.getAvailableCard().getPower() != null
+        && controller.getAvailableCard().getPower().getType() == PowerType.SWAP_POSITION
+        && controller.getHasUsedPower()) {
+      for (Player player : controller.getPlayers()) {
+        int x = initialXPosition + player.getPosition().getCol() * cellSize;
+        int y = initialYPosition + player.getPosition().getRow() * cellSize;
+        g2.drawImage(
+            ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE")
+                .getStandingAnimationImage(),
+            x + (cellSize - playerSize) / 2,
+            y + cellSize / 5,
+            playerSize,
+            playerSize,
+            null);
+      }
+      return;
+    }
     for (Player player : controller.getPlayers()) {
       int[] playerPosition = getPlayerAnimationPosition(player, initialXPosition, initialYPosition);
       int[] playerDirection = getPlayerDirection(player);
@@ -310,7 +328,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
             ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE")
                 .getStandingAnimationImage(),
             playerPosition[0] + (cellSize - playerSize) / 2,
-            playerPosition[1] + cellSize/5,
+            playerPosition[1] + cellSize / 5,
             playerSize,
             playerSize,
             null);
@@ -323,7 +341,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
                         playerDirectionImage.get(
                             Arrays.asList(playerDirection[0], playerDirection[1])))),
             playerPosition[0] + (cellSize - playerSize) / 2,
-            playerPosition[1] + cellSize/5,
+            playerPosition[1] + cellSize / 5,
             playerSize,
             playerSize,
             null);

@@ -11,7 +11,6 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Iterator;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
 public class PowerPnl extends JPanel {
@@ -238,17 +237,18 @@ public class PowerPnl extends JPanel {
         playerButton.setFocusPainted(false);
         playerButton.setBackground(Color.LIGHT_GRAY);
         playerButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
-        playerButton.addMouseListener(new MouseAdapter() {
-          @Override
-          public void mouseEntered(java.awt.event.MouseEvent evt) {
-            playerButton.setBorder(new LineBorder(Color.GREEN, LINE_THICKNESS));
-          }
-  
-          @Override
-          public void mouseExited(java.awt.event.MouseEvent evt) {
-            playerButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
-          }
-        });
+        playerButton.addMouseListener(
+            new MouseAdapter() {
+              @Override
+              public void mouseEntered(java.awt.event.MouseEvent evt) {
+                playerButton.setBorder(new LineBorder(Color.GREEN, LINE_THICKNESS));
+              }
+
+              @Override
+              public void mouseExited(java.awt.event.MouseEvent evt) {
+                playerButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
+              }
+            });
         playerButton.addActionListener(
             e -> {
               controller.setPlayerToSwap(player);
@@ -281,17 +281,18 @@ public class PowerPnl extends JPanel {
         goalButton.setBackground(Color.LIGHT_GRAY);
         goalButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
         goalButton.setFocusPainted(false);
-        goalButton.addMouseListener(new MouseAdapter() {
-          @Override
-          public void mouseEntered(java.awt.event.MouseEvent evt) {
-            goalButton.setBorder(new LineBorder(Color.GREEN, LINE_THICKNESS));
-          }
-  
-          @Override
-          public void mouseExited(java.awt.event.MouseEvent evt) {
-            goalButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
-          }
-        });
+        goalButton.addMouseListener(
+            new MouseAdapter() {
+              @Override
+              public void mouseEntered(java.awt.event.MouseEvent evt) {
+                goalButton.setBorder(new LineBorder(Color.GREEN, LINE_THICKNESS));
+              }
+
+              @Override
+              public void mouseExited(java.awt.event.MouseEvent evt) {
+                goalButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
+              }
+            });
         goalButton.addActionListener(
             e -> {
               controller.setGoalToSwap(goal);
@@ -323,17 +324,18 @@ public class PowerPnl extends JPanel {
       goalButton.setBackground(Color.LIGHT_GRAY);
       goalButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
       goalButton.setFocusPainted(false);
-      goalButton.addMouseListener(new MouseAdapter() {
-        @Override
-        public void mouseEntered(java.awt.event.MouseEvent evt) {
-          goalButton.setBorder(new LineBorder(Color.GREEN, LINE_THICKNESS));
-        }
+      goalButton.addMouseListener(
+          new MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+              goalButton.setBorder(new LineBorder(Color.GREEN, LINE_THICKNESS));
+            }
 
-        @Override
-        public void mouseExited(java.awt.event.MouseEvent evt) {
-          goalButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
-        }
-      });
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+              goalButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
+            }
+          });
       goalButton.addActionListener(
           e -> {
             controller.setGoalToSwap(goal);

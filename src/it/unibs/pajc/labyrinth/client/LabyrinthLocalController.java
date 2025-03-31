@@ -64,9 +64,9 @@ public class LabyrinthLocalController implements LabyrinthController {
     model.setGoalToSwap(goal);
   }
 
-  public void nextPlayer() {
-    model.nextPlayer();
-  }
+  // public void nextPlayer() {
+  //   model.nextPlayer();
+  // }
 
   public void skipTurn() {
     model.skipTurn();

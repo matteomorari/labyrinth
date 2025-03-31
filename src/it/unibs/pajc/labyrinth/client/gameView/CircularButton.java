@@ -23,6 +23,7 @@ public class CircularButton extends JButton {
     setFocusPainted(false);
     setBorderPainted(false);
     loadSVG(svgFilePath);
+    setOpaque(false);
   }
 
   private void loadSVG(String svgFilePath) {
@@ -52,7 +53,7 @@ public class CircularButton extends JButton {
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
     // Draw the circular background
-    g2.setColor(Color.WHITE);
+    g2.setColor(Color.LIGHT_GRAY);
     g2.fill(new Ellipse2D.Float(0, 0, getWidth(), getHeight()));
 
     // Draw the SVG icon
