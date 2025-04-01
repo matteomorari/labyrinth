@@ -52,9 +52,17 @@ public class LabyrinthLocalController implements LabyrinthController {
     return model.getAvailableCard();
   }
 
-  public void nextPlayer() {
-    model.nextPlayer();
+  public void setPlayerToSwap(Player player) {
+    model.setPlayerToSwap(player);
   }
+
+  public void setGoalToSwap(Goal goal) {
+    model.setGoalToSwap(goal);
+  }
+
+  // public void nextPlayer() {
+  //   model.nextPlayer();
+  // }
 
   public void skipTurn() {
     model.skipTurn();
@@ -73,14 +81,6 @@ public class LabyrinthLocalController implements LabyrinthController {
   @Override
   public boolean getHasCurrentPlayerInserted() {
     return model.getHasCurrentPlayerInserted();
-  }
-
-  public void setPlayerToSwap(Player player) {
-    model.setPlayerToSwap(player);
-  }
-
-  public void setGoalToSwap(Goal goal) {
-    model.setGoalToSwap(goal);
   }
 
   public Player getPlayerToSwap() {

@@ -25,7 +25,7 @@ public interface LabyrinthController {
 
   Card getAvailableCard();
 
-  void nextPlayer();
+  // void nextPlayer();
 
   void skipTurn();
 

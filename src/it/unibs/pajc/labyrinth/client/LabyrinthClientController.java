@@ -237,12 +237,6 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
   }
 
   @Override
-  public void nextPlayer() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'nextPlayer'");
-  }
-
-  @Override
   public void skipTurn() {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'skipTurn'");

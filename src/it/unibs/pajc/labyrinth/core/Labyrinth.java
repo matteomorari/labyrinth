@@ -31,22 +31,6 @@ public class Labyrinth extends BaseModel {
   private Player playerToSwap;
   private Goal goalToSwap;
 
-  public Player getPlayerToSwap() {
-    return playerToSwap;
-  }
-
-  public void setPlayerToSwap(Player playerToSwap) {
-    this.playerToSwap = playerToSwap;
-  }
-
-  public Goal getGoalToSwap() {
-    return goalToSwap;
-  }
-
-  public void setGoalToSwap(Goal goalToSwap) {
-    this.goalToSwap = goalToSwap;
-  }
-
   public Labyrinth() {
     this(7);
   }
@@ -58,7 +42,7 @@ public class Labyrinth extends BaseModel {
     this.availableCard = null;
     this.lastInsertedCardPosition = null;
     this.lastPlayerMovedPath = new ArrayList<>();
-    this.powerActions = createPowerActionsMap();
+    this.powerActions = new HashMap<>();
   }
 
   public int getBoardSize() {
@@ -67,14 +51,6 @@ public class Labyrinth extends BaseModel {
 
   public void addPlayer(Player player) {
     this.players.add(player);
-  }
-
-  public boolean getHasCurrentPlayerInserted() {
-    return hasCurrentPlayerInserted;
-  }
-
-  public boolean getHasCurrentPlayerDoubleTurn() {
-    return hasCurrentPlayerDoubleTurn;
   }
 
   public void initializePlayerPositions() {
@@ -149,6 +125,7 @@ public class Labyrinth extends BaseModel {
   public void initGame() {
     this.initBoard();
     this.initializePlayerPositions();
+    createPowerActionsMap();
 
     // shuffle goals
     ArrayList<GoalType> goalList = new ArrayList<>(Arrays.asList(GoalType.values()));
@@ -335,12 +312,12 @@ public class Labyrinth extends BaseModel {
   // if the player can't move, go to the next player immediately
   public void checkAndProceedToNextPlayer() {
     if (getCardOpenDirection(getPlayerCard(getCurrentPlayer())).isEmpty()) {
-      if (availableCard.getPower() != null
-          && !hasUsedPower
-          && (availableCard.getPower().getType() != PowerType.SWAP_POSITION) && !hasUsedPower) {
+      if (availableCard.getPower() != null) {
         return;
       }
-      nextPlayer();
+      // nextPlayer();
+      skipTurn();
+
     }
   }
 
@@ -354,12 +331,10 @@ public class Labyrinth extends BaseModel {
     this.fireChangeListener();
   }
 
-  public HashMap<PowerType, Runnable> createPowerActionsMap() {
-    HashMap<PowerType, Runnable> powerActions = new HashMap<>();
+  public void createPowerActionsMap() {
     powerActions.put(
         PowerType.SWAP_POSITION,
         () -> {
-          // Notify the controller to show a pop-up for player swap
           swapPlayers();
           checkAndProceedToNextPlayer();
         });
@@ -381,7 +356,6 @@ public class Labyrinth extends BaseModel {
     powerActions.put(
         PowerType.CHOOSE_SECOND_GOAL,
         () -> {
-          // The actual goal selection will be handled by the controller
           showGoal();
           changeGoal();
           showGoal();
@@ -390,26 +364,11 @@ public class Labyrinth extends BaseModel {
     powerActions.put(
         PowerType.CHOOSE_GOAL,
         () -> {
-          // notifyChoseGoal();
           showGoal();
           changeGoal();
           showGoal();
           checkAndProceedToNextPlayer();
         });
-
-    return powerActions;
-  }
-
-  public void changeSecondGoal() {
-    Player player = getCurrentPlayer();
-    if (getCurrentPlayer() == null || player.getGoals().size() < 2) {
-      return;
-    }
-    Goal Firstgoal = player.getGoals().removeFirst();
-    Goal Secondgoal = player.getGoals().removeFirst();
-
-    player.getGoals().addFirst(Firstgoal);
-    player.getGoals().addFirst(Secondgoal);
   }
 
   // TEST
@@ -693,7 +652,8 @@ public class Labyrinth extends BaseModel {
       hasCurrentPlayerInserted = false;
       hasCurrentPlayerDoubleTurn = false;
     } else {
-      nextPlayer();
+      // nextPlayer();
+      skipTurn();
     }
 
     isGameFinished();
@@ -712,6 +672,8 @@ public class Labyrinth extends BaseModel {
 
     int x = playerToSwap.getPosition().getRow();
     int y = playerToSwap.getPosition().getCol();
+    int xCurrent = currentPlayer.getPosition().getRow();
+    int yCurrent = currentPlayer.getPosition().getCol();
     // Position playerToSwapPosition = playerToSwap.getPosition();
     // System.out.println("swap player position" + playerToSwapPosition);
 
@@ -719,17 +681,18 @@ public class Labyrinth extends BaseModel {
     Card currentPlayerCard = getPlayerCard(currentPlayer);
     Card playerToSwapCard = getPlayerCard(playerToSwap);
 
-    playerToSwap.setPosition(currentPlayerPosition.getRow(), currentPlayerPosition.getCol());
+    playerToSwap.setPosition(xCurrent, yCurrent);
     currentPlayer.setPosition(x, y);
 
-    // Add players to their new cards
-    currentPlayerCard.addPlayer(playerToSwap);
-    playerToSwapCard.addPlayer(currentPlayer);
-
+    
     // Remove players from their current cards
     currentPlayerCard.removePlayer(currentPlayer);
     playerToSwapCard.removePlayer(playerToSwap);
 
+    // Add players to their new cards
+    currentPlayerCard.addPlayer(playerToSwap);
+    playerToSwapCard.addPlayer(currentPlayer);
+    
     // currentPlayerCard.updatePlayersPosition();
     // playerToSwapCard.updatePlayersPosition();
     System.out.println("current player position " + currentPlayer.getPosition());
@@ -788,6 +751,31 @@ public class Labyrinth extends BaseModel {
   }
 
   public void setHasUsedPower(boolean hasUsedPower) {
+
     this.hasUsedPower = hasUsedPower;
+  }
+
+  public Player getPlayerToSwap() {
+    return playerToSwap;
+  }
+
+  public void setPlayerToSwap(Player playerToSwap) {
+    this.playerToSwap = playerToSwap;
+  }
+
+  public Goal getGoalToSwap() {
+    return goalToSwap;
+  }
+
+  public void setGoalToSwap(Goal goalToSwap) {
+    this.goalToSwap = goalToSwap;
+  }
+
+  public boolean getHasCurrentPlayerInserted() {
+    return hasCurrentPlayerInserted;
+  }
+
+  public boolean getHasCurrentPlayerDoubleTurn() {
+    return hasCurrentPlayerDoubleTurn;
   }
 }
