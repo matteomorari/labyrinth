@@ -17,7 +17,7 @@
         "pajc",
         "xmlgraphics"
     ],
-    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.configuration.updateBuildConfiguration": "automatic",
     "[java]": {
         "editor.defaultFormatter": "josevseb.google-java-format-for-vs-code"
     },

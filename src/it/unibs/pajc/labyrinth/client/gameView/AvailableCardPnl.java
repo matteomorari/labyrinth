@@ -42,8 +42,8 @@ public class AvailableCardPnl extends JPanel implements Animatable {
   private int cardWidth = DEFAULT_CARD_WIDTH;
   private final Font titleFont = new Font(TITLE_FONT_FAMILY, Font.BOLD, TITLE_FONT_SIZE);
   private int panelWidth;
-  private JButton rotateButton;
-  private JButton skipTurnButton;
+  private RoundedIconButton rotateButton;
+  private RoundedIconButton skipTurnButton;
   private Animator animator;
   private int animationCardAngle;
   private boolean isRotating = false;
@@ -53,11 +53,17 @@ public class AvailableCardPnl extends JPanel implements Animatable {
     availableCardImage = getCorrectCardImage();
 
     // Initialize the rotate button
-    rotateButton = new CircularButton("resource\\images\\rotate.svg");
+    rotateButton = new RoundedIconButton("resource\\images\\rotate.svg");
+    rotateButton.setButtonSize(50, 0);
+    rotateButton.setBorderRadius(40);
+    rotateButton.setSvgIconSize(40, 40);
     rotateButton.addActionListener(e -> handleRotationCardBtn());
 
     // Initialize the skip turn button
-    skipTurnButton = new CircularButton("resource\\images\\skip.svg");
+    skipTurnButton = new RoundedIconButton("resource\\images\\skip.svg");
+    skipTurnButton.setButtonSize(50, 0);
+    skipTurnButton.setBorderRadius(40);
+    skipTurnButton.setSvgIconSize(40, 40);
     skipTurnButton.addActionListener(e -> handleSkipTurnBtn());
 
     // Set layout and add buttons

@@ -1,6 +1,6 @@
 package it.unibs.pajc.labyrinth.core;
 
-import it.unibs.pajc.labyrinth.core.utility.MyGson;
+import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
 import it.unibs.pajc.labyrinth.core.utility.Orientation;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.util.ArrayList;
@@ -10,7 +10,6 @@ public class Bot {
 
   Labyrinth model;
   Player player;
-  MyGson myGson = new MyGson();
 
   public Bot(Labyrinth model, Player player) {
     this.model = model;
@@ -31,7 +30,7 @@ public class Bot {
     HashMap<Move, PositionDistance> closestGoalPositionsMap = new HashMap<>();
     for (Position cardInsertionPosition : availableCardInsertionPoint) {
       for (int i = 0; i < Orientation.values().length; i++) {
-        Labyrinth modelCopy = myGson.createCopy(model);
+        Labyrinth modelCopy = LabyrinthGson.createCopy(model);
         modelCopy.getAvailableCard().rotate(i);
         modelCopy.insertCard(cardInsertionPosition);
 

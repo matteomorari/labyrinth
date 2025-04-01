@@ -7,27 +7,19 @@ import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
 import java.awt.Color;
 
-public class MyGson {
-  Gson gson;
+public class LabyrinthGson {
+  private static final Gson gson =
+      new GsonBuilder().registerTypeAdapter(Color.class, new ColorAdapter()).create();
 
-  public MyGson() {
-    gson =
-        new GsonBuilder()
-            // .registerTypeAdapter(Goal.class, new GoalAdapter())
-            .registerTypeAdapter(Color.class, new ColorAdapter())
-            .setPrettyPrinting()
-            .create();
-  }
-
-  public Gson getGson() {
+  public static Gson getGson() {
     return gson;
   }
 
-  public String toJson(Object object) {
+  public static String toJson(Object object) {
     return gson.toJson(object);
   }
 
-  public Labyrinth fromJson(String json) {
+  public static Labyrinth fromJson(String json) {
     Labyrinth modelCopy = gson.fromJson(json, Labyrinth.class);
     // TODO: hard solution, to improve
     // we need the goal class  to be the same instance in the board and in the player
@@ -59,7 +51,7 @@ public class MyGson {
     return modelCopy;
   }
 
-  public Labyrinth createCopy(Labyrinth model) {
+  public static Labyrinth createCopy(Labyrinth model) {
     String json = gson.toJson(model);
     Labyrinth modelCopy = fromJson(json);
 

@@ -17,13 +17,14 @@ public class Card extends Node {
   private Power power;
   private ArrayList<Player> players;
 
-  public Card(CardType type, String uniFqueID) {
+  public Card(CardType type, String uniqueID) {
     this.type = type;
     this.isNordOpen = type.isNordOpen();
     this.isEastOpen = type.isEastOpen();
     this.isSouthOpen = type.isSouthOpen();
     this.isWestOpen = type.isWestOpen();
     this.orientation = Orientation.NORD;
+    this.uniqueID = uniqueID;
     this.players = new ArrayList<Player>();
   }
 

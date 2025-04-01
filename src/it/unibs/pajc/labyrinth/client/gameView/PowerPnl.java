@@ -10,11 +10,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Iterator;
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 
 public class PowerPnl extends JPanel {
-  // UI Constants
   private static final int DEFAULT_CARD_WIDTH = 100;
   private static final int MIN_CONTAINER_WIDTH = 200;
   private static final int PANEL_VERTICAL_PADDING = 150;
@@ -26,7 +31,7 @@ public class PowerPnl extends JPanel {
   private static final int BUTTON_TOP_MARGIN = 10;
   private static final int TITLE_FONT_SIZE = 25;
   private static final String TITLE_FONT_FAMILY = "Times New Roman";
-  private static final int POPUP_IMAGE_SIZE = 100; // New constant for player image size
+  private static final int POPUP_IMAGE_SIZE = 100;
   private static final int BUTTON_PADDING = 10;
   private static final int LINE_THICKNESS = 5;
 
@@ -35,13 +40,16 @@ public class PowerPnl extends JPanel {
   private int cardWidth = DEFAULT_CARD_WIDTH;
   private final Font titleFont = new Font(TITLE_FONT_FAMILY, Font.BOLD, TITLE_FONT_SIZE);
   private int panelWidth;
-  private CircularButton useButton;
+  private RoundedIconButton useButton;
 
   public PowerPnl(LabyrinthController controller) {
     this.controller = controller;
 
-    useButton = new CircularButton("resource\\images\\power.svg");
-    useButton.addActionListener(e -> HandleUsePowerBtn());
+    useButton = new RoundedIconButton("resource\\images\\power.svg");
+    useButton.setButtonSize(50, 0);
+    useButton.setBorderRadius(40);
+    useButton.setSvgIconSize(40, 40);
+    useButton.addActionListener(e -> handleUsePowerBtn());
     setLayout(null);
     add(useButton);
   }
@@ -199,7 +207,7 @@ public class PowerPnl extends JPanel {
   //   return scaledImage;
   // }
 
-  private void HandleUsePowerBtn() {
+  private void handleUsePowerBtn() {
     if (controller.getAvailableCard().getPower() != null
         && !controller.getHasUsedPower()
         && controller.getHasCurrentPlayerInserted()) {

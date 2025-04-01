@@ -5,7 +5,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 
 public interface LabyrinthController {
-  void initGame();
+  // void initGame();
 
   int getBoardSize();
 
@@ -25,10 +25,6 @@ public interface LabyrinthController {
 
   Card getAvailableCard();
 
-  void setPlayerToSwap(Player player);
-
-  void setGoalToSwap(Goal goal);
-
   // void nextPlayer();
 
   void skipTurn();
@@ -38,6 +34,10 @@ public interface LabyrinthController {
   boolean getHasUsedPower();
 
   boolean getHasCurrentPlayerInserted();
+
+  void setPlayerToSwap(Player player);
+
+  void setGoalToSwap(Goal goal);
 
   Player getPlayerToSwap();
 

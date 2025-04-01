@@ -1,5 +1,3 @@
-// package it.unibs.pajc.labyrinth.core.utility;
-
 package it.unibs.pajc.labyrinth.core.utility;
 
 import com.google.gson.Gson;
