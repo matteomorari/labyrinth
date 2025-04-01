@@ -43,6 +43,7 @@ public class Labyrinth extends BaseModel {
     this.lastInsertedCardPosition = null;
     this.lastPlayerMovedPath = new ArrayList<>();
     this.powerActions = new HashMap<>();
+    createPowerActionsMap();
   }
 
   public int getBoardSize() {
@@ -125,15 +126,12 @@ public class Labyrinth extends BaseModel {
   public void initGame() {
     this.initBoard();
     this.initializePlayerPositions();
-    createPowerActionsMap();
 
     // shuffle goals
     ArrayList<GoalType> goalList = new ArrayList<>(Arrays.asList(GoalType.values()));
     Collections.shuffle(goalList);
 
-    // powers
-    ArrayList<PowerType> PowerList = new ArrayList<>(Arrays.asList(PowerType.values()));
-
+    
     // assign goals for each player
     for (Player player : this.players) {
       for (int i = 0; i < GOALS_FOR_PLAYER; i++) {
@@ -159,16 +157,18 @@ public class Labyrinth extends BaseModel {
         }
       }
     }
-
-    // assign powers to the cards
-    while (!PowerList.isEmpty()) {
+    
+    // powers
+    ArrayList<PowerType> powerList = new ArrayList<>(Arrays.asList(PowerType.values()));
+    // TODO: set a number of powers for each type
+    while (!powerList.isEmpty()) {
       int row = random.nextInt(this.boardSize);
       int col = random.nextInt(this.boardSize);
       Card card = this.board.get(row).get(col);
 
       if (card.getPower() == null && isPowerPositionValid(row, col)) {
         // Power power = new Power(PowersList.remove(0));
-        Power power = new Power(PowerList.removeFirst());
+        Power power = new Power(powerList.removeFirst());
         card.setPower(power);
         power.setPosition(card.getPosition());
         System.out.println("potere inserito in carta" + card.getPosition());
@@ -245,6 +245,15 @@ public class Labyrinth extends BaseModel {
     return players;
   }
 
+  public Player getPlayerById(String playerId) {
+    for (Player player : players) {
+      if (player.getId().equals(playerId)) {
+        return player;
+      }
+    }
+    return null;
+  }
+
   public ArrayList<ArrayList<Card>> getBoard() {
     return board;
   }
@@ -315,16 +324,18 @@ public class Labyrinth extends BaseModel {
       if (availableCard.getPower() != null) {
         return;
       }
-      // nextPlayer();
       skipTurn();
 
     }
   }
 
-  public void usePower(PowerType powerType) {
+  public void usePower() {
+    if (availableCard.getPower() == null) {
+      return;
+    }
+    
     System.out.println(availableCard.getPower().getType().toString());
-    System.out.println();
-    if (hasCurrentPlayerInserted && !hasUsedPower && availableCard.getPower() != null) {
+    if (hasCurrentPlayerInserted && !hasUsedPower) {
       powerActions.getOrDefault(availableCard.getPower().getType(), () -> {}).run();
       setHasUsedPower(true);
     }
@@ -356,31 +367,19 @@ public class Labyrinth extends BaseModel {
     powerActions.put(
         PowerType.CHOOSE_SECOND_GOAL,
         () -> {
-          showGoal();
           changeGoal();
-          showGoal();
           checkAndProceedToNextPlayer();
         });
     powerActions.put(
         PowerType.CHOOSE_GOAL,
         () -> {
-          showGoal();
           changeGoal();
-          showGoal();
           checkAndProceedToNextPlayer();
         });
   }
 
-  // TEST
-  public void showGoal() {
-    System.out.println();
-    Player player = getCurrentPlayer();
-    for (Goal goal : player.getGoals()) {
-      System.out.println(goal.getType().toString());
-    }
-  }
-
   public void changeGoal() {
+    System.out.println("goal to change with: " + goalToSwap.getType().toString());
     if (getCurrentPlayer() == null || getCurrentPlayer().getGoals().size() < 2) {
       return;
     }
@@ -660,6 +659,7 @@ public class Labyrinth extends BaseModel {
     this.fireChangeListener();
   }
 
+  // TODO: without leaked reference can be improved
   public void swapPlayers() {
     Player currentPlayer = getCurrentPlayer();
     if (currentPlayer == null || playerToSwap == null) {
@@ -674,8 +674,6 @@ public class Labyrinth extends BaseModel {
     int y = playerToSwap.getPosition().getCol();
     int xCurrent = currentPlayer.getPosition().getRow();
     int yCurrent = currentPlayer.getPosition().getCol();
-    // Position playerToSwapPosition = playerToSwap.getPosition();
-    // System.out.println("swap player position" + playerToSwapPosition);
 
     // Get the cards at the current positions
     Card currentPlayerCard = getPlayerCard(currentPlayer);
@@ -692,15 +690,13 @@ public class Labyrinth extends BaseModel {
     // Add players to their new cards
     currentPlayerCard.addPlayer(playerToSwap);
     playerToSwapCard.addPlayer(currentPlayer);
-    
-    // currentPlayerCard.updatePlayersPosition();
-    // playerToSwapCard.updatePlayersPosition();
+
     System.out.println("current player position " + currentPlayer.getPosition());
     System.out.println("swap player position" + playerToSwap.getPosition());
     setPlayerToSwap(null);
 
     this.fireChangeListener();
-  }
+}
 
   public ArrayList<Position> getLastPlayerMovedPath() {
     return lastPlayerMovedPath;

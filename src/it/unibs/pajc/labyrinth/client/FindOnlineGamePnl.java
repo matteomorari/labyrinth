@@ -99,7 +99,7 @@ public class FindOnlineGamePnl extends JPanel {
             if (selectedIndex != -1) {
               GameLobby selectedLobby = gameLobbies.get(selectedIndex);
               System.out.println("Selected Game: " + selectedLobby);
-              clientController.joinLobby(selectedLobby.getLOBBY_ID());
+              clientController.joinLobby(selectedLobby.getLobbyId());
               // Update the selectedLobby and refresh the avatar panel
               this.selectedLobby = selectedLobby;
               updateAvatarPanel();
@@ -147,7 +147,7 @@ public class FindOnlineGamePnl extends JPanel {
     DefaultListModel<String> listModel = new DefaultListModel<>();
     for (int i = 0; i < gameLobbies.size(); i++) {
       GameLobby lobby = gameLobbies.get(i);
-      if (selectedLobby != null && lobby.getLOBBY_ID().equals(selectedLobby.getLOBBY_ID())) {
+      if (selectedLobby != null && lobby.getLobbyId().equals(selectedLobby.getLobbyId())) {
         listModel.addElement("GAME " + (i + 1) + "  (" + lobby.getPlayerCount() + ")");
 
       } else {

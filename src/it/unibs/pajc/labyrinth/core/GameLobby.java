@@ -82,7 +82,7 @@ public class GameLobby {
     return this.playersList.size();
   }
 
-  public String getLOBBY_ID() {
+  public String getLobbyId() {
     return LOBBY_ID;
   }
 

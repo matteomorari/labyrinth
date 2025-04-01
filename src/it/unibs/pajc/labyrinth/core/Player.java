@@ -58,6 +58,7 @@ public class Player {
   }
 
   public Position getPosition() {
+    // TODO: leaked reference
     return this.position;
   }
 
@@ -67,6 +68,7 @@ public class Player {
   }
 
   public Position getStartPosition() {
+    // TODO: leaked reference
     return this.startPosition;
   }
 

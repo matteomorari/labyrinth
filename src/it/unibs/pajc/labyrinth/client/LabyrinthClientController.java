@@ -117,6 +117,47 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
             exc.printStackTrace();
           }
         });
+    commandMap.put(
+        "turn_skipped",
+        e -> {
+          try {
+            labyrinthModel.skipTurn();
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
+    commandMap.put(
+        "power_used",
+        e -> {
+          try {
+            labyrinthModel.usePower();
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
+    commandMap.put(
+        "set_player_to_swap",
+        e -> {
+          try {
+            String playerId = e.getParameters().get("player_id").getAsString();
+            Player playerToSwap = labyrinthModel.getPlayerById(playerId);
+            labyrinthModel.setPlayerToSwap(playerToSwap);
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
+    commandMap.put(
+        "set_goal_to_swap",
+        e -> {
+          try {
+            int row = e.getParameters().get("goal_position_row").getAsInt();
+            int col = e.getParameters().get("goal_position_col").getAsInt();
+            Goal goal = labyrinthModel.getBoard().get(row).get(col).getGoal();
+            labyrinthModel.setGoalToSwap(goal);
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
   }
 
   public boolean connect(String serverAddress, int serverPort) {
@@ -159,7 +200,7 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
 
     JsonObject parameters = new JsonObject();
     parameters.addProperty("player_id", this.player.getId().toString());
-    parameters.addProperty("lobby_id", this.onlineGameManager.getSelectedLobby().getLOBBY_ID());
+    parameters.addProperty("lobby_id", this.onlineGameManager.getSelectedLobby().getLobbyId());
 
     msg.add("parameters", parameters);
     sendMsg(this, msg.toString());
@@ -228,24 +269,46 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
 
   @Override
   public void setPlayerToSwap(Player player) {
-    labyrinthModel.setPlayerToSwap(player);
+    // labyrinthModel.setPlayerToSwap(player);
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "set_player_to_swap");
+
+    JsonObject parameters = new JsonObject();
+    parameters.addProperty("player_id", player.getId());
+
+    msg.add("parameters", parameters);
+    sendMsg(this, msg.toString());
   }
 
   @Override
   public void setGoalToSwap(Goal goal) {
-    labyrinthModel.setGoalToSwap(goal);
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "set_goal_to_swap");
+
+    JsonObject parameters = new JsonObject();
+    parameters.addProperty("goal_position_row", goal.getPosition().getRow());
+    parameters.addProperty("goal_position_col", goal.getPosition().getCol());
+
+    msg.add("parameters", parameters);
+    sendMsg(this, msg.toString());
   }
 
   @Override
   public void skipTurn() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'skipTurn'");
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "skip_turn");
+
+    msg.add("parameters", null);
+    sendMsg(this, msg.toString());
   }
 
   @Override
   public void usePower() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'usePower'");
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "use_power");
+
+    msg.add("parameters", null);
+    sendMsg(this, msg.toString());
   }
 
   @Override

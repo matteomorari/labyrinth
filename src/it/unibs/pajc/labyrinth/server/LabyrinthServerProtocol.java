@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import it.unibs.pajc.labyrinth.core.GameLobby;
+import it.unibs.pajc.labyrinth.core.Goal;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.clientServerCommon.SocketCommunicationProtocol;
@@ -123,6 +124,76 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol {
             exc.printStackTrace();
           }
         });
+    commandMap.put(
+        "skip_turn",
+        e -> {
+          try {
+            LabyrinthServerProtocol sender = (LabyrinthServerProtocol) e.getSender();
+            Labyrinth labyrinthModel = selectedLobby.getModel();
+
+            // check if the sender is the current player
+            if (sender.player.equals(labyrinthModel.getCurrentPlayer())) {
+              labyrinthModel.skipTurn();
+              sendTurnSkippedNotification();
+            }
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
+    commandMap.put(
+        "use_power",
+        e -> {
+          try {
+            LabyrinthServerProtocol sender = (LabyrinthServerProtocol) e.getSender();
+            Labyrinth labyrinthModel = selectedLobby.getModel();
+
+            // check if the sender is the current player
+            if (sender.player.equals(labyrinthModel.getCurrentPlayer())) {
+              labyrinthModel.usePower();
+              sendPowerUsedNotification();
+            }
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
+    commandMap.put(
+        "set_player_to_swap",
+        e -> {
+          try {
+            LabyrinthServerProtocol sender = (LabyrinthServerProtocol) e.getSender();
+            Labyrinth labyrinthModel = selectedLobby.getModel();
+
+            // check if the sender is the current player
+            if (sender.player.equals(labyrinthModel.getCurrentPlayer())) {
+              String playerId = e.getParameters().get("player_id").getAsString();
+              Player playerToSwap = labyrinthModel.getPlayerById(playerId);
+              labyrinthModel.setPlayerToSwap(playerToSwap);
+              sendPlayerSwapNotification(playerId);
+            }
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
+    commandMap.put(
+        "set_goal_to_swap",
+        e -> {
+          try {
+            LabyrinthServerProtocol sender = (LabyrinthServerProtocol) e.getSender();
+            Labyrinth labyrinthModel = selectedLobby.getModel();
+
+            // check if the sender is the current player
+            if (sender.player.equals(labyrinthModel.getCurrentPlayer())) {
+              int row = e.getParameters().get("goal_position_row").getAsInt();
+              int col = e.getParameters().get("goal_position_col").getAsInt();
+              Goal goal = labyrinthModel.getBoard().get(row).get(col).getGoal();
+              System.out.println(goal.getType().toString());
+              labyrinthModel.setGoalToSwap(goal);
+              sendGoalSwap(goal);
+            }
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
   }
 
   private void sendNotificationToLobbyPlayers(JsonObject msg) {
@@ -134,7 +205,7 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol {
   private GameLobby getLobbyById(String lobbyId) {
     // find the lobby with the given ID
     for (GameLobby gameLobby : gameLobbies) {
-      if (gameLobby.getLOBBY_ID().equals(lobbyId)) {
+      if (gameLobby.getLobbyId().equals(lobbyId)) {
         return gameLobby;
       }
     }
@@ -241,6 +312,45 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol {
 
     msg.add("parameters", parameters);
 
+    sendNotificationToLobbyPlayers(msg);
+  }
+
+  private void sendTurnSkippedNotification() {
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "turn_skipped");
+
+    msg.add("parameters", null);
+    sendNotificationToLobbyPlayers(msg);
+  }
+
+  private void sendPowerUsedNotification() {
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "power_used");
+
+    msg.add("parameters", null);
+    sendNotificationToLobbyPlayers(msg);
+  }
+
+  private void sendPlayerSwapNotification(String playerToSwapId) {
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "set_player_to_swap");
+
+    JsonObject parameters = new JsonObject();
+    parameters.addProperty("player_id", playerToSwapId);
+
+    msg.add("parameters", parameters);
+    sendNotificationToLobbyPlayers(msg);
+  }
+
+  private void sendGoalSwap(Goal goal) {
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "set_goal_to_swap");
+
+    JsonObject parameters = new JsonObject();
+    parameters.addProperty("goal_position_row", goal.getPosition().getRow());
+    parameters.addProperty("goal_position_col", goal.getPosition().getCol());
+
+    msg.add("parameters", parameters);
     sendNotificationToLobbyPlayers(msg);
   }
 }
