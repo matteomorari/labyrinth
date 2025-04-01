@@ -35,12 +35,15 @@ public class PowerPnl extends JPanel {
   private int cardWidth = DEFAULT_CARD_WIDTH;
   private final Font titleFont = new Font(TITLE_FONT_FAMILY, Font.BOLD, TITLE_FONT_SIZE);
   private int panelWidth;
-  private CircularButton useButton;
+  private RoundedIconButton useButton;
 
   public PowerPnl(LabyrinthController controller) {
     this.controller = controller;
 
-    useButton = new CircularButton("resource\\images\\power.svg");
+    useButton = new RoundedIconButton("resource\\images\\power.svg");
+    useButton.setButtonSize(50, 0);
+    useButton.setBorderRadius(40);
+    useButton.setSvgIconSize(40, 40);
     useButton.addActionListener(e -> HandleUsePowerBtn());
     setLayout(null);
     add(useButton);

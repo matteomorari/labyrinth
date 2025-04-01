@@ -18,7 +18,7 @@
   </build>
 
 
-   <dependencies>
+  <dependencies>
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
@@ -38,6 +38,11 @@
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-all</artifactId>
       <version>1.14</version>
+    </dependency>
+    <dependency>
+      <groupId>com.formdev</groupId>
+      <artifactId>svgSalamander</artifactId>
+      <version>1.1.4</version>
     </dependency>
   </dependencies>
 </project>

@@ -1,6 +1,7 @@
 package it.unibs.pajc.labyrinth.client;
 
 import it.unibs.pajc.labyrinth.client.gameView.GamePnl;
+import it.unibs.pajc.labyrinth.client.gameView.RoundedIconButton;
 import it.unibs.pajc.labyrinth.core.Bot;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.OnlineGameManager;
@@ -8,8 +9,11 @@ import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.PlayerColor;
 import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.Color;
 import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -19,48 +23,74 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 public class LocalOnlineGameSelectionPnl extends JPanel {
 
-  private JButton localGameBtn;
-  private JButton onlineGameBtn;
-
   public LocalOnlineGameSelectionPnl() {
-    initializeComponents();
-  }
+    setLayout(new BorderLayout());
 
-  private void initializeComponents() {
-    // Set up the panel layout
-    setLayout(new GridBagLayout());
-    setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    // Title label at the top
+    JLabel titleLabel = new JLabel("LABIRINTO", SwingConstants.CENTER);
+    titleLabel.setFont(new Font("SansSerif", Font.BOLD, 48));
+    titleLabel.setForeground(Color.WHITE);
+    titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+    add(titleLabel, BorderLayout.NORTH);
+
+    // Center panel for buttons
+    JPanel centerPanel = new JPanel(new GridBagLayout());
+    centerPanel.setOpaque(false);
 
     GridBagConstraints gbc = new GridBagConstraints();
-    gbc.gridwidth = GridBagConstraints.REMAINDER;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.insets = new Insets(15, 15, 15, 15);
+    gbc.insets = new Insets(20, 20, 20, 20);
+    gbc.fill = GridBagConstraints.NONE; // Allow buttons to size naturally
+    gbc.weightx = 0.0; // No horizontal stretching
+    gbc.weighty = 1.0; // Allow vertical centering
+    gbc.anchor = GridBagConstraints.CENTER; // Center the buttons
 
-    // Create buttons with appropriate styling
-    localGameBtn = new JButton("Create Local Game");
-    onlineGameBtn = new JButton("Find Online Game");
+    // "Local" button
+    RoundedIconButton localButton = new RoundedIconButton("resource\\images\\rotate.svg", "LOCAL");
+    localButton.setBorderRadius(20);
+    localButton.setButtonSize(200, 50);
+    localButton.setSvgIconSize(150, 150);
+    localButton.addActionListener(e -> createLocalGame());
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.ipadx = 50;
+    gbc.insets = new Insets(20, 20, 20, 40); // Add space to the right of the button
+    centerPanel.add(localButton, gbc);
 
-    // Style the buttons
-    Font buttonFont = new Font("Arial", Font.BOLD, 16);
-    Dimension buttonSize = new Dimension(250, 60);
+    // "Online" button
+    RoundedIconButton onlineButton = new RoundedIconButton("resource\\images\\rotate.svg", "ONLINE");
+    onlineButton.setBorderRadius(20);
+    onlineButton.setButtonSize(200, 50);
+    onlineButton.setSvgIconSize(150, 150);
+    onlineButton.addActionListener(e -> findOnlineGame());
+    gbc.gridx = 1;
+    gbc.gridy = 0;
+    gbc.insets = new Insets(20, 40, 20, 20); // Add space to the left of the button
+    centerPanel.add(onlineButton, gbc);
 
-    localGameBtn.setFont(buttonFont);
-    onlineGameBtn.setFont(buttonFont);
+    add(centerPanel, BorderLayout.CENTER);
+  }
 
-    localGameBtn.setPreferredSize(buttonSize);
-    onlineGameBtn.setPreferredSize(buttonSize);
+  /** Custom paintComponent method to apply a gradient background. */
+  @Override
+  protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
+    Graphics2D g2d = (Graphics2D) g.create();
 
-    // Add action listeners
-    localGameBtn.addActionListener(e -> createLocalGame());
-    onlineGameBtn.addActionListener(e -> findOnlineGame());
+    int width = getWidth();
+    int height = getHeight();
 
-    // Add buttons to panel
-    add(localGameBtn, gbc);
-    add(onlineGameBtn, gbc);
+    GradientPaint gradientPaint =
+        new GradientPaint(-100, height/2, Color.RED, width/2, height/2, Color.YELLOW);
+    g2d.setPaint(gradientPaint);
+    g2d.fillRect(0, 0, width, height);
+
+    g2d.dispose();
   }
 
   /** Creates a new local game and displays the game panel */
