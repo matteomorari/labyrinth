@@ -1,7 +1,6 @@
 package it.unibs.pajc.labyrinth.core;
 
 import it.unibs.pajc.labyrinth.core.utility.Position;
-import java.awt.Color;
 import java.util.ArrayDeque;
 import java.util.UUID;
 
@@ -50,11 +49,11 @@ public class Player {
   }
 
   public String getColorName() {
-    return this.color.getColorName();
+    return this.color != null ? this.color.getColorName() : null;
   }
 
-  public Color getColor() {
-    return this.color.getColor();
+  public PlayerColor getColor() {
+    return this.color;
   }
 
   public Position getPosition() {

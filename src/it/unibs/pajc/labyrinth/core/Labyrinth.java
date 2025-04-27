@@ -15,6 +15,8 @@ import java.util.UUID;
 
 public class Labyrinth extends BaseModel {
   private static final int GOALS_FOR_PLAYER = 4;
+  public static final int MAX_PLAYERS = 4;
+  public static final int MIN_PLAYERS = 2;
   private final transient Random random = new Random();
 
   private int boardSize;
@@ -57,8 +59,9 @@ public class Labyrinth extends BaseModel {
   public void initializePlayerPositions() {
     int numberOfPlayers = players.size();
 
-    if (numberOfPlayers < 2 || numberOfPlayers > 4) {
-      throw new IllegalArgumentException("Invalid number of players, must be between 2 and 4");
+    if (numberOfPlayers < MIN_PLAYERS || numberOfPlayers > MAX_PLAYERS) {
+      throw new IllegalArgumentException(
+          "Invalid number of players, must be between " + MIN_PLAYERS + " and " + MAX_PLAYERS);
     }
 
     Position[] cornerPositions = getCornerPositions();
@@ -131,7 +134,6 @@ public class Labyrinth extends BaseModel {
     ArrayList<GoalType> goalList = new ArrayList<>(Arrays.asList(GoalType.values()));
     Collections.shuffle(goalList);
 
-    
     // assign goals for each player
     for (Player player : this.players) {
       for (int i = 0; i < GOALS_FOR_PLAYER; i++) {
@@ -157,7 +159,7 @@ public class Labyrinth extends BaseModel {
         }
       }
     }
-    
+
     // powers
     ArrayList<PowerType> powerList = new ArrayList<>(Arrays.asList(PowerType.values()));
     // TODO: set a number of powers for each type
@@ -171,7 +173,6 @@ public class Labyrinth extends BaseModel {
         Power power = new Power(powerList.removeFirst());
         card.setPower(power);
         power.setPosition(card.getPosition());
-        System.out.println("potere inserito in carta" + card.getPosition());
       }
     }
     this.fireChangeListener();
@@ -325,7 +326,6 @@ public class Labyrinth extends BaseModel {
         return;
       }
       skipTurn();
-
     }
   }
 
@@ -333,7 +333,7 @@ public class Labyrinth extends BaseModel {
     if (availableCard.getPower() == null) {
       return;
     }
-    
+
     System.out.println(availableCard.getPower().getType().toString());
     if (hasCurrentPlayerInserted && !hasUsedPower) {
       powerActions.getOrDefault(availableCard.getPower().getType(), () -> {}).run();
@@ -682,7 +682,6 @@ public class Labyrinth extends BaseModel {
     playerToSwap.setPosition(xCurrent, yCurrent);
     currentPlayer.setPosition(x, y);
 
-    
     // Remove players from their current cards
     currentPlayerCard.removePlayer(currentPlayer);
     playerToSwapCard.removePlayer(playerToSwap);
@@ -696,7 +695,7 @@ public class Labyrinth extends BaseModel {
     setPlayerToSwap(null);
 
     this.fireChangeListener();
-}
+  }
 
   public ArrayList<Position> getLastPlayerMovedPath() {
     return lastPlayerMovedPath;

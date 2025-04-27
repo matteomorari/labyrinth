@@ -1,18 +1,18 @@
-package it.unibs.pajc.labyrinth.client;
+package it.unibs.pajc.labyrinth.client.controllers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import it.unibs.pajc.labyrinth.core.Card;
-import it.unibs.pajc.labyrinth.core.GameLobby;
 import it.unibs.pajc.labyrinth.core.Goal;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.OnlineGameManager;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.clientServerCommon.SocketCommunicationProtocol;
-import it.unibs.pajc.labyrinth.core.utility.GameLobbyGson;
+import it.unibs.pajc.labyrinth.core.lobby.Lobby;
 import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
+import it.unibs.pajc.labyrinth.core.utility.LobbyGson;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.net.Socket;
 import java.util.ArrayDeque;
@@ -39,21 +39,21 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
         "new_player",
         e -> {
           try {
-            setLocalPlayer(e.getParameters().get("player_id").toString());
+            setLocalPlayer(e.getParameters().get("player_id").getAsString());
           } catch (Exception exc) {
             exc.printStackTrace();
           }
         });
     commandMap.put(
-        "send_lobbies",
+        "available_lobbies",
         e -> {
           try {
-            ArrayList<GameLobby> availableLobbies = new ArrayList<>();
+            ArrayList<Lobby> availableLobbies = new ArrayList<>();
             JsonElement lobbiesParameters = e.getParameters().get("lobbies");
 
             JsonElement parsedLobbies = JsonParser.parseString(lobbiesParameters.getAsString());
             for (JsonElement gameLobbyElement : parsedLobbies.getAsJsonArray()) {
-              GameLobby lobby = GameLobbyGson.fromJson(gameLobbyElement.toString());
+              Lobby lobby = LobbyGson.fromJson(gameLobbyElement.toString());
               availableLobbies.add(lobby);
             }
             onlineGameManager.setAvailableLobbies(availableLobbies);
@@ -69,8 +69,9 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
             JsonElement lobbyParameters = e.getParameters().get("lobby");
             JsonElement parsedLobbyData = JsonParser.parseString(lobbyParameters.getAsString());
 
-            GameLobby lobby = GameLobbyGson.fromJson(parsedLobbyData.toString());
+            Lobby lobby = LobbyGson.fromJson(parsedLobbyData.toString());
             onlineGameManager.setSelectedLobby(lobby);
+            player = onlineGameManager.getSelectedLobby().getPlayerById(player.getId());
 
           } catch (Exception exc) {
             exc.printStackTrace();
@@ -175,7 +176,7 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
     this.player = new Player(playerId);
   }
 
-  public void fetchLobbyOptions() {
+  public void fetchLobby() {
     sendMsg(this, createMessage("fetch_lobbies", null));
   }
 
@@ -199,7 +200,7 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
     msg.addProperty("command", "toggle_player_ready");
 
     JsonObject parameters = new JsonObject();
-    parameters.addProperty("player_id", this.player.getId().toString());
+    parameters.addProperty("player_id", this.player.getId());
     parameters.addProperty("lobby_id", this.onlineGameManager.getSelectedLobby().getLobbyId());
 
     msg.add("parameters", parameters);
@@ -329,5 +330,9 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
   @Override
   public Goal getGoalToSwap() {
     return labyrinthModel.getGoalToSwap();
+  }
+
+  public Labyrinth getLabyrinthModel() {
+    return labyrinthModel;
   }
 }

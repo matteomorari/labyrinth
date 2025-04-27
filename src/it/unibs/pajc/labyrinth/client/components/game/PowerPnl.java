@@ -1,23 +1,20 @@
-package it.unibs.pajc.labyrinth.client.gameView;
+package it.unibs.pajc.labyrinth.client.components.game;
 
+import it.unibs.pajc.labyrinth.client.components.RoundedIconButton;
+import it.unibs.pajc.labyrinth.client.components.SelectionDialog;
+import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.Goal;
 import it.unibs.pajc.labyrinth.core.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.PowerType;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Iterator;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import javax.swing.border.LineBorder;
 
 public class PowerPnl extends JPanel {
   private static final int DEFAULT_CARD_WIDTH = 100;
@@ -142,11 +139,8 @@ public class PowerPnl extends JPanel {
     Card card = controller.getAvailableCard();
 
     if (card.getPower() != null) {
-      powerImage =
-          scaleImage(
-              ImageCntrl.valueOf(card.getPower().getType().toString()).getImage(),
-              cardWidth,
-              Integer.MAX_VALUE);
+      powerImage = ImageCntrl.valueOf(card.getPower().getType().toString()).getImage();
+      powerImage = ImageCntrl.scaleBufferedImage(powerImage, cardWidth, cardWidth);
       if (controller.getHasUsedPower()) {
         // Make the border of the image green
         Graphics2D g2d = powerImage.createGraphics();
@@ -172,41 +166,6 @@ public class PowerPnl extends JPanel {
     repaint();
   }
 
-  private BufferedImage scaleImage(BufferedImage original, int maxWidth, int maxHeight) {
-    int originalWidth = original.getWidth();
-    int originalHeight = original.getHeight();
-
-    if (originalWidth <= 0 || originalHeight <= 0) {
-      return original;
-    }
-
-    double aspectRatio = (double) originalWidth / originalHeight;
-    int width = maxWidth;
-    int height = (int) (width / aspectRatio);
-
-    if (height > maxHeight) {
-      height = maxHeight;
-      width = (int) (height * aspectRatio);
-    }
-
-    Image tmp = original.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-    BufferedImage scaledImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-    Graphics2D g2d = scaledImage.createGraphics();
-    g2d.drawImage(tmp, 0, 0, null);
-    g2d.dispose();
-
-    return scaledImage;
-  }
-
-  // private BufferedImage scaleImage(BufferedImage original, int size) {
-  //   Image tmp = original.getScaledInstance(size, size, Image.SCALE_SMOOTH);
-  //   BufferedImage scaledImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-  //   Graphics2D g2d = scaledImage.createGraphics();
-  //   g2d.drawImage(tmp, 0, 0, null);
-  //   g2d.dispose();
-  //   return scaledImage;
-  // }
-
   private void handleUsePowerBtn() {
     if (controller.getAvailableCard().getPower() != null
         && !controller.getHasUsedPower()
@@ -225,142 +184,48 @@ public class PowerPnl extends JPanel {
   }
 
   private void showSwapPlayerPopup() {
-    JPanel panel = new JPanel(new GridLayout(1, controller.getPlayers().size() - 1));
-    panel.setPreferredSize(new Dimension(400, 200));
-    panel.setBackground(Color.LIGHT_GRAY);
     Player currentPlayer = controller.getCurrentPlayer();
-
-    JDialog dialog = new JDialog((Frame) null, null, true);
-    dialog.getContentPane().add(createCustomPanel(panel, "SELECT   PLAYER"));
-    dialog.pack();
-    dialog.setLocationRelativeTo(this);
+    java.util.List<SelectionDialog.SelectionItem> items = new java.util.ArrayList<>();
 
     for (Player player : controller.getPlayers()) {
       if (!player.equals(currentPlayer)) {
         BufferedImage playerImage =
             ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE")
                 .getStandingAnimationImage();
-        playerImage = scaleImage(playerImage, POPUP_IMAGE_SIZE, POPUP_IMAGE_SIZE);
-        JButton playerButton = new JButton(new ImageIcon(playerImage));
-        playerButton.setFocusPainted(false);
-        playerButton.setBackground(Color.LIGHT_GRAY);
-        playerButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
-        playerButton.addMouseListener(
-            new MouseAdapter() {
-              @Override
-              public void mouseEntered(java.awt.event.MouseEvent evt) {
-                playerButton.setBorder(new LineBorder(Color.GREEN, LINE_THICKNESS));
-              }
-
-              @Override
-              public void mouseExited(java.awt.event.MouseEvent evt) {
-                playerButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
-              }
-            });
-        playerButton.addActionListener(
-            e -> {
-              controller.setPlayerToSwap(player);
-              dialog.dispose();
-            });
-        panel.add(playerButton);
+        items.add(
+            new SelectionDialog.SelectionItem(
+                playerImage, () -> controller.setPlayerToSwap(player)));
       }
     }
 
-    dialog.setVisible(true);
+    SelectionDialog.show(this, "SELECT   PLAYER", items);
   }
 
   private void showSwapGoalPopup() {
-    JPanel panel =
-        new JPanel(new GridLayout(1, controller.getCurrentPlayer().getGoals().size() - 1));
-    panel.setPreferredSize(new Dimension(400, 200));
-    panel.setBackground(Color.LIGHT_GRAY);
     Goal currentGoal = controller.getCurrentPlayer().getGoals().getFirst();
-
-    JDialog dialog = new JDialog((Frame) null, null, true);
-    dialog.getContentPane().add(createCustomPanel(panel, "SELECT   GOAL"));
-    dialog.pack();
-    dialog.setLocationRelativeTo(this);
+    java.util.List<SelectionDialog.SelectionItem> items = new java.util.ArrayList<>();
 
     for (Goal goal : controller.getCurrentPlayer().getGoals()) {
       if (!goal.equals(currentGoal)) {
         BufferedImage goalImage = ImageCntrl.valueOf("GOAL_" + goal.getType()).getImage();
-        goalImage = scaleImage(goalImage, POPUP_IMAGE_SIZE, POPUP_IMAGE_SIZE);
-        JButton goalButton = new JButton(new ImageIcon(goalImage));
-        goalButton.setBackground(Color.LIGHT_GRAY);
-        goalButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
-        goalButton.setFocusPainted(false);
-        goalButton.addMouseListener(
-            new MouseAdapter() {
-              @Override
-              public void mouseEntered(java.awt.event.MouseEvent evt) {
-                goalButton.setBorder(new LineBorder(Color.GREEN, LINE_THICKNESS));
-              }
-
-              @Override
-              public void mouseExited(java.awt.event.MouseEvent evt) {
-                goalButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
-              }
-            });
-        goalButton.addActionListener(
-            e -> {
-              controller.setGoalToSwap(goal);
-              dialog.dispose();
-            });
-        panel.add(goalButton);
+        items.add(
+            new SelectionDialog.SelectionItem(goalImage, () -> controller.setGoalToSwap(goal)));
       }
     }
 
-    dialog.setVisible(true);
+    SelectionDialog.show(this, "SELECT   GOAL", items);
   }
 
   private void showSwapSecondGoalPopup() {
-    JPanel panel = new JPanel(new GridLayout(1, 2));
-    panel.setPreferredSize(new Dimension(400, 200));
-    panel.setBackground(Color.LIGHT_GRAY);
     Iterator<Goal> it = controller.getCurrentPlayer().getGoals().iterator();
-
-    JDialog dialog = new JDialog((Frame) null, null, true);
-    dialog.getContentPane().add(createCustomPanel(panel, "SELECT   GOAL"));
-    dialog.pack();
-    dialog.setLocationRelativeTo(this);
+    java.util.List<SelectionDialog.SelectionItem> items = new java.util.ArrayList<>();
 
     for (int i = 0; i < 2 && it.hasNext(); i++) {
       Goal goal = it.next();
       BufferedImage goalImage = ImageCntrl.valueOf("GOAL_" + goal.getType()).getImage();
-      goalImage = scaleImage(goalImage, POPUP_IMAGE_SIZE, POPUP_IMAGE_SIZE);
-      JButton goalButton = new JButton(new ImageIcon(goalImage));
-      goalButton.setBackground(Color.LIGHT_GRAY);
-      goalButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
-      goalButton.setFocusPainted(false);
-      goalButton.addMouseListener(
-          new MouseAdapter() {
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-              goalButton.setBorder(new LineBorder(Color.GREEN, LINE_THICKNESS));
-            }
-
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-              goalButton.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
-            }
-          });
-      goalButton.addActionListener(
-          e -> {
-            controller.setGoalToSwap(goal);
-            dialog.dispose();
-          });
-      panel.add(goalButton);
+      items.add(new SelectionDialog.SelectionItem(goalImage, () -> controller.setGoalToSwap(goal)));
     }
 
-    dialog.setVisible(true);
-  }
-
-  private JPanel createCustomPanel(JPanel panel, String title) {
-    JLabel messageLabel = new JLabel(title, JLabel.CENTER);
-    messageLabel.setFont(new Font("Times New Roman", Font.BOLD, 15));
-    JPanel customPanel = new JPanel(new BorderLayout());
-    customPanel.add(messageLabel, BorderLayout.NORTH);
-    customPanel.add(panel, BorderLayout.CENTER);
-    return customPanel;
+    SelectionDialog.show(this, "SELECT   GOAL", items);
   }
 }

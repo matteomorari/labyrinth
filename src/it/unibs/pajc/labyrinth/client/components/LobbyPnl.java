@@ -1,0 +1,147 @@
+package it.unibs.pajc.labyrinth.client.components;
+
+import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
+import it.unibs.pajc.labyrinth.core.Player;
+import it.unibs.pajc.labyrinth.core.PlayerColor;
+import it.unibs.pajc.labyrinth.core.lobby.Lobby;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.RenderingHints;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import javax.swing.JPanel;
+
+public class LobbyPnl extends JPanel {
+  private static final int AVATAR_COUNT = 4;
+  private static final int AVATAR_SIZE = 200;
+  private static final int AVATAR_INSET = 40;
+  private static final int GRID_INSET = 20;
+  private static final int ARC_RADIUS = 40;
+
+  private Lobby lobby;
+  private ArrayList<AvatarPnl> avatarPnlList;
+
+  public LobbyPnl() {
+    setPreferredSize(new Dimension(0, 100));
+    setLayout(new GridBagLayout());
+    addComponentListener(
+        new java.awt.event.ComponentAdapter() {
+          @Override
+          public void componentResized(java.awt.event.ComponentEvent e) {
+            update(lobby);
+          }
+        });
+    avatarPnlList = new ArrayList<>();
+  }
+
+  @Override
+  protected void paintComponent(Graphics g) {
+    // Draw rounded background
+    Graphics2D g2 = (Graphics2D) g.create();
+    super.paintComponent(g);
+    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    g2.setColor(Color.ORANGE);
+    g2.fillRoundRect(0, 0, getWidth(), getHeight(), ARC_RADIUS, ARC_RADIUS);
+    g2.dispose();
+  }
+
+  public void update(Lobby gameLobby) {
+    if (gameLobby == null) {
+      return;
+    }
+    this.lobby = gameLobby;
+    removeAll();
+    setLayout(new GridBagLayout());
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.insets = new Insets(GRID_INSET, GRID_INSET, GRID_INSET, GRID_INSET);
+
+    int panelWidth = getWidth() > 0 ? getWidth() : 800;
+    int avatarWidth = AVATAR_SIZE + AVATAR_INSET;
+    int columns = panelWidth >= avatarWidth * AVATAR_COUNT ? AVATAR_COUNT : 2;
+
+    ArrayList<Player> players = lobby.getPlayers();
+    avatarPnlList.clear();
+    if (players != null && !players.isEmpty()) {
+      for (int i = 0; i < AVATAR_COUNT; i++) {
+        gbc.gridx = i % columns;
+        gbc.gridy = i / columns;
+        AvatarPnl avatarPnl = new AvatarPnl();
+        avatarPnl.setPreferredSize(new Dimension(AVATAR_SIZE, AVATAR_SIZE));
+        if (i < players.size()) {
+          avatarPnl.setPlayer(players.get(i));
+        } else {
+          // TODO: if the are no more players, set the "add bot" or "add player" button
+          // based if is an online or local game
+        }
+        add(avatarPnl, gbc);
+        avatarPnlList.add(avatarPnl);
+      }
+    }
+
+    // Add mouse listener to each AvatarPnl in the lobby panel
+    // TODO: is right to be placed in the update method?
+    for (AvatarPnl avatarPnl : getAvatarPanels()) {
+      avatarPnl.addMouseListener(
+          new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+              Player player = avatarPnl.getPlayer();
+              if (player == null) return;
+
+              // Get available colors from the lobby
+              HashSet<PlayerColor> availableColors = lobby.getAvailableColors();
+
+              // Build selection items for the dialog
+              List<SelectionDialog.SelectionItem> items = new ArrayList<>();
+              for (PlayerColor color : availableColors) {
+                BufferedImage img =
+                    ImageCntrl.valueOf(color.name() + "_PLAYER_SPRITE").getStandingAnimationImage();
+                // Create a Runnable variable for the color selection action
+                Runnable colorSelectionAction =
+                    () -> {
+                      lobby.setPlayerColor(player, color);
+                      avatarPnl.repaint();
+                      repaint();
+                    };
+
+                items.add(
+                    new SelectionDialog.SelectionItem(
+                        img,
+                        () -> {
+                          colorSelectionAction.run();
+                          avatarPnl.repaint();
+                          repaint();
+                        }));
+              }
+
+              // Show the selection dialog
+              SelectionDialog.show(avatarPnl, "Select Player Color", items);
+            }
+          });
+    }
+    revalidate();
+    repaint();
+  }
+
+  public void setLobby(Lobby gameLobby) {
+    this.lobby = gameLobby;
+    update(gameLobby);
+  }
+
+  public Lobby getLobby() {
+    return lobby;
+  }
+
+  public ArrayList<AvatarPnl> getAvatarPanels() {
+    return avatarPnlList;
+  }
+}

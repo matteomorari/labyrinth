@@ -1,11 +1,12 @@
-package it.unibs.pajc.labyrinth.client.gameView;
+package it.unibs.pajc.labyrinth.client.components.game;
 
+import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.core.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Player;
 import java.awt.*;
+import java.awt.FontMetrics;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
-import java.awt.FontMetrics;
 
 public class CurrentGoalPnl extends JPanel {
 
@@ -23,7 +24,7 @@ public class CurrentGoalPnl extends JPanel {
   private static final int TITLE_FONT_SIZE = 25;
   private static final String TITLE_FONT_FAMILY = "Times New Roman";
   private static final float OVAL_STROKE_WIDTH = 3.0f;
-  
+
   // Image scaling constants
   private static final int OVERLAY_WIDTH_DIVISOR = 2;
   private static final int OVERLAY_HEIGHT_DIVISOR = 3;
@@ -56,7 +57,8 @@ public class CurrentGoalPnl extends JPanel {
         // If direct parent doesn't have width yet, try to get it from the scroll pnl
         Container ancestor = SwingUtilities.getAncestorOfClass(JScrollPane.class, this);
         if (ancestor != null && ancestor.getWidth() > 0) {
-          containerWidth = ancestor.getWidth() - SCROLL_BAR_WIDTH; // Account for scrollbar and insets
+          containerWidth =
+              ancestor.getWidth() - SCROLL_BAR_WIDTH; // Account for scrollbar and insets
         } else {
           // Fallback to a reasonable default if no ancestor with width is found
           containerWidth = MIN_CONTAINER_WIDTH;
@@ -99,7 +101,8 @@ public class CurrentGoalPnl extends JPanel {
     int textX1 = (getWidth() - fm.stringWidth(line1)) / 2;
     int textX2 = (getWidth() - fm.stringWidth(line2)) / 2;
     int textY1 = TITLE_TEXT_TOP_MARGIN; // Position from top
-    int textY2 = textY1 + fm.getHeight() + TITLE_TEXT_LINE_SPACING; // Add some spacing between lines
+    int textY2 =
+        textY1 + fm.getHeight() + TITLE_TEXT_LINE_SPACING; // Add some spacing between lines
 
     g2.drawString(line1, textX1, textY1);
     g2.drawString(line2, textX2, textY2);
@@ -144,7 +147,7 @@ public class CurrentGoalPnl extends JPanel {
       int x = (goalCardWidth - ovalWidth) / 2;
       int y = (goalCardHeight - ovalHeight) / 2;
 
-      g2.setColor(player.getColor());
+      g2.setColor(player.getColor().getColor());
       g2.setStroke(new BasicStroke(OVAL_STROKE_WIDTH));
       g2.fillOval(x, y, ovalWidth, ovalHeight);
 
@@ -172,7 +175,7 @@ public class CurrentGoalPnl extends JPanel {
       width = (int) (height * aspectRatio);
     }
 
-    BufferedImage scaledImage = goalCardBgCntrl.scaleBufferedImage(original, width, height);
+    BufferedImage scaledImage = ImageCntrl.scaleBufferedImage(original, width, height);
 
     return scaledImage;
   }
@@ -188,7 +191,7 @@ public class CurrentGoalPnl extends JPanel {
     int overlayWidth = width / OVERLAY_WIDTH_DIVISOR;
     int overlayHeight = height / OVERLAY_HEIGHT_DIVISOR;
     BufferedImage scaledOverlay =
-        goalCardBgCntrl.scaleBufferedImage(overlay, overlayWidth, overlayHeight);
+        ImageCntrl.scaleBufferedImage(overlay, overlayWidth, overlayHeight);
 
     // Draw the overlay centered
     int x = (width - overlayWidth) / 2;

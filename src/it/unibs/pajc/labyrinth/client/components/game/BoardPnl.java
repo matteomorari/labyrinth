@@ -1,8 +1,10 @@
-package it.unibs.pajc.labyrinth.client.gameView;
+package it.unibs.pajc.labyrinth.client.components.game;
 
 import it.unibs.pajc.labyrinth.client.animation.Animatable;
 import it.unibs.pajc.labyrinth.client.animation.Animator;
 import it.unibs.pajc.labyrinth.client.animation.EasingFunction;
+import it.unibs.pajc.labyrinth.client.components.CardImage;
+import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Player;
@@ -186,7 +188,8 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
       int startX = initialXPosition + startPos.getCol() * cellSize;
       int startY = initialYPosition + startPos.getRow() * cellSize;
 
-      g2.setColor(player.getColor());
+      // TODO: non la cosa più bella da vedere (controllare anche da altre parti)
+      g2.setColor(player.getColor().getColor());
       g2.fillOval(startX + cellSize / 3, startY + cellSize / 3, cellSize / 3, cellSize / 3);
     }
   }

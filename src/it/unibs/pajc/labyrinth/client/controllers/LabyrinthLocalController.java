@@ -1,4 +1,4 @@
-package it.unibs.pajc.labyrinth.client;
+package it.unibs.pajc.labyrinth.client.controllers;
 
 import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.Goal;

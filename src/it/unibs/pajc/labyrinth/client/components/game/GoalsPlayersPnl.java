@@ -1,6 +1,8 @@
-package it.unibs.pajc.labyrinth.client.gameView;
+package it.unibs.pajc.labyrinth.client.components.game;
 
+import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.core.LabyrinthController;
+import it.unibs.pajc.labyrinth.core.Player;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -9,21 +11,22 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.util.ArrayList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
-public class CurrentPlayerPnl extends JPanel {
+public class GoalsPlayersPnl extends JPanel {
   // Font constants
   private static final String FONT_FAMILY = "Times New Roman";
-  private static final int PLAYER_FONT_SIZE = 23; // Increased font size
+  private static final int TITLE_FONT_SIZE = 25;
+  private static final int PLAYER_FONT_SIZE = 20;
 
   // Layout constants
   private static final int CORNER_RADIUS = 20;
   private static final int STARTING_Y = 50;
   private static final int LINE_HEIGHT = 25;
-  private static final int PADDING_X = 10;
-  private static final int PADDING_Y = 7;
+  private static final int TITLE_BOTTOM_SPACING = 30;
   private static final int PLAYER_BOTTOM_SPACING = 20;
   private static final int PLAYER_SIZE = 35;
   private static final int TEXT_OVAL_SPACING = 10;
@@ -33,17 +36,23 @@ public class CurrentPlayerPnl extends JPanel {
   private static final int PARENT_WIDTH_PADDING = 20;
   private static final int SCROLLBAR_WIDTH = 25;
   private static final int MIN_WIDTH = 100;
-  private static final int BASE_PANEL_HEIGHT = 30;
+  private static final int BASE_PANEL_HEIGHT = 150;
   private static final int PLAYER_HEIGHT = 40;
 
   private LabyrinthController controller;
-  private final Font playerFont = new Font(FONT_FAMILY, Font.BOLD, PLAYER_FONT_SIZE);
+  private ArrayList<Player> players;
+  private final Font titleFont = new Font(FONT_FAMILY, Font.BOLD, TITLE_FONT_SIZE);
+  private final Font playerFont = new Font(FONT_FAMILY, Font.PLAIN, PLAYER_FONT_SIZE);
 
   // Performance optimization fields
   private int lastWidth = -1;
 
-  public CurrentPlayerPnl(LabyrinthController controller, int width) {
+  public GoalsPlayersPnl(LabyrinthController controller, int width) {
     this.controller = controller;
+    this.players = new ArrayList<>();
+    for (Player player : controller.getPlayers()) {
+      this.players.add(player);
+    }
 
     // Set preferred size for the panel
     int panelHeight = calculateHeight();
@@ -90,7 +99,11 @@ public class CurrentPlayerPnl extends JPanel {
 
   private int calculateHeight() {
     int baseHeight = BASE_PANEL_HEIGHT; // Base height for title and some padding
-    return baseHeight + (PLAYER_HEIGHT);
+    int numPlayers =
+        (controller != null && controller.getPlayers() != null)
+            ? controller.getPlayers().size()
+            : 0;
+    return baseHeight + (PLAYER_HEIGHT * numPlayers);
   }
 
   @Override
@@ -110,55 +123,60 @@ public class CurrentPlayerPnl extends JPanel {
     int width = getWidth();
     int currentY = STARTING_Y; // Starting Y position
 
+    // Draw title
+    g2.setFont(titleFont);
+    g2.setColor(Color.DARK_GRAY);
+    FontMetrics titleMetrics = g2.getFontMetrics();
+    String titleLine1 = "CARTE";
+    String titleLine2 = "RIMANENTI";
+
+    int titleWidth1 = titleMetrics.stringWidth(titleLine1);
+    int titleWidth2 = titleMetrics.stringWidth(titleLine2);
+
+    g2.drawString(titleLine1, (width - titleWidth1) / 2, currentY);
+    currentY += LINE_HEIGHT;
+    g2.drawString(titleLine2, (width - titleWidth2) / 2, currentY);
+    currentY += LINE_HEIGHT + TITLE_BOTTOM_SPACING; // Add some spacing after title
+
     // Draw player information
     g2.setFont(playerFont);
-    g2.setColor(Color.DARK_GRAY);
 
     // Find the maximum width of player text
     int maxTextWidth = 0;
-
-    String playerText = "TURNO GIOCATORE :  ";
-    FontMetrics fm = g2.getFontMetrics();
-    int textWidth = fm.stringWidth(playerText) + PLAYER_SIZE;
-    if (textWidth > maxTextWidth) {
-      maxTextWidth = textWidth;
+    for (Player player : players) {
+      String playerText = " " + player.getGoals().size() + " goals left";
+      FontMetrics fm = g2.getFontMetrics();
+      int textWidth = fm.stringWidth(playerText);
+      if (textWidth > maxTextWidth) {
+        maxTextWidth = textWidth;
+      }
     }
 
-    // Calculate the total width needed (image + spacing + max text width)
-    int totalWidth = PLAYER_SIZE + TEXT_OVAL_SPACING + maxTextWidth;
-    // Adjust font size if text is too wide
-    if (totalWidth > width) {
-      float newSize = (float) PLAYER_FONT_SIZE * width / totalWidth;
-      g2.setFont(playerFont.deriveFont(newSize));
-      fm = g2.getFontMetrics();
-      textWidth = fm.stringWidth(playerText);
-      totalWidth = PLAYER_SIZE  + textWidth;
-    } else {
-      g2.setFont(playerFont.deriveFont((float) PLAYER_FONT_SIZE ));
-      fm = g2.getFontMetrics();
-      textWidth = fm.stringWidth(playerText) ;
-      totalWidth =  textWidth + PLAYER_SIZE;
+    for (Player player : players) {
+      String playerText = " " + player.getGoals().size() + " goals left";
+
+      // Calculate the total width needed (oval + spacing + max text width)
+      int totalWidth = PLAYER_SIZE + TEXT_OVAL_SPACING + maxTextWidth;
+
+      // Calculate left position to center the entire element
+      int leftPosition = (width - totalWidth) / 2;
+
+      // Draw colored oval at the centered position
+      int playerY =
+          currentY - PLAYER_SIZE / 2 - OVAL_Y_ADJUSTMENT; // Align vertically with text center
+      g2.drawImage(
+          ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE").getStandingAnimationImage(),
+          leftPosition,
+          playerY - 10,
+          PLAYER_SIZE,
+          PLAYER_SIZE ,
+          null);
+
+      // Draw player text to the right of the oval
+      g2.setColor(Color.DARK_GRAY);
+      g2.drawString(playerText, leftPosition + PLAYER_SIZE + TEXT_OVAL_SPACING, currentY);
+
+      currentY += LINE_HEIGHT + PLAYER_BOTTOM_SPACING;
     }
-
-    // Calculate left position to center the entire element
-    int leftPosition = (width - totalWidth) / 2;
-
-    // Draw player image on the left
-    int playerY =
-        currentY - PLAYER_SIZE / 2 - OVAL_Y_ADJUSTMENT; // Align vertically with text center
-    g2.drawImage(
-        ImageCntrl.valueOf(controller.getCurrentPlayer().getColorName() + "_PLAYER_SPRITE")
-            .getStandingAnimationImage(),
-        leftPosition + textWidth + TEXT_OVAL_SPACING - PADDING_X,
-        playerY - 20,
-        PLAYER_SIZE,
-        PLAYER_SIZE,
-        null);
-
-    // Draw player text to the right of the image
-    g2.setColor(Color.DARK_GRAY);
-    g2.drawString(playerText, leftPosition , currentY - PADDING_Y);
-
-    currentY += LINE_HEIGHT + PLAYER_BOTTOM_SPACING;
   }
 }

@@ -1,4 +1,4 @@
-package it.unibs.pajc.labyrinth.client.gameView;
+package it.unibs.pajc.labyrinth.client.controllers;
 
 import it.unibs.pajc.labyrinth.core.utility.Orientation;
 import java.awt.AlphaComposite;
@@ -58,7 +58,8 @@ public enum ImageCntrl {
   WHITE_PLAYER_SPRITE("white_sprite.png"),
   MAGENTA_PLAYER_SPRITE("magenta_sprite.png"),
   BROWN_PLAYER_SPRITE("brown_sprite.png"),
-  SKYBLUE_PLAYER_SPRITE("skyblue_sprite.png"),;
+  SKYBLUE_PLAYER_SPRITE("skyblue_sprite.png"),
+  ;
 
   // private static final int IMAGE_SIZE = 72;
   private static final int IMAGE_SIZE = 32;
@@ -90,6 +91,7 @@ public enum ImageCntrl {
       System.out.println("invalid sprite sheet");
     }
 
+    // ! TODO: this return an image with not equals border, as a result the image can't be centered
     return image.getSubimage(xGrid * IMAGE_SIZE, yGrid * IMAGE_SIZE, IMAGE_SIZE, IMAGE_SIZE);
   }
 
@@ -147,7 +149,7 @@ public enum ImageCntrl {
    * @param targetHeight The desired height
    * @return A new BufferedImage scaled to the target dimensions
    */
-  public BufferedImage scaleBufferedImage(
+  public static BufferedImage scaleBufferedImage(
       BufferedImage original, int targetWidth, int targetHeight) {
     // Return original if invalid dimensions
     if (original == null || targetWidth <= 0 || targetHeight <= 0) {

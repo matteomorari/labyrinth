@@ -1,13 +1,8 @@
-package it.unibs.pajc.labyrinth.client;
+package it.unibs.pajc.labyrinth.client.views;
 
-import it.unibs.pajc.labyrinth.client.gameView.GamePnl;
-import it.unibs.pajc.labyrinth.client.gameView.RoundedIconButton;
-import it.unibs.pajc.labyrinth.core.Bot;
-import it.unibs.pajc.labyrinth.core.Labyrinth;
+import it.unibs.pajc.labyrinth.client.components.RoundedIconButton;
+import it.unibs.pajc.labyrinth.client.controllers.LabyrinthClientController;
 import it.unibs.pajc.labyrinth.core.OnlineGameManager;
-import it.unibs.pajc.labyrinth.core.Player;
-import it.unibs.pajc.labyrinth.core.PlayerColor;
-import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -17,19 +12,14 @@ import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-public class LocalOnlineGameSelectionPnl extends JPanel {
+public class StartPnl extends JPanel {
 
-  public LocalOnlineGameSelectionPnl() {
+  public StartPnl() {
     setLayout(new BorderLayout());
 
     // Title label at the top
@@ -63,7 +53,8 @@ public class LocalOnlineGameSelectionPnl extends JPanel {
     centerPanel.add(localButton, gbc);
 
     // "Online" button
-    RoundedIconButton onlineButton = new RoundedIconButton("resource\\images\\rotate.svg", "ONLINE");
+    RoundedIconButton onlineButton =
+        new RoundedIconButton("resource\\images\\rotate.svg", "ONLINE");
     onlineButton.setBorderRadius(20);
     onlineButton.setButtonSize(200, 50);
     onlineButton.setSvgIconSize(150, 150);
@@ -86,7 +77,7 @@ public class LocalOnlineGameSelectionPnl extends JPanel {
     int height = getHeight();
 
     GradientPaint gradientPaint =
-        new GradientPaint(-100, height/2, Color.RED, width/2, height/2, Color.YELLOW);
+        new GradientPaint(-100, height / 2, Color.RED, width / 2, height / 2, Color.YELLOW);
     g2d.setPaint(gradientPaint);
     g2d.fillRect(0, 0, width, height);
 
@@ -95,59 +86,8 @@ public class LocalOnlineGameSelectionPnl extends JPanel {
 
   /** Creates a new local game and displays the game panel */
   private void createLocalGame() {
-    Labyrinth labyrinthModel;
-    final boolean LOAD_FROM_FILE = false;
-    if (LOAD_FROM_FILE) {
-      String deepCopy = "";
-      try {
-        deepCopy =
-            new String(Files.readAllBytes(Paths.get("modelCOpy.json")), StandardCharsets.UTF_8);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-
-      labyrinthModel = LabyrinthGson.fromJson(deepCopy);
-    } else {
-      labyrinthModel = new Labyrinth();
-      Player player1 = new Player(PlayerColor.RED);
-      labyrinthModel.addPlayer(player1);
-
-      Player player2 = new Player(PlayerColor.BLACK);
-      labyrinthModel.addPlayer(player2);
-
-      Player player3 = new Player(PlayerColor.PINK);
-      labyrinthModel.addPlayer(player3);
-
-      Player player4 = new Player(PlayerColor.GREEN);
-      labyrinthModel.addPlayer(player4);
-    }
-    LabyrinthLocalController controller = new LabyrinthLocalController(labyrinthModel);
-    if (!LOAD_FROM_FILE) {
-      labyrinthModel.initGame();
-    }
-
-    // TODO: to remove
-    JPanel tempPnl = new JPanel();
-    tempPnl.setLayout(new BorderLayout());
-
-    GamePnl gamePanel = new GamePnl(controller);
-    labyrinthModel.addChangeListener(e -> gamePanel.repaint());
-    tempPnl.add(gamePanel, BorderLayout.CENTER);
-    tempPnl.setVisible(true);
-
-    // TODO: to remove
-    Bot bot1 = new Bot(labyrinthModel, labyrinthModel.getCurrentPlayer());
-    JButton button = new JButton("move bot");
-    tempPnl.add(button, BorderLayout.SOUTH);
-    button.addActionListener(e -> bot1.calcMove());
-
-    // Replace the current panel's content with the game panel
-    JPanel parent = (JPanel) getParent();
-    parent.removeAll();
-    parent.setLayout(new BorderLayout());
-    parent.add(tempPnl, BorderLayout.CENTER);
-    parent.revalidate();
-    parent.repaint();
+    LocalGameLobbyPnl localGameLobbyPnl = new LocalGameLobbyPnl();
+    replaceParentPnlContent(localGameLobbyPnl);
   }
 
   /** Opens the online game finder UI */
@@ -170,11 +110,19 @@ public class LocalOnlineGameSelectionPnl extends JPanel {
     }
 
     FindOnlineGamePnl findOnlineGamePnl = new FindOnlineGamePnl(clientCntrl);
-    onlineGameManager.addChangeListener(e -> findOnlineGamePnl.updateData());
+    onlineGameManager.addChangeListener(
+        e -> {
+          findOnlineGamePnl.updateData();
+        });
+    clientCntrl.fetchLobby();
+    replaceParentPnlContent(findOnlineGamePnl);
+  }
+
+  private void replaceParentPnlContent(JPanel pnl) {
     JPanel parent = (JPanel) getParent();
     parent.removeAll();
     parent.setLayout(new BorderLayout());
-    parent.add(findOnlineGamePnl, BorderLayout.CENTER);
+    parent.add(pnl, BorderLayout.CENTER);
     parent.revalidate();
     parent.repaint();
   }

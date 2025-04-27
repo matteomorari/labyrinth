@@ -1,10 +1,13 @@
 package it.unibs.pajc.labyrinth.core;
 
+import it.unibs.pajc.labyrinth.core.lobby.Lobby;
+import it.unibs.pajc.labyrinth.core.lobby.OnlineLobby;
+
 import java.util.ArrayList;
 
 public class OnlineGameManager extends BaseModel {
-  private GameLobby selectedLobby;
-  private ArrayList<GameLobby> availableLobbies;
+  private Lobby selectedLobby;
+  private ArrayList<Lobby> availableLobbies;
 
   public OnlineGameManager() {
     this.selectedLobby = null;
@@ -12,25 +15,26 @@ public class OnlineGameManager extends BaseModel {
   }
 
   public void createLobby(String lobbyName) {
-    GameLobby newLobby = new GameLobby(lobbyName);
+    Lobby newLobby = new OnlineLobby(lobbyName);
     this.availableLobbies.add(newLobby);
   }
 
-  public void setAvailableLobbies(ArrayList<GameLobby> availableLobbies) {
+  public void setAvailableLobbies(ArrayList<Lobby> availableLobbies) {
     this.availableLobbies = availableLobbies;
+    System.out.println("Available lobbies updated.");
     this.fireChangeListener();
   }
 
-  public ArrayList<GameLobby> getAvailableLobbies() {
+  public ArrayList<Lobby> getAvailableLobbies() {
     return availableLobbies;
   }
 
-  public void setSelectedLobby(GameLobby currentLobby) {
+  public void setSelectedLobby(Lobby currentLobby) {
     this.selectedLobby = currentLobby;
     this.fireChangeListener();
   }
 
-  public GameLobby getSelectedLobby() {
+  public Lobby getSelectedLobby() {
     return selectedLobby;
   }
 

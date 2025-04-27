@@ -1,5 +1,6 @@
 package it.unibs.pajc.labyrinth.client;
 
+import it.unibs.pajc.labyrinth.client.views.StartPnl;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import javax.swing.JFrame;
@@ -33,6 +34,6 @@ public class LabyrinthClientMain {
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setLayout(new BorderLayout(10, 10));
 
-    frame.add(new LocalOnlineGameSelectionPnl(), BorderLayout.CENTER);
+    frame.add(new StartPnl(), BorderLayout.CENTER);
   }
 }

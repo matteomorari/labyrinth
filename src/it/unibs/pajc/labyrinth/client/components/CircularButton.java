@@ -1,4 +1,4 @@
-package it.unibs.pajc.labyrinth.client.gameView;
+package it.unibs.pajc.labyrinth.client.components;
 
 import java.awt.Color;
 import java.awt.Dimension;
