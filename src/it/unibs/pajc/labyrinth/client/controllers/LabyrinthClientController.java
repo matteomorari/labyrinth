@@ -24,13 +24,14 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
   // ! TODO: what a shame to have more than one model
   Labyrinth labyrinthModel;
   OnlineGameManager onlineGameManager;
-  Player player;
+  Player localPlayer;
+  private volatile boolean playerReceived = false;
 
   public LabyrinthClientController(OnlineGameManager onlineGameManager) {
     super(null);
     this.labyrinthModel = null;
     this.onlineGameManager = onlineGameManager;
-    this.player = null;
+    this.localPlayer = null;
     createCommandMap();
   }
 
@@ -71,7 +72,7 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
 
             Lobby lobby = LobbyGson.fromJson(parsedLobbyData.toString());
             onlineGameManager.setSelectedLobby(lobby);
-            player = onlineGameManager.getSelectedLobby().getPlayerById(player.getId());
+            localPlayer = onlineGameManager.getSelectedLobby().getPlayerById(localPlayer.getId());
 
           } catch (Exception exc) {
             exc.printStackTrace();
@@ -173,7 +174,23 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
   }
 
   public void setLocalPlayer(String playerId) {
-    this.player = new Player(playerId);
+    this.localPlayer = new Player(playerId);
+    this.playerReceived = true;
+    synchronized (this) {
+      this.notifyAll(); // Notify any waiting threads
+    }
+  }
+
+  public void waitForPlayer() throws InterruptedException {
+    synchronized (this) {
+      while (!playerReceived) {
+        this.wait();
+      }
+    }
+  }
+
+  public Player getLocalPlayer() {
+    return localPlayer;
   }
 
   public void fetchLobby() {
@@ -200,7 +217,7 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
     msg.addProperty("command", "toggle_player_ready");
 
     JsonObject parameters = new JsonObject();
-    parameters.addProperty("player_id", this.player.getId());
+    parameters.addProperty("player_id", this.localPlayer.getId());
     parameters.addProperty("lobby_id", this.onlineGameManager.getSelectedLobby().getLobbyId());
 
     msg.add("parameters", parameters);

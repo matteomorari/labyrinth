@@ -93,7 +93,7 @@ public class FindOnlineGamePnl extends JPanel {
     add(lobbyListPnl, BorderLayout.WEST);
 
     // lobby panel
-    currentLobbyPnl = new LobbyPnl();
+    currentLobbyPnl = new LobbyPnl(clientController.getLocalPlayer());
     add(currentLobbyPnl, BorderLayout.CENTER);
 
     // Action buttons panel
@@ -178,8 +178,7 @@ public class FindOnlineGamePnl extends JPanel {
   }
 
   private void updateLobbiesJList() {
-    if (currentLobby == null) {
-    }
+    if (currentLobby == null) {}
 
     DefaultListModel<String> listModel = new DefaultListModel<>();
     for (int i = 0; i < availableLobbies.size(); i++) {

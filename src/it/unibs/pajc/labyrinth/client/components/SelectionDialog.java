@@ -47,11 +47,11 @@ public class SelectionDialog {
    * @param title The title of the dialog
    * @param items The list of selectable items to display
    */
-  // TODO: create two rows if there are too many items
   public static void show(Component parent, String title, List<SelectionItem> items) {
     // Create the content panel
-    JPanel panel = new JPanel(new GridLayout(1, items.size()));
+    JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, BUTTON_PADDING, BUTTON_PADDING));
     // Calculate the width based on number of items
+    // TODO: improve the start dimension of the dialog
     int panelWidth = POPUP_IMAGE_SIZE * items.size() + (BUTTON_PADDING * 2 * items.size());
     panel.setPreferredSize(new Dimension(panelWidth, 200));
     panel.setBackground(Color.LIGHT_GRAY);

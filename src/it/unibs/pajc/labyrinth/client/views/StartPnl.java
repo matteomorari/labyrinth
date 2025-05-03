@@ -98,6 +98,7 @@ public class StartPnl extends JPanel {
     clientCntrl.connect("localhost", 1234);
 
     // Wait until the protocol thread is initialized
+    // TODO: is synchronized needed here?
     synchronized (clientCntrl) {
       while (!clientCntrl.isInitialized()) {
         try {
@@ -107,6 +108,14 @@ public class StartPnl extends JPanel {
           System.err.println("Interrupted while waiting for protocol thread initialization.");
         }
       }
+    }
+
+    // Wait for the player to be set (new_player command received)
+    try {
+      clientCntrl.waitForPlayer();
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      System.err.println("Interrupted while waiting for player data from server.");
     }
 
     FindOnlineGamePnl findOnlineGamePnl = new FindOnlineGamePnl(clientCntrl);

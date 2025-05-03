@@ -29,8 +29,12 @@ public class LobbyPnl extends JPanel {
 
   private Lobby lobby;
   private ArrayList<AvatarPnl> avatarPnlList;
+  // use to, in case of online game, allow only this player to change the avatar.
+  // If null it means it's a local game and so all players can change their avatar.
+  private Player localPlayer;
 
-  public LobbyPnl() {
+  public LobbyPnl(Player localPlayer) {
+    this.localPlayer = localPlayer;
     setPreferredSize(new Dimension(0, 100));
     setLayout(new GridBagLayout());
     addComponentListener(
@@ -41,6 +45,10 @@ public class LobbyPnl extends JPanel {
           }
         });
     avatarPnlList = new ArrayList<>();
+  }
+
+  public LobbyPnl() {
+    this(null);
   }
 
   @Override
@@ -88,8 +96,13 @@ public class LobbyPnl extends JPanel {
     }
 
     // Add mouse listener to each AvatarPnl in the lobby panel
-    // TODO: is right to be placed in the update method?
     for (AvatarPnl avatarPnl : getAvatarPanels()) {
+      if ((this.localPlayer != null && avatarPnl.getPlayer() != null)
+          && !avatarPnl.getPlayer().equals(this.localPlayer)) {
+        // for more details see the comment in the class attribute definition
+        continue;
+      }
+
       avatarPnl.addMouseListener(
           new MouseAdapter() {
             @Override
@@ -118,12 +131,11 @@ public class LobbyPnl extends JPanel {
                         img,
                         () -> {
                           colorSelectionAction.run();
-                          avatarPnl.repaint();
-                          repaint();
+                          // avatarPnl.repaint();
+                          // repaint();
                         }));
               }
 
-              // Show the selection dialog
               SelectionDialog.show(avatarPnl, "Select Player Color", items);
             }
           });
