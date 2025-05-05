@@ -98,9 +98,9 @@ public class LocalGameLobbyPnl extends JPanel {
       labyrinthModel = lobby.getModel();
     }
     LabyrinthLocalController controller = new LabyrinthLocalController(labyrinthModel);
-    if (!LOAD_FROM_FILE) {
-      labyrinthModel.initGame();
-    }
+    // if (!LOAD_FROM_FILE) {
+    //   labyrinthModel.initGame();
+    // }
 
     // TODO: to remove
     JPanel tempPnl = new JPanel();
