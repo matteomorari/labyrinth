@@ -18,6 +18,7 @@ public class Labyrinth extends BaseModel {
   public static final int MAX_PLAYERS = 4;
   public static final int MIN_PLAYERS = 2;
   private final transient Random random = new Random();
+  private final transient BotManager botManager;
 
   private int boardSize;
   private ArrayDeque<Player> players;
@@ -45,6 +46,7 @@ public class Labyrinth extends BaseModel {
     this.lastInsertedCardPosition = null;
     this.lastPlayerMovedPath = new ArrayList<>();
     this.powerActions = new HashMap<>();
+    this.botManager = new BotManager(this);
     createPowerActionsMap();
   }
 
@@ -108,22 +110,55 @@ public class Labyrinth extends BaseModel {
 
   public void skipTurn() {
     if (hasCurrentPlayerInserted && hasCurrentPlayerDoubleTurn) {
+      // this rappresent the case when the player has used the power to have a double turn
+      // and has insert the card the first time and want to insert the second without
+      // change the current position
       setHasCurrentPlayerInserted(false);
       setHasCurrentPlayerHasDoubleTurn(false);
     } else if (hasCurrentPlayerInserted) {
-      nextPlayer();
+      // According to the rules, a player must insert a card e each turn.
+      advanceToNextPlayer();
     }
     this.fireChangeListener();
   }
 
-  public Player nextPlayer() {
+  private void advanceToNextPlayer() {
     this.players.add(this.players.poll());
     this.hasCurrentPlayerInserted = false;
     setHasUsedPower(false);
     // in case due to card insertion the player changes position and the goal is found
+    // ! TODO: why only the new player and not all? maybe to do on card insert?
     isGoalFound(getCurrentPlayer());
     System.out.println("Current player: " + this.getCurrentPlayer().getColorName());
-    return this.getCurrentPlayer();
+    startBotPlayerTurn();
+  }
+
+  public void startBotPlayerTurn() {
+    if (this.getCurrentPlayer().isBot()) {
+      botManager.calcMove();
+      botManager.applyCardInsertion();
+    }
+  }
+
+  public void cardAnimationEnded() {
+    if (getCurrentPlayer().isBot()) {
+      botManager.applyPlayerMovement();
+    } else {
+      checkIfPlayerCanMove();
+    }
+  }
+
+  public void playerAnimationEnded() {
+    isGoalFound(getCurrentPlayer());
+
+    if (hasCurrentPlayerDoubleTurn) {
+      hasCurrentPlayerInserted = false;
+      hasCurrentPlayerDoubleTurn = false;
+    } else {
+      skipTurn();
+    }
+
+    isGameFinished();
   }
 
   public void initGame() {
@@ -314,13 +349,13 @@ public class Labyrinth extends BaseModel {
     this.availableCard = nextAvailableCard;
     this.lastInsertedCardPosition = insertPosition;
 
-    checkAndProceedToNextPlayer();
+    // checkIfPlayerCanMove();
     setHasUsedPower(false);
     this.fireChangeListener();
   }
 
   // if the player can't move, go to the next player immediately
-  public void checkAndProceedToNextPlayer() {
+  public void checkIfPlayerCanMove() {
     if (getCardOpenDirection(getPlayerCard(getCurrentPlayer())).isEmpty()) {
       if (availableCard.getPower() != null) {
         return;
@@ -347,7 +382,7 @@ public class Labyrinth extends BaseModel {
         PowerType.SWAP_POSITION,
         () -> {
           swapPlayers();
-          checkAndProceedToNextPlayer();
+          checkIfPlayerCanMove();
         });
     powerActions.put(
         PowerType.DOUBLE_TURN,
@@ -368,13 +403,13 @@ public class Labyrinth extends BaseModel {
         PowerType.CHOOSE_SECOND_GOAL,
         () -> {
           changeGoal();
-          checkAndProceedToNextPlayer();
+          checkIfPlayerCanMove();
         });
     powerActions.put(
         PowerType.CHOOSE_GOAL,
         () -> {
           changeGoal();
-          checkAndProceedToNextPlayer();
+          checkIfPlayerCanMove();
         });
   }
 
@@ -645,17 +680,6 @@ public class Labyrinth extends BaseModel {
     currentPlayer.setPosition(row, col);
 
     this.lastPlayerMovedPath = path;
-    isGoalFound(currentPlayer);
-
-    if (hasCurrentPlayerDoubleTurn) {
-      hasCurrentPlayerInserted = false;
-      hasCurrentPlayerDoubleTurn = false;
-    } else {
-      // nextPlayer();
-      skipTurn();
-    }
-
-    isGameFinished();
     this.fireChangeListener();
   }
 

@@ -6,7 +6,8 @@ import it.unibs.pajc.labyrinth.client.components.game.CurrentGoalPnl;
 import it.unibs.pajc.labyrinth.client.components.game.CurrentPlayerPnl;
 import it.unibs.pajc.labyrinth.client.components.game.GoalsPlayersPnl;
 import it.unibs.pajc.labyrinth.client.components.game.PowerPnl;
-import it.unibs.pajc.labyrinth.core.LabyrinthController;
+import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;

@@ -3,7 +3,7 @@ package it.unibs.pajc.labyrinth.client.views;
 import it.unibs.pajc.labyrinth.client.components.LobbyPnl;
 import it.unibs.pajc.labyrinth.client.components.RoundedIconButton;
 import it.unibs.pajc.labyrinth.client.controllers.LabyrinthClientController;
-import it.unibs.pajc.labyrinth.core.Bot;
+import it.unibs.pajc.labyrinth.core.BotManager;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.lobby.Lobby;
 import java.awt.*;
@@ -156,10 +156,10 @@ public class FindOnlineGamePnl extends JPanel {
       tempPnl.setVisible(true);
 
       // TODO: to remove
-      Bot bot1 = new Bot(labyrinthModel, labyrinthModel.getCurrentPlayer());
-      JButton button = new JButton("move bot");
-      tempPnl.add(button, BorderLayout.SOUTH);
-      button.addActionListener(e -> bot1.calcMove());
+      // BotManager bot1 = new BotManager(labyrinthModel, labyrinthModel.getCurrentPlayer());
+      // JButton button = new JButton("move bot");
+      // tempPnl.add(button, BorderLayout.SOUTH);
+      // button.addActionListener(e -> bot1.calcMove());
 
       // Replace the current panel's content with the game panel
       JPanel parent = (JPanel) getParent();

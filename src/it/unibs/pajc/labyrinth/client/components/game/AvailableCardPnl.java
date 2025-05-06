@@ -6,8 +6,8 @@ import it.unibs.pajc.labyrinth.client.animation.EasingFunction;
 import it.unibs.pajc.labyrinth.client.components.CardImage;
 import it.unibs.pajc.labyrinth.client.components.RoundedIconButton;
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
+import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Card;
-import it.unibs.pajc.labyrinth.core.LabyrinthController;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -233,6 +233,7 @@ public class AvailableCardPnl extends JPanel implements Animatable {
   }
 
   private void handleSkipTurnBtn() {
+    // ! TODO: prevent skip if animation in progress and for bot
     controller.skipTurn();
   }
 

@@ -3,7 +3,6 @@ package it.unibs.pajc.labyrinth.client.controllers;
 import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.Goal;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
-import it.unibs.pajc.labyrinth.core.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.util.ArrayDeque;
@@ -85,5 +84,13 @@ public class LabyrinthLocalController implements LabyrinthController {
 
   public Goal getGoalToSwap() {
     return model.getGoalToSwap();
+  }
+
+  public void cardAnimationEnded() {
+    model.cardAnimationEnded();
+  }
+
+  public void playerAnimationEnded() {
+    model.playerAnimationEnded();
   }
 }

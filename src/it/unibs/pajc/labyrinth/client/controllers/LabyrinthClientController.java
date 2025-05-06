@@ -6,7 +6,6 @@ import com.google.gson.JsonParser;
 import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.Goal;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
-import it.unibs.pajc.labyrinth.core.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.OnlineGameManager;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.clientServerCommon.SocketCommunicationProtocol;
@@ -347,6 +346,16 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
   @Override
   public Goal getGoalToSwap() {
     return labyrinthModel.getGoalToSwap();
+  }
+
+  @Override
+  public void cardAnimationEnded() {
+    // TODO: to implement
+  }
+
+  @Override
+  public void playerAnimationEnded() {
+    // TODO: to implement
   }
 
   public Labyrinth getLabyrinthModel() {
