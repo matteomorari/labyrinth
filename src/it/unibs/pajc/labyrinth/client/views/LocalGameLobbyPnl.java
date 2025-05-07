@@ -5,15 +5,10 @@ import it.unibs.pajc.labyrinth.client.controllers.LabyrinthLocalController;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.lobby.Lobby;
-import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -39,7 +34,7 @@ public class LocalGameLobbyPnl extends JPanel {
     titleLabel.setForeground(Color.BLUE);
     titleLabel.setPreferredSize(new Dimension(0, 200));
     titleLabel.setBackground(Color.YELLOW); // TODO: to remove
-    titleLabel.setOpaque(true);
+    // titleLabel.setOpaque(true);
     add(titleLabel, BorderLayout.NORTH);
 
     // lobby panel
@@ -99,46 +94,19 @@ public class LocalGameLobbyPnl extends JPanel {
 
   private void startGame() {
     Labyrinth labyrinthModel;
-    final boolean LOAD_FROM_FILE = false;
-    if (LOAD_FROM_FILE) {
-      String deepCopy = "";
-      try {
-        deepCopy =
-            new String(Files.readAllBytes(Paths.get("modelCOpy.json")), StandardCharsets.UTF_8);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
 
-      labyrinthModel = LabyrinthGson.fromJson(deepCopy);
-    } else {
-      lobby.startGame();
-      labyrinthModel = lobby.getModel();
-    }
+    lobby.startGame();
+    labyrinthModel = lobby.getModel();
     LabyrinthLocalController controller = new LabyrinthLocalController(labyrinthModel);
-    // if (!LOAD_FROM_FILE) {
-    //   labyrinthModel.initGame();
-    // }
-
-    // TODO: to remove
-    JPanel tempPnl = new JPanel();
-    tempPnl.setLayout(new BorderLayout());
 
     GamePnl gamePanel = new GamePnl(controller);
     labyrinthModel.addChangeListener(e -> gamePanel.repaint());
-    tempPnl.add(gamePanel, BorderLayout.CENTER);
-    tempPnl.setVisible(true);
-
-    // TODO: to remove
-    // Bot bot1 = new Bot(labyrinthModel, labyrinthModel.getCurrentPlayer());
-    // JButton button = new JButton("move bot");
-    // tempPnl.add(button, BorderLayout.SOUTH);
-    // button.addActionListener(e -> bot1.calcMove());
 
     // Replace the current panel's content with the game panel
     JPanel parent = (JPanel) getParent();
     parent.removeAll();
     parent.setLayout(new BorderLayout());
-    parent.add(tempPnl, BorderLayout.CENTER);
+    parent.add(gamePanel, BorderLayout.CENTER);
     parent.revalidate();
     parent.repaint();
 

@@ -130,14 +130,14 @@ public class Labyrinth extends BaseModel {
     // ! TODO: why only the new player and not all? maybe to do on card insert?
     isGoalFound(getCurrentPlayer());
     System.out.println("Current player: " + this.getCurrentPlayer().getColorName());
-    startBotPlayerTurn();
+    if (this.getCurrentPlayer().isBot()) {
+      startBotPlayerTurn();
+    }
   }
 
   public void startBotPlayerTurn() {
-    if (this.getCurrentPlayer().isBot()) {
-      botManager.calcMove();
-      botManager.applyCardInsertion();
-    }
+    botManager.calcMove();
+    botManager.applyCardInsertion();
   }
 
   public void cardAnimationEnded() {
@@ -145,6 +145,7 @@ public class Labyrinth extends BaseModel {
       botManager.applyPlayerMovement();
     } else {
       checkIfPlayerCanMove();
+      // if the play can move, let's wait for the user input
     }
   }
 
@@ -162,8 +163,8 @@ public class Labyrinth extends BaseModel {
   }
 
   public void initGame() {
-    this.initBoard();
     this.initializePlayerPositions();
+    this.initBoard();
 
     // shuffle goals
     ArrayList<GoalType> goalList = new ArrayList<>(Arrays.asList(GoalType.values()));
@@ -495,7 +496,7 @@ public class Labyrinth extends BaseModel {
     }
   }
 
-  // ! seems to not reflect the actual state of the board
+  // ! TODO: seems to not reflect the actual state of the board
   private ArrayList<Orientation> getCardOpenDirection(Card card) {
     ArrayList<Orientation> openOrientation = new ArrayList<>();
     for (Orientation orientation : Orientation.values()) {

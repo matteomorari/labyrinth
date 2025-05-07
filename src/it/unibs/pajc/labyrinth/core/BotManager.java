@@ -7,30 +7,86 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class BotManager {
-
   Labyrinth model;
   CardMovement bestMove = null;
   Position bestPosition = null;
-
+  
   public BotManager(Labyrinth model) {
     this.model = model;
   }
+  class CardMovement {
+    int cardRotateNumber;
+    Position cardInsertPosition;
+  
+    CardMovement(Position insertPosition, int cardRotateNumber) {
+      this.cardInsertPosition = insertPosition;
+      this.cardRotateNumber = cardRotateNumber;
+    }
+  
+    public void setCardRotateNumber(int cardRotateNumber) {
+      this.cardRotateNumber = cardRotateNumber;
+    }
+  
+    public void setCardInsertPosition(Position insertPosition) {
+      this.cardInsertPosition = insertPosition;
+    }
+  
+    public int getCardRotateNumber() {
+      return cardRotateNumber;
+    }
+  
+    public Position getCardInsertPosition() {
+      return cardInsertPosition;
+    }
+  }
+  
+  class newPositionWithDistance {
+    Position position;
+    int distance;
+  
+    newPositionWithDistance(Position position, int distance) {
+      this.position = position;
+      this.distance = distance;
+    }
+  }
 
-  // ! TODO if the goal changes, the goal position in the users queu isn't updated correctly
+  public Labyrinth getModel() {
+    return model;
+  }
+
+  public void setModel(Labyrinth model) {
+    this.model = model;
+  }
+
+  public void setBestPosition(Position bestPosition) {
+    this.bestPosition = bestPosition;
+  }
+
+  public Position getBestPosition() {
+    return bestPosition;
+  }
+
+  public CardMovement getBestMove() {
+    return bestMove;
+  }
+
+  public void setBestMove(CardMovement bestMove) {
+    this.bestMove = bestMove;
+  }
+
   public void calcMove() {
-
-    if (model.getCurrentPlayer().getGoals().isEmpty()) {
+    if (getModel().getCurrentPlayer().getGoals().isEmpty()) {
       System.out.println("going at the base!!");
     } else {
       System.out.println(
-          "Searching for: " + model.getCurrentPlayer().getCurrentGoal().getType().toString());
+          "Searching for: " + getModel().getCurrentPlayer().getCurrentGoal().getType().toString());
     }
 
-    ArrayList<Position> availableCardInsertionPoint = model.getAvailableCardInsertionPoint();
+    ArrayList<Position> availableCardInsertionPoint = getModel().getAvailableCardInsertionPoint();
     HashMap<CardMovement, newPositionWithDistance> closestGoalPositionsMap = new HashMap<>();
     for (Position cardInsertionPosition : availableCardInsertionPoint) {
       for (int i = 0; i < Orientation.values().length; i++) {
-        Labyrinth modelCopy = LabyrinthGson.createCopy(model);
+        Labyrinth modelCopy = LabyrinthGson.createCopy(getModel());
         modelCopy.getAvailableCard().rotate(i);
         modelCopy.insertCard(cardInsertionPosition);
 
@@ -48,6 +104,7 @@ public class BotManager {
           // skip if the goal is on the available card
           continue;
         }
+        CardMovement move = new CardMovement(cardInsertionPosition, i);
 
         ArrayList<Position> reachablePlayerPositions =
             modelCopy.findPath(currentPlayerCopy.getPosition(), currentGoalPosition);
@@ -55,70 +112,21 @@ public class BotManager {
         newPositionWithDistance closestGoalPosition =
             findClosestGoalPosition(reachablePlayerPositions, currentGoalPosition);
 
-        CardMovement move = new CardMovement(cardInsertionPosition, i);
         closestGoalPositionsMap.put(move, closestGoalPosition);
       }
     }
 
-    bestMove = null;
-    bestPosition = null;
     int minDistance = Integer.MAX_VALUE;
     for (CardMovement move : closestGoalPositionsMap.keySet()) {
       newPositionWithDistance closestGoalPosition = closestGoalPositionsMap.get(move);
       if (closestGoalPosition.distance < minDistance) {
         minDistance = closestGoalPosition.distance;
-        bestMove = move;
-        bestPosition = closestGoalPosition.position;
+        setBestMove(move);
+        setBestPosition(closestGoalPosition.position);
       }
     }
-
-    // if (bestMove != null && bestPosition != null) {
-    //   this.model.getAvailableCard().rotate(bestMove.getCardRotateNumber());
-    //   this.model.insertCard(bestMove.getCardInsertPosition());
-    //   if (model.getCurrentPlayer().getPosition().equals(bestPosition)) {
-    //     System.out.println("I'm already in the best position");
-    //     this.model.skipTurn();
-    //   } else {
-    //     this.model.movePlayer(bestPosition.row, bestPosition.col);
-    //   }
-    // }
   }
 
-  class CardMovement {
-    int cardRotateNumber;
-    Position cardInsertPosition;
-
-    CardMovement(Position insertPosition, int cardRotateNumber) {
-      this.cardInsertPosition = insertPosition;
-      this.cardRotateNumber = cardRotateNumber;
-    }
-
-    public void setCardRotateNumber(int cardRotateNumber) {
-      this.cardRotateNumber = cardRotateNumber;
-    }
-
-    public void setCardInsertPosition(Position insertPosition) {
-      this.cardInsertPosition = insertPosition;
-    }
-
-    public int getCardRotateNumber() {
-      return cardRotateNumber;
-    }
-
-    public Position getCardInsertPosition() {
-      return cardInsertPosition;
-    }
-  }
-
-  class newPositionWithDistance {
-    Position position;
-    int distance;
-
-    newPositionWithDistance(Position position, int distance) {
-      this.position = position;
-      this.distance = distance;
-    }
-  }
 
   private newPositionWithDistance findClosestGoalPosition(
       ArrayList<Position> positions, Position goalPosition) {
@@ -141,22 +149,19 @@ public class BotManager {
   }
 
   public void applyCardInsertion() {
-    if (bestMove != null && bestPosition != null) {
-      this.model.getAvailableCard().rotate(bestMove.getCardRotateNumber());
-      this.model.insertCard(bestMove.getCardInsertPosition());
-    }
-    bestMove = null;
+    getModel().getAvailableCard().rotate(getBestMove().getCardRotateNumber());
+    getModel().insertCard(getBestMove().getCardInsertPosition());
+    setBestMove(null);
   }
 
   public void applyPlayerMovement() {
-    if (bestPosition != null) {
-      if (model.getCurrentPlayer().getPosition().equals(bestPosition)) {
-        System.out.println("I'm already in the best position");
-        this.model.skipTurn();
-      } else {
-        this.model.movePlayer(bestPosition.row, bestPosition.col);
-      }
+    if (getModel().getCurrentPlayer().getPosition().equals(getBestPosition())) {
+      System.out.println("I'm already in the best position");
+      setBestPosition(null);
+      getModel().skipTurn();
+    } else {
+      getModel().movePlayer(getBestPosition().getRow(), getBestPosition().getCol());
+      setBestPosition(null);
     }
-    bestPosition = null;
   }
 }
