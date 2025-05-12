@@ -1,16 +1,18 @@
-package it.unibs.pajc.labyrinth.core.lobby;
+package it.unibs.pajc.labyrinth.server;
 
+import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
-import it.unibs.pajc.labyrinth.server.LabyrinthServerProtocol;
+import it.unibs.pajc.labyrinth.core.lobby.Lobby;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class OnlineLobby extends Lobby {
+public class ServerLobby extends Lobby {
   private final transient ReentrantLock lock = new ReentrantLock();
   private transient ConcurrentHashMap<Player, LabyrinthServerProtocol> playersSocket;
 
-  public OnlineLobby(String lobbyName) {
-    super(lobbyName);
+  public ServerLobby(String lobbyName, Labyrinth.EnvironmentType environmentType) {
+    super(lobbyName, environmentType);
     this.playersSocket = new ConcurrentHashMap<>();
   }
 
@@ -31,13 +33,17 @@ public class OnlineLobby extends Lobby {
 
   @Override
   public synchronized void startGame() {
+    if (isGameInProgress()) {
+      throw new IllegalStateException("Game is already in progress.");
+    }
     lock.lock();
     try {
-      for (Player player : this.playersSocket.keySet()) {
+      for (Player player : getPlayers()) {
         getLabyrinth().addPlayer(player);
       }
       getLabyrinth().initGame();
       setGameInProgress(true);
+
     } finally {
       lock.unlock();
     }

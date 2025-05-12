@@ -45,12 +45,13 @@ public class LabyrinthClientMain {
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setLayout(new BorderLayout(10, 10));
 
+    // for debug purposes
+    // to create "modelCopy.json" file see LabyrinthGson.createCopy()
     final boolean LOAD_FROM_FILE = false;
-
     if (LOAD_FROM_FILE) {
       String deepCopy = "";
       try {
-        deepCopy = new String(Files.readAllBytes(Paths.get("modelCOpy.json")), StandardCharsets.UTF_8);
+        deepCopy = new String(Files.readAllBytes(Paths.get("modelCopy.json")), StandardCharsets.UTF_8);
       } catch (IOException e) {
         e.printStackTrace();
       }

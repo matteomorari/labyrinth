@@ -26,7 +26,7 @@ public class LocalGameLobbyPnl extends JPanel {
     setLayout(new BorderLayout(10, 10));
     setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-    lobby = new Lobby("Local Game");
+    lobby = new Lobby("Local Game", Labyrinth.EnvironmentType.LOCAL);
 
     // Title label
     JLabel titleLabel = new JLabel("LABIRINTO", SwingConstants.CENTER);
@@ -43,10 +43,10 @@ public class LocalGameLobbyPnl extends JPanel {
     lobbyPnl.setLobby(lobby);
 
     // add 2 players (the minimum to start a game)
-    // addNewPlayer();
-    // addNewPlayer();
-    addNewBot();
-    addNewBot();
+    addNewPlayer();
+    addNewPlayer();
+    // addNewBot();
+    // addNewBot();
 
     // Action buttons panel
     JPanel buttonPanel = new JPanel();

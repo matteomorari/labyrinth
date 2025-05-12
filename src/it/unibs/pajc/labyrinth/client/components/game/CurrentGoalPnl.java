@@ -4,7 +4,6 @@ import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Player;
 import java.awt.*;
-import java.awt.FontMetrics;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 

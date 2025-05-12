@@ -1,5 +1,6 @@
 package it.unibs.pajc.labyrinth.core;
 
+import it.unibs.pajc.labyrinth.core.utility.CardInsertMove;
 import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
 import it.unibs.pajc.labyrinth.core.utility.Orientation;
 import it.unibs.pajc.labyrinth.core.utility.Position;
@@ -8,43 +9,17 @@ import java.util.HashMap;
 
 public class BotManager {
   Labyrinth model;
-  CardMovement bestMove = null;
+  CardInsertMove bestCardInsertMove = null;
   Position bestPosition = null;
   
   public BotManager(Labyrinth model) {
     this.model = model;
   }
-  class CardMovement {
-    int cardRotateNumber;
-    Position cardInsertPosition;
-  
-    CardMovement(Position insertPosition, int cardRotateNumber) {
-      this.cardInsertPosition = insertPosition;
-      this.cardRotateNumber = cardRotateNumber;
-    }
-  
-    public void setCardRotateNumber(int cardRotateNumber) {
-      this.cardRotateNumber = cardRotateNumber;
-    }
-  
-    public void setCardInsertPosition(Position insertPosition) {
-      this.cardInsertPosition = insertPosition;
-    }
-  
-    public int getCardRotateNumber() {
-      return cardRotateNumber;
-    }
-  
-    public Position getCardInsertPosition() {
-      return cardInsertPosition;
-    }
-  }
-  
-  class newPositionWithDistance {
+  public class newPositionWithDistance {
     Position position;
     int distance;
-  
-    newPositionWithDistance(Position position, int distance) {
+
+    public newPositionWithDistance(Position position, int distance) {
       this.position = position;
       this.distance = distance;
     }
@@ -66,12 +41,12 @@ public class BotManager {
     return bestPosition;
   }
 
-  public CardMovement getBestMove() {
-    return bestMove;
+  public CardInsertMove getBestCardInsertMove() {
+    return bestCardInsertMove;
   }
 
-  public void setBestMove(CardMovement bestMove) {
-    this.bestMove = bestMove;
+  public void setBestCardInsertMove(CardInsertMove bestMove) {
+    this.bestCardInsertMove = bestMove;
   }
 
   public void calcMove() {
@@ -83,7 +58,7 @@ public class BotManager {
     }
 
     ArrayList<Position> availableCardInsertionPoint = getModel().getAvailableCardInsertionPoint();
-    HashMap<CardMovement, newPositionWithDistance> closestGoalPositionsMap = new HashMap<>();
+    HashMap<CardInsertMove, newPositionWithDistance> closestGoalPositionsMap = new HashMap<>();
     for (Position cardInsertionPosition : availableCardInsertionPoint) {
       for (int i = 0; i < Orientation.values().length; i++) {
         Labyrinth modelCopy = LabyrinthGson.createCopy(getModel());
@@ -104,7 +79,7 @@ public class BotManager {
           // skip if the goal is on the available card
           continue;
         }
-        CardMovement move = new CardMovement(cardInsertionPosition, i);
+        CardInsertMove move = new CardInsertMove(cardInsertionPosition, i);
 
         ArrayList<Position> reachablePlayerPositions =
             modelCopy.findPath(currentPlayerCopy.getPosition(), currentGoalPosition);
@@ -117,11 +92,11 @@ public class BotManager {
     }
 
     int minDistance = Integer.MAX_VALUE;
-    for (CardMovement move : closestGoalPositionsMap.keySet()) {
+    for (CardInsertMove move : closestGoalPositionsMap.keySet()) {
       newPositionWithDistance closestGoalPosition = closestGoalPositionsMap.get(move);
       if (closestGoalPosition.distance < minDistance) {
         minDistance = closestGoalPosition.distance;
-        setBestMove(move);
+        setBestCardInsertMove(move);
         setBestPosition(closestGoalPosition.position);
       }
     }
@@ -149,9 +124,9 @@ public class BotManager {
   }
 
   public void applyCardInsertion() {
-    getModel().getAvailableCard().rotate(getBestMove().getCardRotateNumber());
-    getModel().insertCard(getBestMove().getCardInsertPosition());
-    setBestMove(null);
+    getModel().getAvailableCard().rotate(getBestCardInsertMove().getCardRotateNumber());
+    getModel().insertCard(getBestCardInsertMove().getCardInsertPosition());
+    setBestCardInsertMove(null);
   }
 
   public void applyPlayerMovement() {

@@ -1,5 +1,6 @@
 package it.unibs.pajc.labyrinth.core;
 
+import it.unibs.pajc.labyrinth.core.utility.BotMoveCalcListener;
 import it.unibs.pajc.labyrinth.core.utility.NodeComparator;
 import it.unibs.pajc.labyrinth.core.utility.Orientation;
 import it.unibs.pajc.labyrinth.core.utility.Position;
@@ -17,8 +18,12 @@ public class Labyrinth extends BaseModel {
   private static final int GOALS_FOR_PLAYER = 4;
   public static final int MAX_PLAYERS = 4;
   public static final int MIN_PLAYERS = 2;
-  private final transient Random random = new Random();
-  private final transient BotManager botManager;
+  private transient Random random = new Random();
+  private transient BotManager botManager;
+  private EnvironmentType environmentType;
+  private transient BotMoveCalcListener botMoveListener = null;
+  private boolean waitingForCardAnimation = false;
+  private boolean waitingForPlayerAnimation = false;
 
   private int boardSize;
   private ArrayDeque<Player> players;
@@ -34,14 +39,21 @@ public class Labyrinth extends BaseModel {
   private Player playerToSwap;
   private Goal goalToSwap;
 
-  public Labyrinth() {
-    this(7);
+  public enum EnvironmentType {
+    LOCAL,
+    CLIENT,
+    SERVER;
   }
 
-  public Labyrinth(int boardSize) {
+  public Labyrinth(EnvironmentType environmentType) {
+    this(7, environmentType);
+  }
+
+  public Labyrinth(int boardSize, EnvironmentType environmentType) {
     this.players = new ArrayDeque<>();
     this.board = new ArrayList<>();
     this.boardSize = boardSize;
+    this.environmentType = environmentType;
     this.availableCard = null;
     this.lastInsertedCardPosition = null;
     this.lastPlayerMovedPath = new ArrayList<>();
@@ -125,32 +137,53 @@ public class Labyrinth extends BaseModel {
   private void advanceToNextPlayer() {
     this.players.add(this.players.poll());
     this.hasCurrentPlayerInserted = false;
+    setWaitingForPlayerAnimation(false);
     setHasUsedPower(false);
     // in case due to card insertion the player changes position and the goal is found
     // ! TODO: why only the new player and not all? maybe to do on card insert?
     isGoalFound(getCurrentPlayer());
     System.out.println("Current player: " + this.getCurrentPlayer().getColorName());
+
     if (this.getCurrentPlayer().isBot()) {
-      startBotPlayerTurn();
+      // if this class is used in local environment, the bot are handled here as expected
+      if (getEnvironmentType() == EnvironmentType.LOCAL) {
+        startBotPlayerTurn();
+      } else if (getEnvironmentType() == EnvironmentType.SERVER) {
+        // the server must notify the controller to send the bot move to the client
+        // Calculate the bot move but don't apply it yet
+        getBotManager().calcMove();
+
+        // Notify the controller about the calculated bot move
+        if (botMoveListener != null) {
+          botMoveListener.onBotMoveCalc(
+              getBotManager().getBestCardInsertMove(), getBotManager().getBestPosition());
+          getBotManager().applyCardInsertion();
+          getBotManager().applyPlayerMovement();
+        }
+      }
+      // the last case is the class represents a client;
+      // in this case it must wait from the server to know the bot move
     }
   }
 
   public void startBotPlayerTurn() {
-    botManager.calcMove();
-    botManager.applyCardInsertion();
+    getBotManager().calcMove();
+    getBotManager().applyCardInsertion();
   }
 
   public void cardAnimationEnded() {
+    System.out.println("card animation ended");
     if (getCurrentPlayer().isBot()) {
-      botManager.applyPlayerMovement();
+      getBotManager().applyPlayerMovement();
     } else {
       checkIfPlayerCanMove();
-      // if the play can move, let's wait for the user input
+      // if the player can move, let's wait for the user input
     }
   }
 
   public void playerAnimationEnded() {
     isGoalFound(getCurrentPlayer());
+    setWaitingForPlayerAnimation(false);
 
     if (hasCurrentPlayerDoubleTurn) {
       hasCurrentPlayerInserted = false;
@@ -350,7 +383,6 @@ public class Labyrinth extends BaseModel {
     this.availableCard = nextAvailableCard;
     this.lastInsertedCardPosition = insertPosition;
 
-    // checkIfPlayerCanMove();
     setHasUsedPower(false);
     this.fireChangeListener();
   }
@@ -680,6 +712,7 @@ public class Labyrinth extends BaseModel {
     this.board.get(row).get(col).addPlayer(currentPlayer);
     currentPlayer.setPosition(row, col);
 
+    setWaitingForPlayerAnimation(true);
     this.lastPlayerMovedPath = path;
     this.fireChangeListener();
   }
@@ -797,5 +830,45 @@ public class Labyrinth extends BaseModel {
 
   public boolean getHasCurrentPlayerDoubleTurn() {
     return hasCurrentPlayerDoubleTurn;
+  }
+
+  public EnvironmentType getEnvironmentType() {
+    return environmentType;
+  }
+
+  public void setEnvironmentType(EnvironmentType environmentType) {
+    this.environmentType = environmentType;
+  }
+
+  public void setBotMoveListener(BotMoveCalcListener listener) {
+    this.botMoveListener = listener;
+  }
+
+  public void removeBotMoveListener() {
+    this.botMoveListener = null;
+  }
+
+  public synchronized void setWaitingForCardAnimation(boolean waitingForCardAnimation) {
+    this.waitingForCardAnimation = waitingForCardAnimation;
+  }
+
+  public synchronized boolean isWaitingForCardAnimation() {
+    return waitingForCardAnimation;
+  }
+
+  public synchronized void setWaitingForPlayerAnimation(boolean waitingForPlayerAnimation) {
+    this.waitingForPlayerAnimation = waitingForPlayerAnimation;
+  }
+
+  public synchronized boolean isWaitingForPlayerAnimation() {
+    return waitingForPlayerAnimation;
+  }
+
+  public BotManager getBotManager() {
+    return botManager;
+  }
+
+  public void setBotManager(BotManager botManager) {
+    this.botManager = botManager;
   }
 }

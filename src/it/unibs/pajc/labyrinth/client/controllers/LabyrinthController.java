@@ -22,6 +22,8 @@ public interface LabyrinthController {
 
   void insertCard(Position position);
 
+  void rotateAvailableCard(int rotation);
+
   ArrayList<Position> getLastPlayerMovedPath();
 
   Position lastInsertedCardPosition();

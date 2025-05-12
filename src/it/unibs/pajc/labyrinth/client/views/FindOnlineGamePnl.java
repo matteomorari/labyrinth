@@ -3,7 +3,6 @@ package it.unibs.pajc.labyrinth.client.views;
 import it.unibs.pajc.labyrinth.client.components.LobbyPnl;
 import it.unibs.pajc.labyrinth.client.components.RoundedIconButton;
 import it.unibs.pajc.labyrinth.client.controllers.LabyrinthClientController;
-import it.unibs.pajc.labyrinth.core.BotManager;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.lobby.Lobby;
 import java.awt.*;
@@ -17,6 +16,7 @@ public class FindOnlineGamePnl extends JPanel {
   private LobbyPnl currentLobbyPnl;
   private JButton newGameButton;
   private JButton readyButton;
+  private JButton addBotButton;
   private ArrayList<Lobby> availableLobbies;
   private JList<String> lobbiesJList;
   private Lobby currentLobby;
@@ -101,11 +101,13 @@ public class FindOnlineGamePnl extends JPanel {
     buttonPanel.setPreferredSize(new Dimension(0, 60));
     add(buttonPanel, BorderLayout.SOUTH);
 
-    newGameButton = new JButton("+ NEW GAME");
+    newGameButton = new JButton("NEW GAME");
     readyButton = new JButton("READY TO PLAY");
+    addBotButton = new JButton("ADD BOT");
 
     buttonPanel.add(newGameButton);
     buttonPanel.add(readyButton);
+    buttonPanel.add(addBotButton);
 
     // Add action listeners
     newGameButton.addActionListener(
@@ -113,7 +115,7 @@ public class FindOnlineGamePnl extends JPanel {
           @Override
           public void actionPerformed(ActionEvent e) {
             System.out.println("New Game button clicked!");
-            // Add logic to handle creating a new game
+            //TODO: Add logic to handle creating a new game
           }
         });
 
@@ -123,6 +125,16 @@ public class FindOnlineGamePnl extends JPanel {
           public void actionPerformed(ActionEvent e) {
             if (currentLobby != null) {
               clientController.togglePlayerReadyToPlay();
+            }
+          }
+        });
+
+    addBotButton.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            if (currentLobby != null) {
+              clientController.addBotToLobby();
             }
           }
         });

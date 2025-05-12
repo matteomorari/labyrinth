@@ -1,7 +1,8 @@
-package it.unibs.pajc.labyrinth.core;
+package it.unibs.pajc.labyrinth.core.lobby;
 
-import it.unibs.pajc.labyrinth.core.lobby.Lobby;
-import it.unibs.pajc.labyrinth.core.lobby.OnlineLobby;
+import it.unibs.pajc.labyrinth.core.BaseModel;
+import it.unibs.pajc.labyrinth.core.Labyrinth;
+import it.unibs.pajc.labyrinth.core.Labyrinth.EnvironmentType;
 
 import java.util.ArrayList;
 
@@ -15,7 +16,7 @@ public class OnlineGameManager extends BaseModel {
   }
 
   public void createLobby(String lobbyName) {
-    Lobby newLobby = new OnlineLobby(lobbyName);
+    Lobby newLobby = new Lobby(lobbyName, Labyrinth.EnvironmentType.CLIENT);
     this.availableLobbies.add(newLobby);
   }
 

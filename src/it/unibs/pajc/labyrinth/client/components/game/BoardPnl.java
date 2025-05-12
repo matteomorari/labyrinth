@@ -111,7 +111,6 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
 
     // check if a new card has been inserted
     if (!currentAvailableCard.equals(previousAvailableCard)) {
-      // controller.setHasCurrentPlayerInserted(false); //!
       lastCardInsertPosition = controller.lastInsertedCardPosition();
       previousAvailableCard = currentAvailableCard;
       updateLastPlayerPosition();
@@ -129,12 +128,6 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
         return;
       }
     }
-
-    // if (controller.hasCurrentPlayerMoved()) {
-    //   controller.setHasCurrentPlayerMoved(false); //!
-    //   lastPlayerMovedPath = controller.getLastPlayerMovedPath();
-    //   firePlayerMoveAnimation();
-    // }
   }
 
   // TODO: change name firePlayerMoveAnimation and initializeAnimation
