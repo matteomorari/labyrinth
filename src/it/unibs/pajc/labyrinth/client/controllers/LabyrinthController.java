@@ -1,5 +1,8 @@
-package it.unibs.pajc.labyrinth.core;
+package it.unibs.pajc.labyrinth.client.controllers;
 
+import it.unibs.pajc.labyrinth.core.Card;
+import it.unibs.pajc.labyrinth.core.Goal;
+import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -19,13 +22,13 @@ public interface LabyrinthController {
 
   void insertCard(Position position);
 
+  void rotateAvailableCard(int rotation);
+
   ArrayList<Position> getLastPlayerMovedPath();
 
   Position lastInsertedCardPosition();
 
   Card getAvailableCard();
-
-  // void nextPlayer();
 
   void skipTurn();
 
@@ -42,4 +45,8 @@ public interface LabyrinthController {
   Player getPlayerToSwap();
 
   Goal getGoalToSwap();
+
+  void cardAnimationEnded();
+
+  void playerAnimationEnded();
 }

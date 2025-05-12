@@ -1,5 +1,6 @@
 package it.unibs.pajc.labyrinth.core;
 
+import it.unibs.pajc.labyrinth.core.utility.BotMoveCalcListener;
 import it.unibs.pajc.labyrinth.core.utility.NodeComparator;
 import it.unibs.pajc.labyrinth.core.utility.Orientation;
 import it.unibs.pajc.labyrinth.core.utility.Position;
@@ -17,7 +18,12 @@ public class Labyrinth extends BaseModel {
   private static final int GOALS_FOR_PLAYER = 4;
   public static final int MAX_PLAYERS = 4;
   public static final int MIN_PLAYERS = 2;
-  private final transient Random random = new Random();
+  private transient Random random = new Random();
+  private transient BotManager botManager;
+  private EnvironmentType environmentType;
+  private transient BotMoveCalcListener botMoveListener = null;
+  private boolean waitingForCardAnimation = false;
+  private boolean waitingForPlayerAnimation = false;
 
   private int boardSize;
   private ArrayDeque<Player> players;
@@ -33,18 +39,26 @@ public class Labyrinth extends BaseModel {
   private Player playerToSwap;
   private Goal goalToSwap;
 
-  public Labyrinth() {
-    this(7);
+  public enum EnvironmentType {
+    LOCAL,
+    CLIENT,
+    SERVER;
   }
 
-  public Labyrinth(int boardSize) {
+  public Labyrinth(EnvironmentType environmentType) {
+    this(7, environmentType);
+  }
+
+  public Labyrinth(int boardSize, EnvironmentType environmentType) {
     this.players = new ArrayDeque<>();
     this.board = new ArrayList<>();
     this.boardSize = boardSize;
+    this.environmentType = environmentType;
     this.availableCard = null;
     this.lastInsertedCardPosition = null;
     this.lastPlayerMovedPath = new ArrayList<>();
     this.powerActions = new HashMap<>();
+    this.botManager = new BotManager(this);
     createPowerActionsMap();
   }
 
@@ -108,27 +122,82 @@ public class Labyrinth extends BaseModel {
 
   public void skipTurn() {
     if (hasCurrentPlayerInserted && hasCurrentPlayerDoubleTurn) {
+      // this rappresent the case when the player has used the power to have a double turn
+      // and has insert the card the first time and want to insert the second without
+      // change the current position
       setHasCurrentPlayerInserted(false);
       setHasCurrentPlayerHasDoubleTurn(false);
     } else if (hasCurrentPlayerInserted) {
-      nextPlayer();
+      // According to the rules, a player must insert a card e each turn.
+      advanceToNextPlayer();
     }
     this.fireChangeListener();
   }
 
-  public Player nextPlayer() {
+  private void advanceToNextPlayer() {
     this.players.add(this.players.poll());
     this.hasCurrentPlayerInserted = false;
+    setWaitingForPlayerAnimation(false);
     setHasUsedPower(false);
     // in case due to card insertion the player changes position and the goal is found
+    // ! TODO: why only the new player and not all? maybe to do on card insert?
     isGoalFound(getCurrentPlayer());
     System.out.println("Current player: " + this.getCurrentPlayer().getColorName());
-    return this.getCurrentPlayer();
+
+    if (this.getCurrentPlayer().isBot()) {
+      // if this class is used in local environment, the bot are handled here as expected
+      if (getEnvironmentType() == EnvironmentType.LOCAL) {
+        startBotPlayerTurn();
+      } else if (getEnvironmentType() == EnvironmentType.SERVER) {
+        // the server must notify the controller to send the bot move to the client
+        // Calculate the bot move but don't apply it yet
+        getBotManager().calcMove();
+
+        // Notify the controller about the calculated bot move
+        if (botMoveListener != null) {
+          botMoveListener.onBotMoveCalc(
+              getBotManager().getBestCardInsertMove(), getBotManager().getBestPosition());
+          getBotManager().applyCardInsertion();
+          getBotManager().applyPlayerMovement();
+        }
+      }
+      // the last case is the class represents a client;
+      // in this case it must wait from the server to know the bot move
+    }
+  }
+
+  public void startBotPlayerTurn() {
+    getBotManager().calcMove();
+    getBotManager().applyCardInsertion();
+  }
+
+  public void cardAnimationEnded() {
+    System.out.println("card animation ended");
+    if (getCurrentPlayer().isBot()) {
+      getBotManager().applyPlayerMovement();
+    } else {
+      checkIfPlayerCanMove();
+      // if the player can move, let's wait for the user input
+    }
+  }
+
+  public void playerAnimationEnded() {
+    isGoalFound(getCurrentPlayer());
+    setWaitingForPlayerAnimation(false);
+
+    if (hasCurrentPlayerDoubleTurn) {
+      hasCurrentPlayerInserted = false;
+      hasCurrentPlayerDoubleTurn = false;
+    } else {
+      skipTurn();
+    }
+
+    isGameFinished();
   }
 
   public void initGame() {
-    this.initBoard();
     this.initializePlayerPositions();
+    this.initBoard();
 
     // shuffle goals
     ArrayList<GoalType> goalList = new ArrayList<>(Arrays.asList(GoalType.values()));
@@ -314,13 +383,12 @@ public class Labyrinth extends BaseModel {
     this.availableCard = nextAvailableCard;
     this.lastInsertedCardPosition = insertPosition;
 
-    checkAndProceedToNextPlayer();
     setHasUsedPower(false);
     this.fireChangeListener();
   }
 
   // if the player can't move, go to the next player immediately
-  public void checkAndProceedToNextPlayer() {
+  public void checkIfPlayerCanMove() {
     if (getCardOpenDirection(getPlayerCard(getCurrentPlayer())).isEmpty()) {
       if (availableCard.getPower() != null) {
         return;
@@ -347,7 +415,7 @@ public class Labyrinth extends BaseModel {
         PowerType.SWAP_POSITION,
         () -> {
           swapPlayers();
-          checkAndProceedToNextPlayer();
+          checkIfPlayerCanMove();
         });
     powerActions.put(
         PowerType.DOUBLE_TURN,
@@ -368,13 +436,13 @@ public class Labyrinth extends BaseModel {
         PowerType.CHOOSE_SECOND_GOAL,
         () -> {
           changeGoal();
-          checkAndProceedToNextPlayer();
+          checkIfPlayerCanMove();
         });
     powerActions.put(
         PowerType.CHOOSE_GOAL,
         () -> {
           changeGoal();
-          checkAndProceedToNextPlayer();
+          checkIfPlayerCanMove();
         });
   }
 
@@ -460,7 +528,7 @@ public class Labyrinth extends BaseModel {
     }
   }
 
-  // ! seems to not reflect the actual state of the board
+  // ! TODO: seems to not reflect the actual state of the board
   private ArrayList<Orientation> getCardOpenDirection(Card card) {
     ArrayList<Orientation> openOrientation = new ArrayList<>();
     for (Orientation orientation : Orientation.values()) {
@@ -644,18 +712,8 @@ public class Labyrinth extends BaseModel {
     this.board.get(row).get(col).addPlayer(currentPlayer);
     currentPlayer.setPosition(row, col);
 
+    setWaitingForPlayerAnimation(true);
     this.lastPlayerMovedPath = path;
-    isGoalFound(currentPlayer);
-
-    if (hasCurrentPlayerDoubleTurn) {
-      hasCurrentPlayerInserted = false;
-      hasCurrentPlayerDoubleTurn = false;
-    } else {
-      // nextPlayer();
-      skipTurn();
-    }
-
-    isGameFinished();
     this.fireChangeListener();
   }
 
@@ -772,5 +830,45 @@ public class Labyrinth extends BaseModel {
 
   public boolean getHasCurrentPlayerDoubleTurn() {
     return hasCurrentPlayerDoubleTurn;
+  }
+
+  public EnvironmentType getEnvironmentType() {
+    return environmentType;
+  }
+
+  public void setEnvironmentType(EnvironmentType environmentType) {
+    this.environmentType = environmentType;
+  }
+
+  public void setBotMoveListener(BotMoveCalcListener listener) {
+    this.botMoveListener = listener;
+  }
+
+  public void removeBotMoveListener() {
+    this.botMoveListener = null;
+  }
+
+  public synchronized void setWaitingForCardAnimation(boolean waitingForCardAnimation) {
+    this.waitingForCardAnimation = waitingForCardAnimation;
+  }
+
+  public synchronized boolean isWaitingForCardAnimation() {
+    return waitingForCardAnimation;
+  }
+
+  public synchronized void setWaitingForPlayerAnimation(boolean waitingForPlayerAnimation) {
+    this.waitingForPlayerAnimation = waitingForPlayerAnimation;
+  }
+
+  public synchronized boolean isWaitingForPlayerAnimation() {
+    return waitingForPlayerAnimation;
+  }
+
+  public BotManager getBotManager() {
+    return botManager;
+  }
+
+  public void setBotManager(BotManager botManager) {
+    this.botManager = botManager;
   }
 }

@@ -3,31 +3,33 @@ package it.unibs.pajc.labyrinth.server;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import it.unibs.pajc.labyrinth.core.Goal;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.clientServerCommon.SocketCommunicationProtocol;
-import it.unibs.pajc.labyrinth.core.lobby.OnlineLobby;
-import it.unibs.pajc.labyrinth.core.utility.LobbyGson;
+import it.unibs.pajc.labyrinth.core.utility.BotMoveCalcListener;
+import it.unibs.pajc.labyrinth.core.utility.CardInsertMove;
 import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
+import it.unibs.pajc.labyrinth.core.utility.LobbyGson;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.net.Socket;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class LabyrinthServerProtocol extends SocketCommunicationProtocol {
-  private volatile OnlineLobby currentLobby;
+// ! TODO: hide lobby with game in progress
+public class LabyrinthServerProtocol extends SocketCommunicationProtocol
+    implements BotMoveCalcListener {
+  private volatile ServerLobby currentLobby;
   private Player player;
-  private static final CopyOnWriteArrayList<OnlineLobby> gameLobbies = new CopyOnWriteArrayList<>();
+  private static final CopyOnWriteArrayList<ServerLobby> gameLobbies = new CopyOnWriteArrayList<>();
   private static final ReentrantLock lobbyOperationsLock = new ReentrantLock();
 
   static {
     // TODO: to remove, this is just for testing purposes
     // Initialize the game lobbies
-    gameLobbies.add(new OnlineLobby("Lobby 1"));
-    gameLobbies.add(new OnlineLobby("Lobby 2"));
-    gameLobbies.add(new OnlineLobby("Lobby 3"));
+    gameLobbies.add(new ServerLobby("Lobby 1", Labyrinth.EnvironmentType.SERVER));
+    gameLobbies.add(new ServerLobby("Lobby 2", Labyrinth.EnvironmentType.SERVER));
+    gameLobbies.add(new ServerLobby("Lobby 3", Labyrinth.EnvironmentType.SERVER));
   }
 
   public LabyrinthServerProtocol(Player player, Socket client) {
@@ -64,7 +66,7 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol {
               }
 
               // set new lobby
-              OnlineLobby currentLobby = getLobbyById(lobbyId);
+              ServerLobby currentLobby = getLobbyById(lobbyId);
               currentLobby.addPlayer(player, this);
               this.currentLobby = currentLobby;
               // send the new player message to all players in the lobby
@@ -72,6 +74,19 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol {
             } finally {
               lobbyOperationsLock.unlock();
             }
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
+    commandMap.put(
+        "request_add_bot",
+        e -> {
+          try {
+            Player newBot = new Player();
+            newBot.setIsReadyToPlay(true);
+            newBot.setIsBot(true);
+            currentLobby.addPlayer(newBot);
+            sendLobbyStateUpdate(currentLobby);
           } catch (Exception exc) {
             exc.printStackTrace();
           }
@@ -107,6 +122,24 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol {
           }
         });
     commandMap.put(
+        "rotate_available_card",
+        e -> {
+          try {
+            LabyrinthServerProtocol sender = (LabyrinthServerProtocol) e.getSender();
+            int rotation = e.getParameters().get("rotation").getAsInt();
+
+            Labyrinth labyrinthModel = currentLobby.getModel();
+
+            // check if the sender is the current player
+            if (sender.player.equals(labyrinthModel.getCurrentPlayer())) {
+              labyrinthModel.getAvailableCard().rotate(rotation);
+              sendCardAvailableRotatedMsg(rotation);
+            }
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
+    commandMap.put(
         "insert_card",
         e -> {
           try {
@@ -120,6 +153,34 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol {
             if (sender.player.equals(labyrinthModel.getCurrentPlayer())) {
               labyrinthModel.insertCard(new Position(row, col));
               sendPlayerCardInsertNotification(row, col);
+            }
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
+    commandMap.put(
+        "card_animation_ended",
+        e -> {
+          try {
+            Labyrinth labyrinthModel = currentLobby.getModel();
+
+            if (currentLobby.getModel().isWaitingForCardAnimation()) {
+              currentLobby.getModel().setWaitingForCardAnimation(false);
+              labyrinthModel.cardAnimationEnded();
+            }
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
+    commandMap.put(
+        "player_animation_ended",
+        e -> {
+          try {
+            Labyrinth labyrinthModel = currentLobby.getModel();
+
+            if (currentLobby.getModel().isWaitingForPlayerAnimation()) {
+              currentLobby.getModel().setWaitingForPlayerAnimation(false);
+              labyrinthModel.playerAnimationEnded();
             }
           } catch (Exception exc) {
             exc.printStackTrace();
@@ -197,15 +258,27 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol {
         });
   }
 
+  private void sendCardAvailableRotatedMsg(int rotation) {
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "card_available_rotated");
+
+    JsonObject parameters = new JsonObject();
+    parameters.addProperty("rotation", rotation);
+
+    msg.add("parameters", parameters);
+
+    sendNotificationToLobbyPlayers(msg);
+  }
+
   private void sendNotificationToLobbyPlayers(JsonObject msg) {
     for (SocketCommunicationProtocol playerSocket : currentLobby.getPlayersSockets().values()) {
       playerSocket.sendMsg(playerSocket, msg.toString());
     }
   }
 
-  private OnlineLobby getLobbyById(String lobbyId) {
+  private ServerLobby getLobbyById(String lobbyId) {
     // find the lobby with the given ID
-    for (OnlineLobby gameLobby : gameLobbies) {
+    for (ServerLobby gameLobby : gameLobbies) {
       if (gameLobby.getLobbyId().equals(lobbyId)) {
         return gameLobby;
       }
@@ -230,9 +303,8 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol {
 
     // Using CopyOnWriteArrayList provides thread-safe iteration
     JsonArray lobbyListJson = new JsonArray();
-    for (OnlineLobby lobby : gameLobbies) {
-      JsonObject gameLobbyJson =
-          JsonParser.parseString(LobbyGson.toJson(lobby)).getAsJsonObject();
+    for (ServerLobby lobby : gameLobbies) {
+      JsonObject gameLobbyJson = JsonParser.parseString(LobbyGson.toJson(lobby)).getAsJsonObject();
       lobbyListJson.add(gameLobbyJson);
     }
 
@@ -243,7 +315,7 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol {
     sendMsg(this, msg.toString());
   }
 
-  private void sendLobbyStateUpdate(OnlineLobby lobby) {
+  private void sendLobbyStateUpdate(ServerLobby lobby) {
     // Create a snapshot of the message before iteration
     JsonObject msg = new JsonObject();
     msg.addProperty("command", "update_lobby");
@@ -258,27 +330,28 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol {
     }
   }
 
-  public static synchronized boolean addLobby(OnlineLobby lobby) {
+  public static synchronized boolean addLobby(ServerLobby lobby) {
     return gameLobbies.add(lobby);
   }
 
-  public static synchronized boolean removeLobby(OnlineLobby lobby) {
+  public static synchronized boolean removeLobby(ServerLobby lobby) {
     return gameLobbies.remove(lobby);
   }
 
   private void checkGameBeStarted() {
-    OnlineLobby lobby = this.currentLobby;
+    ServerLobby lobby = this.currentLobby;
     if (lobby.getPlayers().size() < 2) {
       return;
     }
     if (lobby.getPlayers().stream().allMatch(Player::isReadyToPlay)) {
       lobby.startGame();
+      lobby.getModel().setBotMoveListener(this);
       sendGameStartedMsg();
     }
   }
 
   private void sendGameStartedMsg() {
-    OnlineLobby lobby = this.currentLobby;
+    ServerLobby lobby = this.currentLobby;
 
     JsonObject msg = new JsonObject();
     msg.addProperty("command", "game_started");
@@ -350,6 +423,26 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol {
     JsonObject parameters = new JsonObject();
     parameters.addProperty("goal_position_row", goal.getPosition().getRow());
     parameters.addProperty("goal_position_col", goal.getPosition().getCol());
+
+    msg.add("parameters", parameters);
+    sendNotificationToLobbyPlayers(msg);
+  }
+
+  @Override
+  public void onBotMoveCalc(CardInsertMove insertedCard, Position futureBotPosition) {
+    sendBotMove(insertedCard, futureBotPosition);
+  }
+
+  private void sendBotMove(CardInsertMove insertedCard, Position futureBotPosition) {
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "bot_move_calculated");
+
+    JsonObject parameters = new JsonObject();
+    parameters.addProperty("card_rotate_number", insertedCard.getCardRotateNumber());
+    parameters.addProperty("card_row", insertedCard.getCardInsertPosition().getRow());
+    parameters.addProperty("card_col", insertedCard.getCardInsertPosition().getCol());
+    parameters.addProperty("bot_row", futureBotPosition.getRow());
+    parameters.addProperty("bot_col", futureBotPosition.getCol());
 
     msg.add("parameters", parameters);
     sendNotificationToLobbyPlayers(msg);

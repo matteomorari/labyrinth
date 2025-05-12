@@ -15,34 +15,34 @@ public class Lobby {
   private Boolean gameInProgress;
   private HashSet<PlayerColor> availableColors;
 
-  public Lobby(String lobbyName) {
+  public Lobby(String lobbyName, Labyrinth.EnvironmentType environmentType) {
     this.playersList = new ArrayList<>();
     this.LOBBY_ID = UUID.randomUUID().toString();
     this.lobbyName = lobbyName;
     this.gameInProgress = false;
-    this.labyrinth = new Labyrinth();
+    this.labyrinth = new Labyrinth(7, environmentType);
     this.availableColors = new HashSet<>();
     availableColors = new HashSet<>(java.util.Arrays.asList(PlayerColor.values()));
   }
 
   public void addPlayer(Player player) {
-    if (playersList.contains(player)) {
+    if (getPlayers().contains(player)) {
       throw new IllegalArgumentException("Player already exists in the lobby.");
     }
 
-    if (playersList.size() >= Labyrinth.MAX_PLAYERS) {
+    if (getPlayers().size() >= Labyrinth.MAX_PLAYERS) {
       throw new IllegalStateException("Lobby is full. Cannot add more players.");
     }
     if (gameInProgress) {
       throw new IllegalStateException("Game is already in progress. Cannot add more players.");
     }
 
-    playersList.add(player);
+    getPlayers().add(player);
     setPlayerRandomColor(player);
   }
 
   public Player getPlayerById(String playerId) {
-    for (Player player : playersList) {
+    for (Player player : getPlayers()) {
       if (player.getId().equals(playerId)) {
         return player;
       }
@@ -52,11 +52,11 @@ public class Lobby {
 
   public void removePlayer(Player player) {
     removePlayerColor(player);
-    playersList.remove(player);
+    getPlayers().remove(player);
   }
 
   public ArrayList<Player> getPlayers() {
-    return new ArrayList<>(playersList);
+    return this.playersList;
   }
 
   public void setModel(Labyrinth labyrinth) {
@@ -76,7 +76,7 @@ public class Lobby {
   }
 
   public void startGame() {
-    for (Player player : playersList) {
+    for (Player player : getPlayers()) {
       labyrinth.addPlayer(player);
     }
     labyrinth.initGame();
@@ -84,10 +84,10 @@ public class Lobby {
   }
 
   public int getPlayerCount() {
-    if (playersList == null) {
+    if (getPlayers() == null) {
       return 0;
     }
-    return playersList.size();
+    return getPlayers().size();
   }
 
   public String getLobbyId() {
@@ -107,14 +107,14 @@ public class Lobby {
   }
 
   public void setPlayerColor(Player player, PlayerColor color) {
-    if (!playersList.contains(player)) {
+    if (!getPlayers().contains(player)) {
       throw new IllegalArgumentException("Player not found in the lobby.");
     }
 
     removePlayerColor(player);
 
     // get the player from the list and set the color
-    for (Player p : playersList) {
+    for (Player p : getPlayers()) {
       if (p.equals(player)) {
         p.setColor(color);
         // remove the color from the available colors
@@ -125,7 +125,7 @@ public class Lobby {
   }
 
   public void setPlayerRandomColor(Player player) {
-    if (!playersList.contains(player)) {
+    if (!getPlayers().contains(player)) {
       throw new IllegalArgumentException("Player not found in the lobby.");
     }
 

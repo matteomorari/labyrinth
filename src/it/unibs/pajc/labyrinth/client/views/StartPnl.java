@@ -2,7 +2,8 @@ package it.unibs.pajc.labyrinth.client.views;
 
 import it.unibs.pajc.labyrinth.client.components.RoundedIconButton;
 import it.unibs.pajc.labyrinth.client.controllers.LabyrinthClientController;
-import it.unibs.pajc.labyrinth.core.OnlineGameManager;
+import it.unibs.pajc.labyrinth.core.lobby.OnlineGameManager;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;

@@ -1,7 +1,8 @@
 package it.unibs.pajc.labyrinth.client.components.game;
 
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
-import it.unibs.pajc.labyrinth.core.LabyrinthController;
+import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
+
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;

@@ -6,8 +6,8 @@ import it.unibs.pajc.labyrinth.client.animation.EasingFunction;
 import it.unibs.pajc.labyrinth.client.components.CardImage;
 import it.unibs.pajc.labyrinth.client.components.RoundedIconButton;
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
+import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Card;
-import it.unibs.pajc.labyrinth.core.LabyrinthController;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -143,16 +143,15 @@ public class AvailableCardPnl extends JPanel implements Animatable {
 
     int textX1 = (getWidth() - fm.stringWidth(line1)) / 2;
     int textX2 = (getWidth() - fm.stringWidth(line2)) / 2;
-    int textY1 = TITLE_TEXT_TOP_MARGIN; // Position from top
-    int textY2 =
-        textY1 + fm.getHeight() + TITLE_TEXT_LINE_SPACING; // Add some spacing between lines
+    int textY1 = TITLE_TEXT_TOP_MARGIN;
+    int textY2 = textY1 + fm.getHeight() + TITLE_TEXT_LINE_SPACING;
 
     g2.drawString(line1, textX1, textY1);
     g2.drawString(line2, textX2, textY2);
     updateCardImage();
 
     int imageX = (getWidth() - availableCardImage.getWidth(null)) / 2;
-    int imageY = textY2 + GOAL_IMAGE_TOP_MARGIN; // Position below the text with some padding
+    int imageY = textY2 + GOAL_IMAGE_TOP_MARGIN;
     g2.drawImage(availableCardImage, imageX, imageY, null);
 
     // Position the rotate and skip turn buttons below the image with some padding
@@ -187,6 +186,7 @@ public class AvailableCardPnl extends JPanel implements Animatable {
     repaint();
   }
 
+  // TODO: use ImageCntrl method?
   private BufferedImage scaleImage(BufferedImage original, int maxWidth, int maxHeight) {
     int originalWidth = original.getWidth();
     int originalHeight = original.getHeight();
@@ -216,7 +216,6 @@ public class AvailableCardPnl extends JPanel implements Animatable {
 
   private BufferedImage getCorrectCardImage() {
     Card card = controller.getAvailableCard();
-    // BufferedImage availableCardImage = ;
     CardImage cardImage =
         new CardImage(
             ImageCntrl.valueOf("CARD_" + card.getType()), (Graphics2D) this.getGraphics());
@@ -225,7 +224,11 @@ public class AvailableCardPnl extends JPanel implements Animatable {
   }
 
   private void handleRotationCardBtn() {
-    controller.getAvailableCard().rotate();
+    controller.rotateAvailableCard(1);
+    startCardRotationAnimation();
+  }
+
+  private void startCardRotationAnimation() {
     isRotating = true;
     animationCardAngle = -90;
     animator.initializeAnimation(new int[] {-90}, new int[] {0});
@@ -233,6 +236,7 @@ public class AvailableCardPnl extends JPanel implements Animatable {
   }
 
   private void handleSkipTurnBtn() {
+    // ! TODO: prevent skip if animation in progress and for bot
     controller.skipTurn();
   }
 
