@@ -16,7 +16,7 @@ import java.net.Socket;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
-// ! TODO: hide lobby with game in progress
+// ! TODO: delete a lobby when the game end (and also when the is no player in the lobby??)
 public class LabyrinthServerProtocol extends SocketCommunicationProtocol
     implements BotMoveCalcListener {
   private volatile ServerLobby currentLobby;
@@ -27,9 +27,9 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
   static {
     // TODO: to remove, this is just for testing purposes
     // Initialize the game lobbies
-    gameLobbies.add(new ServerLobby("Lobby 1", Labyrinth.EnvironmentType.SERVER));
-    gameLobbies.add(new ServerLobby("Lobby 2", Labyrinth.EnvironmentType.SERVER));
-    gameLobbies.add(new ServerLobby("Lobby 3", Labyrinth.EnvironmentType.SERVER));
+    addLobby(new ServerLobby("Lobby 1", Labyrinth.EnvironmentType.SERVER));
+    addLobby(new ServerLobby("Lobby 2", Labyrinth.EnvironmentType.SERVER));
+    addLobby(new ServerLobby("Lobby 3", Labyrinth.EnvironmentType.SERVER));
   }
 
   public LabyrinthServerProtocol(Player player, Socket client) {
@@ -43,6 +43,18 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
         "fetch_lobbies",
         e -> {
           try {
+            sendAvailableLobbies();
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
+    commandMap.put(
+        "create_lobby",
+        e -> {
+          try {
+            String lobbyName = e.getParameters().get("lobby_name").getAsString();
+            ServerLobby newLobby = new ServerLobby(lobbyName, Labyrinth.EnvironmentType.SERVER);
+            addLobby(newLobby);
             sendAvailableLobbies();
           } catch (Exception exc) {
             exc.printStackTrace();

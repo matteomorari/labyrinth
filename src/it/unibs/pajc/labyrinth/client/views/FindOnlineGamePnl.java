@@ -17,6 +17,7 @@ public class FindOnlineGamePnl extends JPanel {
   private JButton newGameButton;
   private JButton readyButton;
   private JButton addBotButton;
+  private JButton createNewLobbyButton;
   private ArrayList<Lobby> availableLobbies;
   private JList<String> lobbiesJList;
   private Lobby currentLobby;
@@ -102,12 +103,18 @@ public class FindOnlineGamePnl extends JPanel {
     add(buttonPanel, BorderLayout.SOUTH);
 
     newGameButton = new JButton("NEW GAME");
+    newGameButton.setPreferredSize(new Dimension(200, 50));
     readyButton = new JButton("READY TO PLAY");
+    readyButton.setPreferredSize(new Dimension(200, 50));
     addBotButton = new JButton("ADD BOT");
+    addBotButton.setPreferredSize(new Dimension(200, 50));
+    createNewLobbyButton = new JButton("CREATE NEW LOBBY");
+    createNewLobbyButton.setPreferredSize(new Dimension(200, 50));
 
     buttonPanel.add(newGameButton);
     buttonPanel.add(readyButton);
     buttonPanel.add(addBotButton);
+    buttonPanel.add(createNewLobbyButton);
 
     // Add action listeners
     newGameButton.addActionListener(
@@ -115,7 +122,7 @@ public class FindOnlineGamePnl extends JPanel {
           @Override
           public void actionPerformed(ActionEvent e) {
             System.out.println("New Game button clicked!");
-            //TODO: Add logic to handle creating a new game
+            // TODO: Add logic to handle creating a new game
           }
         });
 
@@ -135,6 +142,35 @@ public class FindOnlineGamePnl extends JPanel {
           public void actionPerformed(ActionEvent e) {
             if (currentLobby != null) {
               clientController.addBotToLobby();
+            }
+          }
+        });
+    createNewLobbyButton.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            String lobbyName = JOptionPane.showInputDialog("Enter lobby name:");
+            if (lobbyName != null) {
+              if (!lobbyName.trim().isEmpty()) {
+                // check if the lobby name is already taken
+                for (Lobby lobby : availableLobbies) {
+                  if (lobby.getLobbyName().equalsIgnoreCase(lobbyName)) {
+                    JOptionPane.showMessageDialog(
+                        FindOnlineGamePnl.this,
+                        "Lobby name already taken. Please choose another name.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                  }
+                }
+                clientController.createLobby(lobbyName);
+              } else {
+                JOptionPane.showMessageDialog(
+                    FindOnlineGamePnl.this,
+                    "Lobby name cannot be empty.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+              }
             }
           }
         });
@@ -158,26 +194,15 @@ public class FindOnlineGamePnl extends JPanel {
     // so we have to switch to the game panel
     if (currentLobby != null && currentLobby.isGameInProgress()) {
       Labyrinth labyrinthModel = clientController.getLabyrinthModel();
-      // TODO: to remove
-      JPanel tempPnl = new JPanel();
-      tempPnl.setLayout(new BorderLayout());
 
       GamePnl gamePanel = new GamePnl(clientController);
       labyrinthModel.addChangeListener(e -> gamePanel.repaint());
-      tempPnl.add(gamePanel, BorderLayout.CENTER);
-      tempPnl.setVisible(true);
-
-      // TODO: to remove
-      // BotManager bot1 = new BotManager(labyrinthModel, labyrinthModel.getCurrentPlayer());
-      // JButton button = new JButton("move bot");
-      // tempPnl.add(button, BorderLayout.SOUTH);
-      // button.addActionListener(e -> bot1.calcMove());
 
       // Replace the current panel's content with the game panel
       JPanel parent = (JPanel) getParent();
       parent.removeAll();
       parent.setLayout(new BorderLayout());
-      parent.add(tempPnl, BorderLayout.CENTER);
+      parent.add(gamePanel, BorderLayout.CENTER);
       parent.revalidate();
       parent.repaint();
     }
@@ -193,12 +218,14 @@ public class FindOnlineGamePnl extends JPanel {
     if (currentLobby == null) {}
 
     DefaultListModel<String> listModel = new DefaultListModel<>();
-    for (int i = 0; i < availableLobbies.size(); i++) {
-      Lobby lobby = availableLobbies.get(i);
+    for (Lobby lobby : availableLobbies) {
+      if (lobby.isGameInProgress()) {
+        continue;
+      }
+
       String lobbyName = lobby.getLobbyName();
       if (currentLobby != null && lobby.getLobbyId().equals(currentLobby.getLobbyId())) {
         listModel.addElement(lobbyName.toUpperCase() + "  (" + lobby.getPlayerCount() + ")");
-
       } else {
         listModel.addElement(lobbyName + "  (" + lobby.getPlayerCount() + ")");
       }

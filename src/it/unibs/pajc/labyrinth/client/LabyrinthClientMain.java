@@ -41,7 +41,7 @@ public class LabyrinthClientMain {
   /** Initialize the contents of the frame. */
   private void initialize() {
     frame = new JFrame("Labyrinth");
-    frame.setBounds(20, 20, 1400, 800);
+    frame.setBounds(20, 20, 1400, 850);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setLayout(new BorderLayout(10, 10));
 

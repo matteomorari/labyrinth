@@ -438,4 +438,16 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
     msg.add("parameters", null);
     sendMsg(this, msg.toString());
   }
+
+  public void createLobby(String lobbyName) {
+    System.out.println("create lobby: " + lobbyName);
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "create_lobby");
+
+    JsonObject parameters = new JsonObject();
+    parameters.addProperty("lobby_name", lobbyName);
+
+    msg.add("parameters", parameters);
+    sendMsg(this, msg.toString());
+  }
 }
