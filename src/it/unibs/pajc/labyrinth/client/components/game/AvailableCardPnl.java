@@ -182,11 +182,8 @@ public class AvailableCardPnl extends JPanel implements Animatable {
     availableCardImage = getCorrectCardImage();
     // ImageCntrl.valueOf("CARD_" + controller.getAvailableCard().getType()).getImage();
     availableCardImage = scaleImage(availableCardImage, cardWidth, Integer.MAX_VALUE);
-
-    repaint();
   }
 
-  // TODO: use ImageCntrl method?
   private BufferedImage scaleImage(BufferedImage original, int maxWidth, int maxHeight) {
     int originalWidth = original.getWidth();
     int originalHeight = original.getHeight();
@@ -204,12 +201,7 @@ public class AvailableCardPnl extends JPanel implements Animatable {
       width = (int) (height * aspectRatio);
     }
 
-    BufferedImage scaledImage = new BufferedImage(width, height, original.getType());
-    Graphics2D g2d = scaledImage.createGraphics();
-    g2d.setRenderingHint(
-        RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-    g2d.drawImage(original, 0, 0, width, height, null);
-    g2d.dispose();
+    BufferedImage scaledImage = ImageCntrl.scaleBufferedImage(original, width, height);
 
     return scaledImage;
   }
@@ -236,13 +228,17 @@ public class AvailableCardPnl extends JPanel implements Animatable {
   }
 
   private void handleSkipTurnBtn() {
-    // ! TODO: prevent skip if animation in progress and for bot
+    if (isRotating || controller.getCurrentPlayer().isBot()) {
+      return;
+    }
+
     controller.skipTurn();
   }
 
   @Override
   public void updateAnimation(int[] values) {
     animationCardAngle = values[0];
+    repaint();
   }
 
   private boolean onAnimationEnded() {

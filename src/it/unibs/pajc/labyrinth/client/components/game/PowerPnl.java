@@ -163,7 +163,6 @@ public class PowerPnl extends JPanel {
 
       g2d.dispose();
     }
-    repaint();
   }
 
   private void handleUsePowerBtn() {

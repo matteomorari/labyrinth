@@ -153,8 +153,6 @@ public class CurrentGoalPnl extends JPanel {
       g2.dispose();
       currentGoalImage = combined;
     }
-
-    repaint();
   }
 
   private BufferedImage scaleImage(BufferedImage original, int maxWidth, int maxHeight) {
