@@ -28,9 +28,6 @@ public class PowerPnl extends JPanel {
   private static final int BUTTON_TOP_MARGIN = 10;
   private static final int TITLE_FONT_SIZE = 25;
   private static final String TITLE_FONT_FAMILY = "Times New Roman";
-  private static final int POPUP_IMAGE_SIZE = 100;
-  private static final int BUTTON_PADDING = 10;
-  private static final int LINE_THICKNESS = 5;
 
   private LabyrinthController controller;
   private BufferedImage powerImage;

@@ -36,7 +36,6 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
   private int boardSize;
   private ArrayList<ArrayList<Card>> board;
   private LabyrinthController controller;
-  private Player currentPlayer;
   private Card currentAvailableCard;
   private Card previousAvailableCard;
   private HashMap<Player, Position> lastPlayerPositions;
@@ -98,7 +97,6 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
   }
 
   private void updateData() {
-    this.currentPlayer = controller.getCurrentPlayer();
     this.currentAvailableCard = controller.getAvailableCard();
     this.board = controller.getBoard();
   }
