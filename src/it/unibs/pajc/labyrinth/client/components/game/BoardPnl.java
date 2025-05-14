@@ -1,10 +1,12 @@
-package it.unibs.pajc.labyrinth.client.gameView;
+package it.unibs.pajc.labyrinth.client.components.game;
 
 import it.unibs.pajc.labyrinth.client.animation.Animatable;
 import it.unibs.pajc.labyrinth.client.animation.Animator;
 import it.unibs.pajc.labyrinth.client.animation.EasingFunction;
+import it.unibs.pajc.labyrinth.client.components.CardImage;
+import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
+import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Card;
-import it.unibs.pajc.labyrinth.core.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.PowerType;
 import it.unibs.pajc.labyrinth.core.utility.Orientation;
@@ -43,7 +45,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
   private int cellSize;
   private Player playerToAnimate;
   private boolean cardAnimationInProgress = false;
-  private boolean playerPositionInProgress = false;
+  private boolean playerAnimationInProgress = false;
   private Position playerAnimationPreviousPoint;
   private Position playerAnimationFuturePoint;
   private Position lastCardInsertPosition;
@@ -109,7 +111,6 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
 
     // check if a new card has been inserted
     if (!currentAvailableCard.equals(previousAvailableCard)) {
-      // controller.setHasCurrentPlayerInserted(false); //!
       lastCardInsertPosition = controller.lastInsertedCardPosition();
       previousAvailableCard = currentAvailableCard;
       updateLastPlayerPosition();
@@ -127,12 +128,6 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
         return;
       }
     }
-
-    // if (controller.hasCurrentPlayerMoved()) {
-    //   controller.setHasCurrentPlayerMoved(false); //!
-    //   lastPlayerMovedPath = controller.getLastPlayerMovedPath();
-    //   firePlayerMoveAnimation();
-    // }
   }
 
   // TODO: change name firePlayerMoveAnimation and initializeAnimation
@@ -145,7 +140,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     startAnimation();
     playerAnimationPreviousPoint = lastPlayerMovedPath.get(0);
     playerAnimationFuturePoint = lastPlayerMovedPath.get(1);
-    playerPositionInProgress = true;
+    playerAnimationInProgress = true;
   }
 
   private void startAnimation() {
@@ -186,7 +181,8 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
       int startX = initialXPosition + startPos.getCol() * cellSize;
       int startY = initialYPosition + startPos.getRow() * cellSize;
 
-      g2.setColor(player.getColor());
+      // TODO: non la cosa più bella da vedere (controllare anche da altre parti)
+      g2.setColor(player.getColor().getColor());
       g2.fillOval(startX + cellSize / 3, startY + cellSize / 3, cellSize / 3, cellSize / 3);
     }
   }
@@ -375,7 +371,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     int posX = initialXPosition;
     int posY = initialYPosition;
 
-    if (playerPositionInProgress && player.equals(playerToAnimate)) {
+    if (playerAnimationInProgress && player.equals(playerToAnimate)) {
       posX += playerAnimationPreviousPoint.getCol() * cellSize;
       posY += playerAnimationPreviousPoint.getRow() * cellSize;
       posX +=
@@ -406,7 +402,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
   private int[] getPlayerDirection(Player player) {
     int posX, posY;
 
-    if (playerPositionInProgress && player.equals(playerToAnimate)) {
+    if (playerAnimationInProgress && player.equals(playerToAnimate)) {
       posX =
           Integer.compare(
               playerAnimationFuturePoint.getCol(), playerAnimationPreviousPoint.getCol());
@@ -441,7 +437,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
 
   @Override
   public void mouseClicked(MouseEvent e) {
-    if (cardAnimationInProgress || playerPositionInProgress) {
+    if (cardAnimationInProgress || playerAnimationInProgress) {
       return;
     }
 
@@ -523,17 +519,21 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
   }
 
   private void endAnimation() {
-    cardAnimationInProgress = false;
+    if (cardAnimationInProgress) {
+      cardAnimationInProgress = false;
+      controller.cardAnimationEnded();
+    }
 
-    if (playerPositionInProgress) {
+    if (playerAnimationInProgress) {
       int index = lastPlayerMovedPath.indexOf(playerAnimationFuturePoint);
       if (index < lastPlayerMovedPath.size() - 1) {
         animator.initializeAnimation(new int[] {0}, new int[] {(int) cellSize}).start();
         playerAnimationPreviousPoint = playerAnimationFuturePoint;
         playerAnimationFuturePoint = lastPlayerMovedPath.get(index + 1);
       } else {
-        playerPositionInProgress = false;
+        playerAnimationInProgress = false;
         frameCount = 0;
+        controller.playerAnimationEnded();
       }
     }
     animationOffset = 0;

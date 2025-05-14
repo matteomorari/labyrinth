@@ -1,18 +1,19 @@
-package it.unibs.pajc.labyrinth.client;
+package it.unibs.pajc.labyrinth.client.controllers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import it.unibs.pajc.labyrinth.core.BotManager;
 import it.unibs.pajc.labyrinth.core.Card;
-import it.unibs.pajc.labyrinth.core.GameLobby;
 import it.unibs.pajc.labyrinth.core.Goal;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
-import it.unibs.pajc.labyrinth.core.LabyrinthController;
-import it.unibs.pajc.labyrinth.core.OnlineGameManager;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.clientServerCommon.SocketCommunicationProtocol;
-import it.unibs.pajc.labyrinth.core.utility.GameLobbyGson;
+import it.unibs.pajc.labyrinth.core.lobby.Lobby;
+import it.unibs.pajc.labyrinth.core.lobby.OnlineGameManager;
+import it.unibs.pajc.labyrinth.core.utility.CardInsertMove;
 import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
+import it.unibs.pajc.labyrinth.core.utility.LobbyGson;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.net.Socket;
 import java.util.ArrayDeque;
@@ -24,13 +25,14 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
   // ! TODO: what a shame to have more than one model
   Labyrinth labyrinthModel;
   OnlineGameManager onlineGameManager;
-  Player player;
+  Player localPlayer;
+  private volatile boolean playerReceived = false;
 
   public LabyrinthClientController(OnlineGameManager onlineGameManager) {
     super(null);
     this.labyrinthModel = null;
     this.onlineGameManager = onlineGameManager;
-    this.player = null;
+    this.localPlayer = null;
     createCommandMap();
   }
 
@@ -39,21 +41,21 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
         "new_player",
         e -> {
           try {
-            setLocalPlayer(e.getParameters().get("player_id").toString());
+            setLocalPlayer(e.getParameters().get("player_id").getAsString());
           } catch (Exception exc) {
             exc.printStackTrace();
           }
         });
     commandMap.put(
-        "send_lobbies",
+        "available_lobbies",
         e -> {
           try {
-            ArrayList<GameLobby> availableLobbies = new ArrayList<>();
+            ArrayList<Lobby> availableLobbies = new ArrayList<>();
             JsonElement lobbiesParameters = e.getParameters().get("lobbies");
 
             JsonElement parsedLobbies = JsonParser.parseString(lobbiesParameters.getAsString());
             for (JsonElement gameLobbyElement : parsedLobbies.getAsJsonArray()) {
-              GameLobby lobby = GameLobbyGson.fromJson(gameLobbyElement.toString());
+              Lobby lobby = LobbyGson.fromJson(gameLobbyElement.toString());
               availableLobbies.add(lobby);
             }
             onlineGameManager.setAvailableLobbies(availableLobbies);
@@ -69,8 +71,9 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
             JsonElement lobbyParameters = e.getParameters().get("lobby");
             JsonElement parsedLobbyData = JsonParser.parseString(lobbyParameters.getAsString());
 
-            GameLobby lobby = GameLobbyGson.fromJson(parsedLobbyData.toString());
+            Lobby lobby = LobbyGson.fromJson(parsedLobbyData.toString());
             onlineGameManager.setSelectedLobby(lobby);
+            localPlayer = onlineGameManager.getSelectedLobby().getPlayerById(localPlayer.getId());
 
           } catch (Exception exc) {
             exc.printStackTrace();
@@ -86,13 +89,14 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
 
             Labyrinth labyrinth = LabyrinthGson.fromJson(parsedLabyrinthData.toString());
             this.labyrinthModel = labyrinth;
+            labyrinth.setEnvironmentType(Labyrinth.EnvironmentType.CLIENT);
+            labyrinth.setBotManager(new BotManager(labyrinth));
             onlineGameManager.getSelectedLobby().setModel(labyrinth);
             onlineGameManager.setGameInProgress();
           } catch (Exception exc) {
             exc.printStackTrace();
           }
         });
-
     commandMap.put(
         "player_moved",
         e -> {
@@ -101,6 +105,38 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
             int newCol = e.getParameters().get("col").getAsInt();
 
             labyrinthModel.movePlayer(newRow, newCol);
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
+    commandMap.put(
+        "bot_move_calculated",
+        e -> {
+          try {
+            int cardRotateNumber = e.getParameters().get("card_rotate_number").getAsInt();
+            int cardRow = e.getParameters().get("card_row").getAsInt();
+            int cardCol = e.getParameters().get("card_col").getAsInt();
+            int playerRow = e.getParameters().get("bot_row").getAsInt();
+            int playerCol = e.getParameters().get("bot_col").getAsInt();
+            Position cardPosition = new Position(cardRow, cardCol);
+            Position playerPosition = new Position(playerRow, playerCol);
+
+            CardInsertMove move = new CardInsertMove(cardPosition, cardRotateNumber);
+
+            labyrinthModel.getBotManager().setBestCardInsertMove(move);
+            labyrinthModel.getBotManager().setBestPosition(playerPosition);
+            labyrinthModel.getBotManager().applyCardInsertion();
+
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
+    commandMap.put(
+        "card_available_rotated",
+        e -> {
+          try {
+            int rotation = e.getParameters().get("rotation").getAsInt();
+            labyrinthModel.getAvailableCard().rotate(rotation);
           } catch (Exception exc) {
             exc.printStackTrace();
           }
@@ -172,10 +208,26 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
   }
 
   public void setLocalPlayer(String playerId) {
-    this.player = new Player(playerId);
+    this.localPlayer = new Player(playerId);
+    this.playerReceived = true;
+    synchronized (this) {
+      this.notifyAll(); // Notify any waiting threads
+    }
   }
 
-  public void fetchLobbyOptions() {
+  public void waitForPlayer() throws InterruptedException {
+    synchronized (this) {
+      while (!playerReceived) {
+        this.wait();
+      }
+    }
+  }
+
+  public Player getLocalPlayer() {
+    return localPlayer;
+  }
+
+  public void fetchLobby() {
     sendMsg(this, createMessage("fetch_lobbies", null));
   }
 
@@ -199,7 +251,7 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
     msg.addProperty("command", "toggle_player_ready");
 
     JsonObject parameters = new JsonObject();
-    parameters.addProperty("player_id", this.player.getId().toString());
+    parameters.addProperty("player_id", this.localPlayer.getId());
     parameters.addProperty("lobby_id", this.onlineGameManager.getSelectedLobby().getLobbyId());
 
     msg.add("parameters", parameters);
@@ -247,6 +299,18 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
     JsonObject parameters = new JsonObject();
     parameters.addProperty("row", position.getRow());
     parameters.addProperty("col", position.getCol());
+
+    msg.add("parameters", parameters);
+    sendMsg(this, msg.toString());
+  }
+
+  @Override
+  public void rotateAvailableCard(int rotation) {
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "rotate_available_card");
+
+    JsonObject parameters = new JsonObject();
+    parameters.addProperty("rotation", rotation);
 
     msg.add("parameters", parameters);
     sendMsg(this, msg.toString());
@@ -329,5 +393,49 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
   @Override
   public Goal getGoalToSwap() {
     return labyrinthModel.getGoalToSwap();
+  }
+
+  @Override
+  public void cardAnimationEnded() {
+    labyrinthModel.cardAnimationEnded();
+    sendCardAnimationEndedMsg();
+  }
+
+  private void sendCardAnimationEndedMsg() {
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "card_animation_ended");
+
+    msg.add("parameters", null);
+    sendMsg(this, msg.toString());
+  }
+
+  @Override
+  public void playerAnimationEnded() {
+    labyrinthModel.playerAnimationEnded();
+    sendPlayerAnimationEndedMsg();
+  }
+
+  private void sendPlayerAnimationEndedMsg() {
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "player_animation_ended");
+
+    msg.add("parameters", null);
+    sendMsg(this, msg.toString());
+  }
+
+  public Labyrinth getLabyrinthModel() {
+    return labyrinthModel;
+  }
+
+  public void addBotToLobby() {
+    sendNewBotMsg();
+  }
+
+  private void sendNewBotMsg() {
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "request_add_bot");
+
+    msg.add("parameters", null);
+    sendMsg(this, msg.toString());
   }
 }

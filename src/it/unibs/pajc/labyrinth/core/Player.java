@@ -1,36 +1,41 @@
 package it.unibs.pajc.labyrinth.core;
 
 import it.unibs.pajc.labyrinth.core.utility.Position;
-import java.awt.Color;
 import java.util.ArrayDeque;
 import java.util.UUID;
 
 public class Player {
-  private ArrayDeque<Goal> goalsQueue;
-  private Position position;
-  private Position startPosition;
-  private PlayerColor color;
   private String id;
+  private PlayerColor color;
+  private Position startPosition;
+  private Position position;
   private Boolean isReadyToPlay = false;
+  private Boolean isBot = false;
+  private ArrayDeque<Goal> goalsQueue;
 
-  public Player(PlayerColor color, String id) {
+  public Player(PlayerColor color, String id, boolean isBot) {
     this.goalsQueue = new ArrayDeque<>();
     this.position = new Position();
     this.startPosition = new Position();
     this.color = color;
     this.id = id;
+    this.isBot = isBot;
+  }
+
+  public Player(PlayerColor color, String id) {
+    this(color, id, false);
   }
 
   public Player(PlayerColor color) {
-    this(color, UUID.randomUUID().toString());
+    this(color, UUID.randomUUID().toString(), false);
   }
 
   public Player() {
-    this(null, UUID.randomUUID().toString());
+    this(null, UUID.randomUUID().toString(), false);
   }
 
   public Player(String id) {
-    this(null, id);
+    this(null, id, false);
   }
 
   public void addGoal(Goal goal) {
@@ -50,11 +55,11 @@ public class Player {
   }
 
   public String getColorName() {
-    return this.color.getColorName();
+    return this.color != null ? this.color.getColorName() : null;
   }
 
-  public Color getColor() {
-    return this.color.getColor();
+  public PlayerColor getColor() {
+    return this.color;
   }
 
   public Position getPosition() {
@@ -90,5 +95,27 @@ public class Player {
 
   public Boolean isReadyToPlay() {
     return isReadyToPlay;
+  }
+
+  public Boolean isBot() {
+    return isBot;
+  }
+
+  public void setIsBot(Boolean isBot) {
+    this.isBot = isBot;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null || getClass() != obj.getClass()) return false;
+
+    Player other = (Player) obj;
+    return id != null ? id.equals(other.id) : other.id == null;
+  }
+
+  @Override
+  public int hashCode() {
+    return id != null ? id.hashCode() : 0;
   }
 }

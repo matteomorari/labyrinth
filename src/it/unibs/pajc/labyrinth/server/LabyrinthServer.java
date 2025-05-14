@@ -7,7 +7,6 @@ import java.net.Socket;
 import java.time.LocalDateTime;
 
 public class LabyrinthServer {
-
   public static void main(String[] args) {
     LabyrinthServer trisServer = new LabyrinthServer();
     try (ServerSocket server = new ServerSocket(1234)) {

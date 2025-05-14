@@ -1,6 +1,13 @@
-package it.unibs.pajc.labyrinth.client.gameView;
+package it.unibs.pajc.labyrinth.client.views;
 
-import it.unibs.pajc.labyrinth.core.LabyrinthController;
+import it.unibs.pajc.labyrinth.client.components.game.AvailableCardPnl;
+import it.unibs.pajc.labyrinth.client.components.game.BoardPnl;
+import it.unibs.pajc.labyrinth.client.components.game.CurrentGoalPnl;
+import it.unibs.pajc.labyrinth.client.components.game.CurrentPlayerPnl;
+import it.unibs.pajc.labyrinth.client.components.game.GoalsPlayersPnl;
+import it.unibs.pajc.labyrinth.client.components.game.PowerPnl;
+import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;

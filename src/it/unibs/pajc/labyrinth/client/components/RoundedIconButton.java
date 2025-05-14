@@ -1,4 +1,4 @@
-package it.unibs.pajc.labyrinth.client.gameView;
+package it.unibs.pajc.labyrinth.client.components;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -20,7 +20,7 @@ public class RoundedIconButton extends JButton {
   private BufferedImage svgImage;
   private String label;
   private String svgFilePath; // Store the SVG file path for reloading
-
+  private Color bgColor;
   // Configurable sizes
   private int iconDiameter = 45;
   private int labelExtraHeight = 15;
@@ -30,6 +30,7 @@ public class RoundedIconButton extends JButton {
 
   public RoundedIconButton(String svgFilePath) {
     this.svgFilePath = svgFilePath;
+    bgColor = Color.WHITE;
     setPreferredSize(new Dimension(iconDiameter, iconDiameter));
     setContentAreaFilled(false);
     setFocusPainted(false);
@@ -83,39 +84,40 @@ public class RoundedIconButton extends JButton {
     } else {
       setPreferredSize(new Dimension(iconDiameter, iconDiameter));
     }
-    
+
     // Reload the SVG at the new size
     if (svgFilePath != null) {
       loadSVG(svgFilePath);
     }
-    
+
     revalidate();
     repaint();
   }
 
   private void loadSVG(String svgFilePath) {
     try {
-        TranscoderInput input = new TranscoderInput(new File(svgFilePath).toURI().toString());
-        ImageTranscoder transcoder = new ImageTranscoder() {
+      TranscoderInput input = new TranscoderInput(new File(svgFilePath).toURI().toString());
+      ImageTranscoder transcoder =
+          new ImageTranscoder() {
             @Override
             public BufferedImage createImage(int width, int height) {
-                return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+              return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             }
 
             @Override
             public void writeImage(BufferedImage image, TranscoderOutput output) {
-                svgImage = image;
+              svgImage = image;
             }
-        };
+          };
 
-        // Set the desired width and height for the SVG rendering
-        // Use a slightly larger size for better quality
-        float scaleFactor = 1.5f;  // Render at higher resolution for sharper display
-        transcoder.addTranscodingHint(ImageTranscoder.KEY_WIDTH, (float) iconDiameter * scaleFactor);
-        transcoder.addTranscodingHint(ImageTranscoder.KEY_HEIGHT, (float) iconDiameter * scaleFactor);
-        transcoder.transcode(input, null);
+      // Set the desired width and height for the SVG rendering
+      // Use a slightly larger size for better quality
+      float scaleFactor = 1.5f; // Render at higher resolution for sharper display
+      transcoder.addTranscodingHint(ImageTranscoder.KEY_WIDTH, (float) iconDiameter * scaleFactor);
+      transcoder.addTranscodingHint(ImageTranscoder.KEY_HEIGHT, (float) iconDiameter * scaleFactor);
+      transcoder.transcode(input, null);
     } catch (TranscoderException e) {
-        e.printStackTrace();
+      e.printStackTrace();
     }
   }
 
@@ -123,13 +125,14 @@ public class RoundedIconButton extends JButton {
   protected void paintComponent(Graphics g) {
     Graphics2D g2 = (Graphics2D) g.create();
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+    g2.setRenderingHint(
+        RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
     g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
     int width = getWidth();
 
     // Draw the background in the icon area based on borderRadius setting
-    g2.setColor(Color.WHITE);
+    g2.setColor(bgColor);
     if (borderRadius < 0) {
       // Draw a circle if borderRadius is -1 (default)
       g2.fill(new Ellipse2D.Float(0, 0, width, iconDiameter));
@@ -163,33 +166,35 @@ public class RoundedIconButton extends JButton {
     // If we have a stored path, reload at the new size for best quality
     if (svgFilePath != null) {
       try {
-          TranscoderInput input = new TranscoderInput(new File(svgFilePath).toURI().toString());
-          ImageTranscoder transcoder = new ImageTranscoder() {
+        TranscoderInput input = new TranscoderInput(new File(svgFilePath).toURI().toString());
+        ImageTranscoder transcoder =
+            new ImageTranscoder() {
               @Override
               public BufferedImage createImage(int w, int h) {
-                  return new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+                return new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
               }
 
               @Override
               public void writeImage(BufferedImage image, TranscoderOutput output) {
-                  svgImage = image;
+                svgImage = image;
               }
-          };
+            };
 
-          // Set the desired dimensions
-          transcoder.addTranscodingHint(ImageTranscoder.KEY_WIDTH, (float) width);
-          transcoder.addTranscodingHint(ImageTranscoder.KEY_HEIGHT, (float) height);
+        // Set the desired dimensions
+        transcoder.addTranscodingHint(ImageTranscoder.KEY_WIDTH, (float) width);
+        transcoder.addTranscodingHint(ImageTranscoder.KEY_HEIGHT, (float) height);
 
-          transcoder.transcode(input, null);
-          repaint();
+        transcoder.transcode(input, null);
+        repaint();
       } catch (TranscoderException e) {
-          e.printStackTrace();
+        e.printStackTrace();
       }
     } else if (svgImage != null) {
       // Fall back to scaling if path isn't available
       BufferedImage scaledImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
       Graphics2D g2d = scaledImage.createGraphics();
-      g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+      g2d.setRenderingHint(
+          RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
       g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
       g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       g2d.drawImage(svgImage, 0, 0, width, height, null);
@@ -231,5 +236,14 @@ public class RoundedIconButton extends JButton {
         return iconRoundRect.contains(x, y);
       }
     }
+  }
+
+  public void setBgColor(Color bgColor) {
+    this.bgColor = bgColor;
+    repaint();
+  }
+
+  public Color getBgColor() {
+    return bgColor;
   }
 }
