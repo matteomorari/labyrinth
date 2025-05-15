@@ -291,40 +291,46 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
 
   @Override
   public void movePlayer(int row, int col) {
-    JsonObject msg = new JsonObject();
-    msg.addProperty("command", "move_player");
+    if (localPlayer.equals(labyrinthModel.getCurrentPlayer())) {
+      JsonObject msg = new JsonObject();
+      msg.addProperty("command", "move_player");
 
-    JsonObject parameters = new JsonObject();
-    parameters.addProperty("row", row);
-    parameters.addProperty("col", col);
+      JsonObject parameters = new JsonObject();
+      parameters.addProperty("row", row);
+      parameters.addProperty("col", col);
 
-    msg.add("parameters", parameters);
-    sendMsg(this, msg.toString());
+      msg.add("parameters", parameters);
+      sendMsg(this, msg.toString());
+    }
   }
 
   @Override
   public void insertCard(Position position) {
-    JsonObject msg = new JsonObject();
-    msg.addProperty("command", "insert_card");
+    if (localPlayer.equals(labyrinthModel.getCurrentPlayer())) {
+      JsonObject msg = new JsonObject();
+      msg.addProperty("command", "insert_card");
 
-    JsonObject parameters = new JsonObject();
-    parameters.addProperty("row", position.getRow());
-    parameters.addProperty("col", position.getCol());
+      JsonObject parameters = new JsonObject();
+      parameters.addProperty("row", position.getRow());
+      parameters.addProperty("col", position.getCol());
 
-    msg.add("parameters", parameters);
-    sendMsg(this, msg.toString());
+      msg.add("parameters", parameters);
+      sendMsg(this, msg.toString());
+    }
   }
 
   @Override
   public void rotateAvailableCard(int rotation) {
-    JsonObject msg = new JsonObject();
-    msg.addProperty("command", "rotate_available_card");
+    if (localPlayer.equals(labyrinthModel.getCurrentPlayer())) {
+      JsonObject msg = new JsonObject();
+      msg.addProperty("command", "rotate_available_card");
 
-    JsonObject parameters = new JsonObject();
-    parameters.addProperty("rotation", rotation);
+      JsonObject parameters = new JsonObject();
+      parameters.addProperty("rotation", rotation);
 
-    msg.add("parameters", parameters);
-    sendMsg(this, msg.toString());
+      msg.add("parameters", parameters);
+      sendMsg(this, msg.toString());
+    }
   }
 
   @Override
@@ -344,46 +350,53 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
 
   @Override
   public void setPlayerToSwap(Player player) {
-    // labyrinthModel.setPlayerToSwap(player);
-    JsonObject msg = new JsonObject();
-    msg.addProperty("command", "set_player_to_swap");
+    if (localPlayer.equals(labyrinthModel.getCurrentPlayer())) {
+      JsonObject msg = new JsonObject();
+      msg.addProperty("command", "set_player_to_swap");
 
-    JsonObject parameters = new JsonObject();
-    parameters.addProperty("player_id", player.getId());
+      JsonObject parameters = new JsonObject();
+      parameters.addProperty("player_id", player.getId());
 
-    msg.add("parameters", parameters);
-    sendMsg(this, msg.toString());
+      msg.add("parameters", parameters);
+      sendMsg(this, msg.toString());
+    }
   }
 
   @Override
   public void setGoalToSwap(Goal goal) {
-    JsonObject msg = new JsonObject();
-    msg.addProperty("command", "set_goal_to_swap");
+    if (localPlayer.equals(labyrinthModel.getCurrentPlayer())) {
+      JsonObject msg = new JsonObject();
+      msg.addProperty("command", "set_goal_to_swap");
 
-    JsonObject parameters = new JsonObject();
-    parameters.addProperty("goal_position_row", goal.getPosition().getRow());
-    parameters.addProperty("goal_position_col", goal.getPosition().getCol());
+      JsonObject parameters = new JsonObject();
+      parameters.addProperty("goal_position_row", goal.getPosition().getRow());
+      parameters.addProperty("goal_position_col", goal.getPosition().getCol());
 
-    msg.add("parameters", parameters);
-    sendMsg(this, msg.toString());
+      msg.add("parameters", parameters);
+      sendMsg(this, msg.toString());
+    }
   }
 
   @Override
   public void skipTurn() {
-    JsonObject msg = new JsonObject();
-    msg.addProperty("command", "skip_turn");
+    if (localPlayer.equals(labyrinthModel.getCurrentPlayer())) {
+      JsonObject msg = new JsonObject();
+      msg.addProperty("command", "skip_turn");
 
-    msg.add("parameters", null);
-    sendMsg(this, msg.toString());
+      msg.add("parameters", null);
+      sendMsg(this, msg.toString());
+    }
   }
 
   @Override
   public void usePower() {
-    JsonObject msg = new JsonObject();
-    msg.addProperty("command", "use_power");
+    if (localPlayer.equals(labyrinthModel.getCurrentPlayer())) {
+      JsonObject msg = new JsonObject();
+      msg.addProperty("command", "use_power");
 
-    msg.add("parameters", null);
-    sendMsg(this, msg.toString());
+      msg.add("parameters", null);
+      sendMsg(this, msg.toString());
+    }
   }
 
   @Override
