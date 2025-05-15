@@ -49,4 +49,8 @@ public interface LabyrinthController {
   void cardAnimationEnded();
 
   void playerAnimationEnded();
+
+  boolean isGameOver();
+
+  boolean isGameCrashed();
 }

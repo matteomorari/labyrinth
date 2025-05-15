@@ -336,10 +336,7 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
     parameters.addProperty("lobby", LobbyGson.toJson(lobby));
     msg.add("parameters", parameters);
 
-    // Use synchronized block when accessing shared collection
-    synchronized (lobby) {
-      sendNotificationToLobbyPlayers(msg);
-    }
+    sendNotificationToLobbyPlayers(msg);
   }
 
   public static synchronized boolean addLobby(ServerLobby lobby) {
@@ -455,6 +452,54 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
     parameters.addProperty("card_col", insertedCard.getCardInsertPosition().getCol());
     parameters.addProperty("bot_row", futureBotPosition.getRow());
     parameters.addProperty("bot_col", futureBotPosition.getCol());
+
+    msg.add("parameters", parameters);
+    sendNotificationToLobbyPlayers(msg);
+  }
+
+  @Override
+  public void disconnectUser() {
+    // Handle disconnection first
+    handleDisconnection();
+
+    // Then call the parent class disconnect method to clean up resources
+    super.disconnectUser();
+  }
+
+  private void handleDisconnection() {
+    lobbyOperationsLock.lock();
+    try {
+      if (currentLobby != null) {
+        // Remove player from current lobby
+        currentLobby.removePlayer(player);
+        // If there's only one human player left, end the game
+        long humanPlayersCount = currentLobby.getPlayers().stream().filter(p -> !p.isBot()).count();
+
+        // If the player was in a game in progress, end the game
+        if (currentLobby.isGameInProgress()) {
+          removeLobby(currentLobby);
+          sendPlayerDisconnectedNotification(player.getId());
+        } else {
+          // If lobby is empty after player left, remove it
+          if (humanPlayersCount == 0) {
+            removeLobby(currentLobby);
+          }
+          sendLobbyStateUpdate(currentLobby);
+        }
+
+        currentLobby = null;
+      }
+    } finally {
+      lobbyOperationsLock.unlock();
+    }
+  }
+
+  private void sendPlayerDisconnectedNotification(String id) {
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "player_disconnected");
+
+    JsonObject parameters = new JsonObject();
+    parameters.addProperty("player_id", id);
 
     msg.add("parameters", parameters);
     sendNotificationToLobbyPlayers(msg);

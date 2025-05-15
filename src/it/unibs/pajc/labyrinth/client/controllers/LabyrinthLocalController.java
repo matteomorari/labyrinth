@@ -97,4 +97,14 @@ public class LabyrinthLocalController implements LabyrinthController {
   public void playerAnimationEnded() {
     model.playerAnimationEnded();
   }
+
+  @Override
+  public boolean isGameOver() {
+    return model.isGameOver();
+  }
+
+  @Override
+  public boolean isGameCrashed() {
+    return model.isGameCrashed();
+  }
 }

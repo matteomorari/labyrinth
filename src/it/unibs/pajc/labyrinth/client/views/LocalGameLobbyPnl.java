@@ -43,10 +43,10 @@ public class LocalGameLobbyPnl extends JPanel {
     lobbyPnl.setLobby(lobby);
 
     // add 2 players (the minimum to start a game)
-    addNewPlayer();
-    addNewPlayer();
-    // addNewBot();
-    // addNewBot();
+    // addNewPlayer();
+    // addNewPlayer();
+    addNewBot();
+    addNewBot();
 
     // Action buttons panel
     JPanel buttonPanel = new JPanel();
@@ -100,7 +100,7 @@ public class LocalGameLobbyPnl extends JPanel {
     LabyrinthLocalController controller = new LabyrinthLocalController(labyrinthModel);
 
     GamePnl gamePanel = new GamePnl(controller);
-    labyrinthModel.addChangeListener(e -> gamePanel.repaint());
+    labyrinthModel.addChangeListener(e -> gamePanel.update());
 
     // Replace the current panel's content with the game panel
     JPanel parent = (JPanel) getParent();

@@ -14,10 +14,9 @@ import javax.swing.*;
 public class FindOnlineGamePnl extends JPanel {
   private LabyrinthClientController clientController;
   private LobbyPnl currentLobbyPnl;
-  private JButton newGameButton;
+  private JButton createNewLobbyButton;
   private JButton readyButton;
   private JButton addBotButton;
-  private JButton createNewLobbyButton;
   private ArrayList<Lobby> availableLobbies;
   private JList<String> lobbiesJList;
   private Lobby currentLobby;
@@ -102,8 +101,6 @@ public class FindOnlineGamePnl extends JPanel {
     buttonPanel.setPreferredSize(new Dimension(0, 60));
     add(buttonPanel, BorderLayout.SOUTH);
 
-    newGameButton = new JButton("NEW GAME");
-    newGameButton.setPreferredSize(new Dimension(200, 50));
     readyButton = new JButton("READY TO PLAY");
     readyButton.setPreferredSize(new Dimension(200, 50));
     addBotButton = new JButton("ADD BOT");
@@ -111,40 +108,11 @@ public class FindOnlineGamePnl extends JPanel {
     createNewLobbyButton = new JButton("CREATE NEW LOBBY");
     createNewLobbyButton.setPreferredSize(new Dimension(200, 50));
 
-    buttonPanel.add(newGameButton);
     buttonPanel.add(readyButton);
     buttonPanel.add(addBotButton);
     buttonPanel.add(createNewLobbyButton);
 
     // Add action listeners
-    newGameButton.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            System.out.println("New Game button clicked!");
-            // TODO: Add logic to handle creating a new game
-          }
-        });
-
-    readyButton.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            if (currentLobby != null) {
-              clientController.togglePlayerReadyToPlay();
-            }
-          }
-        });
-
-    addBotButton.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            if (currentLobby != null) {
-              clientController.addBotToLobby();
-            }
-          }
-        });
     createNewLobbyButton.addActionListener(
         new ActionListener() {
           @Override
@@ -174,6 +142,25 @@ public class FindOnlineGamePnl extends JPanel {
             }
           }
         });
+    readyButton.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            if (currentLobby != null) {
+              clientController.togglePlayerReadyToPlay();
+            }
+          }
+        });
+
+    addBotButton.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            if (currentLobby != null) {
+              clientController.addBotToLobby();
+            }
+          }
+        });
 
     lobbiesJList.addListSelectionListener(
         e -> {
@@ -196,7 +183,7 @@ public class FindOnlineGamePnl extends JPanel {
       Labyrinth labyrinthModel = clientController.getLabyrinthModel();
 
       GamePnl gamePanel = new GamePnl(clientController);
-      labyrinthModel.addChangeListener(e -> gamePanel.repaint());
+      labyrinthModel.addChangeListener(e -> gamePanel.update());
 
       // Replace the current panel's content with the game panel
       JPanel parent = (JPanel) getParent();

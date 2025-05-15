@@ -10,7 +10,8 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 
-// TODO: add a remove method to remove the avatar from the lobby
+// ! TODO: add a remove method to remove the avatar from the lobby
+// TODO: add a label to show if a player is a bot or a human
 public class AvatarPnl extends JPanel {
   private Player player;
   private static final Color bgColor = Color.WHITE;

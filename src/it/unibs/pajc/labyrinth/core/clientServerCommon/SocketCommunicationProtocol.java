@@ -15,14 +15,14 @@ public class SocketCommunicationProtocol {
   protected PrintWriter outputStream;
   protected HashMap<String, Consumer<LabyrinthEvent>> commandMap;
   protected boolean isRunning = false;
-  private static CopyOnWriteArrayList<SocketCommunicationProtocol> connectedPlayers =
+  private static CopyOnWriteArrayList<SocketCommunicationProtocol> connectedUsers =
       new CopyOnWriteArrayList<>();
   private volatile boolean initialized = false;
 
   public SocketCommunicationProtocol(Socket client) {
     commandMap = new HashMap<>();
     connect(client);
-    connectedPlayers.add(this);
+    connectedUsers.add(this);
   }
 
   public void connect(Socket client) {
@@ -58,12 +58,17 @@ public class SocketCommunicationProtocol {
         else System.out.println("comando non riconosciuto");
       }
 
-      System.out.printf("Collegamento terminato\n");
-      connectedPlayers.remove(this);
-      close();
     } catch (Exception ex) {
       ex.printStackTrace();
+    } finally {
+      disconnectUser();
+      close();
     }
+  }
+
+  public void disconnectUser() {
+    System.out.printf("Collegamento terminato\n");
+    connectedUsers.remove(this);
   }
 
   public boolean isInitialized() {
@@ -106,7 +111,7 @@ public class SocketCommunicationProtocol {
     return msg.toString();
   }
 
-  public static CopyOnWriteArrayList<SocketCommunicationProtocol> getConnectedPlayers() {
-    return connectedPlayers;
+  public static CopyOnWriteArrayList<SocketCommunicationProtocol> getConnectedUsers() {
+    return connectedUsers;
   }
 }

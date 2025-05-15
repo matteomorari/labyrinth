@@ -194,6 +194,17 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
             exc.printStackTrace();
           }
         });
+    commandMap.put(
+        "player_disconnected",
+        e -> {
+          try {
+            String playerId = e.getParameters().get("player_id").getAsString();
+            labyrinthModel.setGameCrashed(true);
+            // TODO: to implement
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
   }
 
   public boolean connect(String serverAddress, int serverPort) {
@@ -449,5 +460,15 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
 
     msg.add("parameters", parameters);
     sendMsg(this, msg.toString());
+  }
+
+  @Override
+  public boolean isGameOver() {
+    return labyrinthModel.isGameOver();
+  }
+
+  @Override
+  public boolean isGameCrashed() {
+    return labyrinthModel.isGameCrashed();
   }
 }

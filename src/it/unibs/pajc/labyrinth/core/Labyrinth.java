@@ -24,6 +24,8 @@ public class Labyrinth extends BaseModel {
   private transient BotMoveCalcListener botMoveListener = null;
   private boolean waitingForCardAnimation = false;
   private boolean waitingForPlayerAnimation = false;
+  private boolean isGameOver = false;
+  private boolean isGameCrashed = false; // due to user disconnection
 
   private int boardSize;
   private ArrayDeque<Player> players;
@@ -184,6 +186,12 @@ public class Labyrinth extends BaseModel {
   public void playerAnimationEnded() {
     isGoalFound(getCurrentPlayer());
     setWaitingForPlayerAnimation(false);
+    checkIfGameIsOver();
+
+    if (isGameOver() || isGameCrashed()) {
+      fireChangeListener();
+      return;
+    }
 
     if (hasCurrentPlayerDoubleTurn) {
       hasCurrentPlayerInserted = false;
@@ -191,8 +199,6 @@ public class Labyrinth extends BaseModel {
     } else {
       skipTurn();
     }
-
-    isGameFinished();
   }
 
   public void initGame() {
@@ -767,14 +773,13 @@ public class Labyrinth extends BaseModel {
     this.lastInsertedCardPosition = lastInsertedCardPosition;
   }
 
-  public boolean isGameFinished() {
+  public void checkIfGameIsOver() {
     for (Player player : players) {
       if (player.getGoals().isEmpty() && player.getPosition().equals(player.getStartPosition())) {
         System.out.println("game over");
-        return true;
+        setGameOver(true);
       }
     }
-    return false;
   }
 
   public boolean isGoalFound(Player player) {
@@ -870,5 +875,24 @@ public class Labyrinth extends BaseModel {
 
   public void setBotManager(BotManager botManager) {
     this.botManager = botManager;
+  }
+
+  public boolean isGameOver() {
+    return isGameOver;
+  }
+
+  public void setGameOver(boolean isGameEnded) {
+    this.isGameOver = isGameEnded;
+  }
+
+  public boolean isGameCrashed() {
+    return isGameCrashed;
+  }
+
+  public void setGameCrashed(boolean isGameCrashed) {
+    this.isGameCrashed = isGameCrashed;
+    if (isGameCrashed) {
+      fireChangeListener();
+    }
   }
 }

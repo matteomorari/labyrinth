@@ -14,6 +14,7 @@ import java.awt.event.ComponentEvent;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -48,16 +49,16 @@ public class GamePnl extends JPanel {
     JPanel leftPanel = createLeftPanel();
     JPanel rightPanel = createRightPanel();
     JPanel gameBoardPanel = new BoardPnl(controller);
-    
+
     // Initialize scroll panes
     leftScrollPnl = createScrollPane(leftPanel, leftColumnWidth);
     rightScrollPnl = createScrollPane(rightPanel, rightColumnWidth);
-    
+
     // Add panels to the layout
     add(leftScrollPnl, BorderLayout.WEST);
     add(rightScrollPnl, BorderLayout.EAST);
     add(gameBoardPanel, BorderLayout.CENTER);
-    
+
     // Register listener for resizing
     addComponentListener(
         new ComponentAdapter() {
@@ -161,5 +162,35 @@ public class GamePnl extends JPanel {
       leftScrollPnl.setPreferredSize(new Dimension(leftColumnWidth, 0));
       rightScrollPnl.setPreferredSize(new Dimension(rightColumnWidth, 0));
     }
+  }
+
+  public void update() {
+    if (controller.isGameOver()) {
+      JOptionPane.showMessageDialog(
+          this,
+          "Game Over: " + controller.getCurrentPlayer().getColorName() + " won",
+          "Game Over",
+          JOptionPane.INFORMATION_MESSAGE);
+      goBackToHome();
+    }
+    if (controller.isGameCrashed()) {
+      JOptionPane.showMessageDialog(
+          this,
+          "A player has crashed. You will be redirected to the home page.",
+          "Game Crashed",
+          JOptionPane.ERROR_MESSAGE);
+      goBackToHome();
+    }
+
+    repaint();
+  }
+
+  private void goBackToHome() {
+    JPanel parent = (JPanel) getParent();
+    parent.removeAll();
+    parent.setLayout(new BorderLayout());
+    parent.add(new StartPnl(), BorderLayout.CENTER);
+    parent.revalidate();
+    parent.repaint();
   }
 }
