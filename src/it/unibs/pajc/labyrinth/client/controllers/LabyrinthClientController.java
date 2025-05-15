@@ -136,7 +136,7 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
         e -> {
           try {
             int rotation = e.getParameters().get("rotation").getAsInt();
-            labyrinthModel.getAvailableCard().rotate(rotation);
+            labyrinthModel.rotateAvailableCard(rotation);
           } catch (Exception exc) {
             exc.printStackTrace();
           }
@@ -198,9 +198,9 @@ public class LabyrinthClientController extends SocketCommunicationProtocol
         "player_disconnected",
         e -> {
           try {
+            // TODO: to implement
             String playerId = e.getParameters().get("player_id").getAsString();
             labyrinthModel.setGameCrashed(true);
-            // TODO: to implement
           } catch (Exception exc) {
             exc.printStackTrace();
           }

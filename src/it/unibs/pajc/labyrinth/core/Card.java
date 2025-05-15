@@ -176,4 +176,8 @@ public class Card extends Node {
   public int hashCode() {
     return uniqueID != null ? uniqueID.hashCode() : 0;
   }
+
+  public String getID() {
+    return uniqueID;
+  }
 }

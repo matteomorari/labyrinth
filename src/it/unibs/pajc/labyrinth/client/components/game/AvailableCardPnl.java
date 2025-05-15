@@ -8,6 +8,8 @@ import it.unibs.pajc.labyrinth.client.components.RoundedIconButton;
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Card;
+import it.unibs.pajc.labyrinth.core.utility.Orientation;
+
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -40,6 +42,8 @@ public class AvailableCardPnl extends JPanel implements Animatable {
   private static final String TITLE_FONT_FAMILY = "Times New Roman";
 
   private LabyrinthController controller;
+  private String availableCardId;
+  private Orientation availableCardOrientation;
   private BufferedImage availableCardImage;
   private int cardWidth = DEFAULT_CARD_WIDTH;
   private final Font titleFont = new Font(TITLE_FONT_FAMILY, Font.BOLD, TITLE_FONT_SIZE);
@@ -52,7 +56,9 @@ public class AvailableCardPnl extends JPanel implements Animatable {
 
   public AvailableCardPnl(LabyrinthController controller) {
     this.controller = controller;
-    availableCardImage = getCorrectCardImage();
+    availableCardId = controller.getAvailableCard().getID();
+    availableCardOrientation = controller.getAvailableCard().getOrientation();
+    availableCardImage = getCardImage();
 
     // Initialize the rotate button
     rotateButton = new RoundedIconButton("resource\\images\\rotate.svg");
@@ -178,9 +184,15 @@ public class AvailableCardPnl extends JPanel implements Animatable {
     // Check if we need to recreate the scaled background
     cardWidth = Math.max(DEFAULT_CARD_WIDTH, panelWidth - CARD_HORIZONTAL_MARGIN);
 
-    // if (controller.getHasCurrentPlayerInserted()) {
-    availableCardImage = getCorrectCardImage();
-    // ImageCntrl.valueOf("CARD_" + controller.getAvailableCard().getType()).getImage();
+    // check if the orientation of the card has changed
+    Card newCard = controller.getAvailableCard();
+    if (availableCardId.equals(newCard.getID()) && availableCardOrientation != newCard.getOrientation()) {
+      startCardRotationAnimation();
+    }
+    availableCardId = newCard.getID();
+    availableCardOrientation = newCard.getOrientation();
+
+    availableCardImage = getCardImage();
     availableCardImage = scaleImage(availableCardImage, cardWidth, Integer.MAX_VALUE);
   }
 
@@ -206,7 +218,7 @@ public class AvailableCardPnl extends JPanel implements Animatable {
     return scaledImage;
   }
 
-  private BufferedImage getCorrectCardImage() {
+  private BufferedImage getCardImage() {
     Card card = controller.getAvailableCard();
     CardImage cardImage =
         new CardImage(
@@ -217,7 +229,6 @@ public class AvailableCardPnl extends JPanel implements Animatable {
 
   private void handleRotationCardBtn() {
     controller.rotateAvailableCard(1);
-    startCardRotationAnimation();
   }
 
   private void startCardRotationAnimation() {

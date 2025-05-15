@@ -144,7 +144,7 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
 
             // check if the sender is the current player
             if (sender.player.equals(labyrinthModel.getCurrentPlayer())) {
-              labyrinthModel.getAvailableCard().rotate(rotation);
+              labyrinthModel.rotateAvailableCard(rotation);
               sendCardAvailableRotatedMsg(rotation);
             }
           } catch (Exception exc) {

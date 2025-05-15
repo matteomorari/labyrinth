@@ -62,7 +62,7 @@ public class LabyrinthClientMain {
       tempPnl.setLayout(new BorderLayout());
 
       GamePnl gamePanel = new GamePnl(controller);
-      labyrinthModel.addChangeListener(e -> gamePanel.repaint());
+      labyrinthModel.addChangeListener(e -> gamePanel.update());
       tempPnl.add(gamePanel, BorderLayout.CENTER);
       tempPnl.setVisible(true);
       JButton button = new JButton("move bot");

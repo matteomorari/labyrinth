@@ -40,7 +40,7 @@ public class LabyrinthLocalController implements LabyrinthController {
   }
 
   public void rotateAvailableCard(int rotation) {
-    model.getAvailableCard().rotate(rotation);
+    model.rotateAvailableCard(rotation);
   }
 
   public ArrayList<Position> getLastPlayerMovedPath() {

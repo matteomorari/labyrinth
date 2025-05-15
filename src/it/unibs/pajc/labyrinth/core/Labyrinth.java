@@ -895,4 +895,11 @@ public class Labyrinth extends BaseModel {
       fireChangeListener();
     }
   }
+
+  public void rotateAvailableCard(int rotationCount) {
+    if(!hasCurrentPlayerInserted) {
+      getAvailableCard().rotate(rotationCount);
+      fireChangeListener();
+    }
+  }
 }
