@@ -80,7 +80,7 @@ public class FindOnlineGamePnl extends JPanel {
           }
           panel.add(label, BorderLayout.WEST);
 
-          SvgIconButton icon = new SvgIconButton("resource\\images\\rotate.svg");
+          SvgIconButton icon = new SvgIconButton("resource\\icons\\rotate.svg");
           icon.setBorderRadius(-1);
           icon.setButtonSize(30, 30);
           icon.setSvgIconSize(30, 30);

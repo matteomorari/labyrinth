@@ -60,14 +60,14 @@ public class AvailableCardPnl extends JPanel implements Animatable {
     availableCardImage = getCardImage();
 
     // Initialize the rotate button
-    rotateButton = new SvgIconButton("resource\\images\\rotate.svg");
+    rotateButton = new SvgIconButton("resource\\icons\\rotate.svg");
     rotateButton.setButtonSize(50, 0);
     rotateButton.setBorderRadius(40);
     rotateButton.setSvgIconSize(40, 40);
     rotateButton.addActionListener(e -> handleRotationCardBtn());
 
     // Initialize the skip turn button
-    skipTurnButton = new SvgIconButton("resource\\images\\skip.svg");
+    skipTurnButton = new SvgIconButton("resource\\icons\\skip.svg");
     skipTurnButton.setButtonSize(50, 0);
     skipTurnButton.setBorderRadius(40);
     skipTurnButton.setSvgIconSize(40, 40);

@@ -20,9 +20,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-public class StartPnl extends JPanel {
+public class HomePnl extends JPanel {
 
-  public StartPnl() {
+  public HomePnl() {
     setLayout(new BorderLayout());
 
     // Title label at the top
@@ -44,7 +44,7 @@ public class StartPnl extends JPanel {
     gbc.anchor = GridBagConstraints.CENTER; // Center the buttons
 
     // "Local" button
-    SvgIconButton localButton = new SvgIconButton("resource\\images\\rotate.svg", "LOCAL");
+    SvgIconButton localButton = new SvgIconButton("resource\\icons\\computer.svg", "LOCAL");
     localButton.setBorderRadius(20);
     localButton.setButtonSize(200, 50);
     localButton.setSvgIconSize(150, 150);
@@ -56,7 +56,7 @@ public class StartPnl extends JPanel {
     centerPanel.add(localButton, gbc);
 
     // "Online" button
-    SvgIconButton onlineButton = new SvgIconButton("resource\\images\\rotate.svg", "ONLINE");
+    SvgIconButton onlineButton = new SvgIconButton("resource\\icons\\online.svg", "ONLINE");
     onlineButton.setBorderRadius(20);
     onlineButton.setButtonSize(200, 50);
     onlineButton.setSvgIconSize(150, 150);

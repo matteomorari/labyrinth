@@ -51,7 +51,7 @@ public class AvatarPnl extends JPanel {
     g2.drawImage(avatarImage, x, y, this);
 
     String playerTypeIconPath =
-        player.isBot() ? "resource\\images\\bot.svg" : "resource\\images\\player.svg";
+        player.isBot() ? "resource\\icons\\bot.svg" : "resource\\icons\\player.svg";
 
     SvgIconButton playerTypeButton = new SvgIconButton(playerTypeIconPath);
     playerTypeButton.setBgColor(Color.LIGHT_GRAY);
@@ -66,7 +66,7 @@ public class AvatarPnl extends JPanel {
     add(playerTypeButton);
 
     if(canBeRemoved != null && canBeRemoved) {
-      SvgIconButton removePlayerButton = new SvgIconButton("resource\\images\\delete.svg");
+      SvgIconButton removePlayerButton = new SvgIconButton("resource\\icons\\delete.svg");
       removePlayerButton.setBgColor(new Color(255, 66, 66));
       removePlayerButton.setBorderRadius(-1);
       removePlayerButton.setButtonSize(35, 0);

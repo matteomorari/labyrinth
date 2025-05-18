@@ -189,7 +189,7 @@ public class GamePnl extends JPanel {
     JPanel parent = (JPanel) getParent();
     parent.removeAll();
     parent.setLayout(new BorderLayout());
-    parent.add(new StartPnl(), BorderLayout.CENTER);
+    parent.add(new HomePnl(), BorderLayout.CENTER);
     parent.revalidate();
     parent.repaint();
   }

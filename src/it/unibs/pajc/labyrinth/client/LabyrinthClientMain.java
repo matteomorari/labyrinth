@@ -2,7 +2,7 @@ package it.unibs.pajc.labyrinth.client;
 
 import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthLocalController;
 import it.unibs.pajc.labyrinth.client.views.GamePnl;
-import it.unibs.pajc.labyrinth.client.views.StartPnl;
+import it.unibs.pajc.labyrinth.client.views.HomePnl;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
 import java.awt.BorderLayout;
@@ -71,7 +71,7 @@ public class LabyrinthClientMain {
       button.addActionListener(e -> labyrinthModel.startBotPlayerTurn());
       frame.add(tempPnl, BorderLayout.CENTER);
     } else {
-      frame.add(new StartPnl(), BorderLayout.CENTER);
+      frame.add(new HomePnl(), BorderLayout.CENTER);
     }
   }
 }

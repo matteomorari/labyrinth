@@ -39,7 +39,7 @@ public class PowerPnl extends JPanel {
   public PowerPnl(LabyrinthController controller) {
     this.controller = controller;
 
-    useButton = new SvgIconButton("resource\\images\\power.svg");
+    useButton = new SvgIconButton("resource\\icons\\power.svg");
     useButton.setButtonSize(50, 0);
     useButton.setBorderRadius(40);
     useButton.setSvgIconSize(40, 40);
