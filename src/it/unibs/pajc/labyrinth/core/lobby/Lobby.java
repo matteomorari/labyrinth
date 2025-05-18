@@ -12,14 +12,14 @@ public class Lobby {
   private volatile String lobbyName;
   private ArrayList<Player> playersList;
   private final String LOBBY_ID;
-  private Boolean gameInProgress;
+  private Boolean isGameInProgress;
   private HashSet<PlayerColor> availableColors;
 
   public Lobby(String lobbyName, Labyrinth.EnvironmentType environmentType) {
     this.playersList = new ArrayList<>();
     this.LOBBY_ID = UUID.randomUUID().toString();
     this.lobbyName = lobbyName;
-    this.gameInProgress = false;
+    this.isGameInProgress = false;
     this.labyrinth = new Labyrinth(7, environmentType);
     this.availableColors = new HashSet<>();
     availableColors = new HashSet<>(java.util.Arrays.asList(PlayerColor.values()));
@@ -33,7 +33,7 @@ public class Lobby {
     if (getPlayers().size() >= Labyrinth.MAX_PLAYERS) {
       throw new IllegalStateException("Lobby is full. Cannot add more players.");
     }
-    if (gameInProgress) {
+    if (isGameInProgress) {
       throw new IllegalStateException("Game is already in progress. Cannot add more players.");
     }
 
@@ -80,7 +80,7 @@ public class Lobby {
       labyrinth.addPlayer(player);
     }
     labyrinth.initGame();
-    gameInProgress = true;
+    isGameInProgress = true;
   }
 
   public int getPlayerCount() {
@@ -94,12 +94,12 @@ public class Lobby {
     return LOBBY_ID;
   }
 
-  public void setGameInProgress(Boolean gameInProgress) {
-    this.gameInProgress = gameInProgress;
+  public void setIsGameInProgress(Boolean gameInProgress) {
+    this.isGameInProgress = gameInProgress;
   }
 
   public Boolean isGameInProgress() {
-    return gameInProgress;
+    return isGameInProgress;
   }
 
   public Labyrinth getLabyrinth() {

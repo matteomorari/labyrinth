@@ -1,10 +1,9 @@
 package it.unibs.pajc.labyrinth.client.components;
 
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
-import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
+import it.unibs.pajc.labyrinth.client.controllers.lobby.LobbyController;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.PlayerColor;
-import it.unibs.pajc.labyrinth.core.lobby.Lobby;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -28,13 +27,14 @@ public class LobbyPnl extends JPanel {
   private static final int GRID_INSET = 20;
   private static final int ARC_RADIUS = 40;
 
-  private Lobby lobby;
+  private LobbyController lobbyController;
   private ArrayList<AvatarPnl> avatarPnlList;
   // use to, in case of online game, allow only this player to change the avatar.
   // If null it means it's a local game and so all players can change their avatar.
   private Player localPlayer;
 
-  public LobbyPnl(Player localPlayer) {
+  public LobbyPnl(LobbyController lobbyController, Player localPlayer) {
+    this.lobbyController = lobbyController;
     this.localPlayer = localPlayer;
     setPreferredSize(new Dimension(0, 100));
     setLayout(new GridBagLayout());
@@ -42,14 +42,14 @@ public class LobbyPnl extends JPanel {
         new java.awt.event.ComponentAdapter() {
           @Override
           public void componentResized(java.awt.event.ComponentEvent e) {
-            update(lobby);
+            update();
           }
         });
     avatarPnlList = new ArrayList<>();
   }
 
-  public LobbyPnl() {
-    this(null);
+  public LobbyPnl(LobbyController lobbyController) {
+    this(lobbyController, null);
   }
 
   @Override
@@ -63,11 +63,7 @@ public class LobbyPnl extends JPanel {
     g2.dispose();
   }
 
-  public void update(Lobby gameLobby) {
-    if (gameLobby == null) {
-      return;
-    }
-    this.lobby = gameLobby;
+  public void update() {
     removeAll();
     setLayout(new GridBagLayout());
     GridBagConstraints gbc = new GridBagConstraints();
@@ -77,7 +73,7 @@ public class LobbyPnl extends JPanel {
     int avatarWidth = AVATAR_SIZE + AVATAR_INSET;
     int columns = panelWidth >= avatarWidth * AVATAR_COUNT ? AVATAR_COUNT : 2;
 
-    ArrayList<Player> players = lobby.getPlayers();
+    ArrayList<Player> players = lobbyController.getPlayers();
     avatarPnlList.clear();
     if (players != null && !players.isEmpty()) {
       for (int i = 0; i < AVATAR_COUNT; i++) {
@@ -112,7 +108,7 @@ public class LobbyPnl extends JPanel {
               if (player == null) return;
 
               // Get available colors from the lobby
-              HashSet<PlayerColor> availableColors = lobby.getAvailableColors();
+              HashSet<PlayerColor> availableColors = lobbyController.getAvailableColors();
 
               // Build selection items for the dialog
               List<SelectionDialog.SelectionItem> items = new ArrayList<>();
@@ -122,7 +118,7 @@ public class LobbyPnl extends JPanel {
                 // Create a Runnable variable for the color selection action
                 Runnable onAvatarChange =
                     () -> {
-                      lobby.setPlayerColor(player, color);
+                      lobbyController.setPlayerColor(player, color);
                       repaint();
                     };
 
@@ -142,13 +138,12 @@ public class LobbyPnl extends JPanel {
     repaint();
   }
 
-  public void setLobby(Lobby gameLobby) {
-    this.lobby = gameLobby;
-    update(gameLobby);
+  public void setLobbyController(LobbyController lobbyController) {
+    this.lobbyController = lobbyController;
   }
 
-  public Lobby getLobby() {
-    return lobby;
+  public LobbyController getLobbyController() {
+    return lobbyController;
   }
 
   public ArrayList<AvatarPnl> getAvatarPanels() {

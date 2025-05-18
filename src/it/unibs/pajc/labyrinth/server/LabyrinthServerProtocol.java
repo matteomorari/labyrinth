@@ -17,6 +17,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 // ! TODO: delete a lobby when the game end (and also when the is no player in the lobby??)
+// TODO: separate the lobby and game as in the client?
 public class LabyrinthServerProtocol extends SocketCommunicationProtocol
     implements BotMoveCalcListener {
   private volatile ServerLobby currentLobby;

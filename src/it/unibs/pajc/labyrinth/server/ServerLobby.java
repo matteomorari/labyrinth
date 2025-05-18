@@ -3,7 +3,6 @@ package it.unibs.pajc.labyrinth.server;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.lobby.Lobby;
-
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -42,7 +41,7 @@ public class ServerLobby extends Lobby {
         getLabyrinth().addPlayer(player);
       }
       getLabyrinth().initGame();
-      setGameInProgress(true);
+      setIsGameInProgress(true);
 
     } finally {
       lock.unlock();

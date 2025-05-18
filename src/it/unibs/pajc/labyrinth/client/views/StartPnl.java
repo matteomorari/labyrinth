@@ -2,8 +2,10 @@ package it.unibs.pajc.labyrinth.client.views;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import it.unibs.pajc.labyrinth.client.components.SvgIconButton;
-import it.unibs.pajc.labyrinth.client.controllers.LabyrinthClientController;
-import it.unibs.pajc.labyrinth.core.lobby.OnlineGameManager;
+import it.unibs.pajc.labyrinth.client.controllers.ClientSocketProtocol;
+import it.unibs.pajc.labyrinth.client.controllers.lobby.LobbyClientController;
+import it.unibs.pajc.labyrinth.client.controllers.lobby.LobbyLocalController;
+import it.unibs.pajc.labyrinth.core.lobby.LobbyManager;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -86,7 +88,15 @@ public class StartPnl extends JPanel {
 
   /** Creates a new local game and displays the game panel */
   private void createLocalGame() {
-    LocalGameLobbyPnl localGameLobbyPnl = new LocalGameLobbyPnl();
+    LobbyManager onlineGameManager = new LobbyManager();
+    LobbyLocalController lobbyLocalController = new LobbyLocalController(onlineGameManager);
+    lobbyLocalController.createLobby("Local Game");
+    LocalGameLobbyPnl localGameLobbyPnl = new LocalGameLobbyPnl(lobbyLocalController);
+    onlineGameManager.addChangeListener(
+        e -> {
+          // localGameLobbyPnl.repaint();
+          localGameLobbyPnl.update();
+        });
     replaceParentPnlContent(localGameLobbyPnl);
   }
 
@@ -95,17 +105,16 @@ public class StartPnl extends JPanel {
     Dotenv dotenv = Dotenv.load();
     String serverIp = dotenv.get("SERVER_IP", "localhost");
     int serverPort = Integer.parseInt(dotenv.get("SERVER_PORT", "2234"));
-    OnlineGameManager onlineGameManager = new OnlineGameManager();
 
-    LabyrinthClientController clientCntrl = new LabyrinthClientController(onlineGameManager);
-    clientCntrl.connect(serverIp, serverPort);
+    ClientSocketProtocol clientSocketController = new ClientSocketProtocol();
+    clientSocketController.connect(serverIp, serverPort);
 
     // Wait until the protocol thread is initialized
     // TODO: is synchronized needed here?
-    synchronized (clientCntrl) {
-      while (!clientCntrl.isInitialized()) {
+    synchronized (clientSocketController) {
+      while (!clientSocketController.isInitialized()) {
         try {
-          clientCntrl.wait();
+          clientSocketController.wait();
         } catch (InterruptedException e) {
           Thread.currentThread().interrupt();
           System.err.println("Interrupted while waiting for protocol thread initialization.");
@@ -115,19 +124,21 @@ public class StartPnl extends JPanel {
 
     // Wait for the player to be set (new_player command received)
     try {
-      clientCntrl.waitForPlayer();
+      LobbyManager onlineGameManager = new LobbyManager();
+      LobbyClientController lobbyClientController =
+          new LobbyClientController(clientSocketController, onlineGameManager);
+      lobbyClientController.waitForPlayer();
+      FindOnlineGamePnl findOnlineGamePnl = new FindOnlineGamePnl(lobbyClientController);
+      onlineGameManager.addChangeListener(
+          e -> {
+            findOnlineGamePnl.updateData();
+          });
+      lobbyClientController.fetchLobby();
+      replaceParentPnlContent(findOnlineGamePnl);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       System.err.println("Interrupted while waiting for player data from server.");
     }
-
-    FindOnlineGamePnl findOnlineGamePnl = new FindOnlineGamePnl(clientCntrl);
-    onlineGameManager.addChangeListener(
-        e -> {
-          findOnlineGamePnl.updateData();
-        });
-    clientCntrl.fetchLobby();
-    replaceParentPnlContent(findOnlineGamePnl);
   }
 
   private void replaceParentPnlContent(JPanel pnl) {

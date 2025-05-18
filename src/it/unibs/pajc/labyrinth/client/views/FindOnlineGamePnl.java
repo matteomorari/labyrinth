@@ -2,8 +2,10 @@ package it.unibs.pajc.labyrinth.client.views;
 
 import it.unibs.pajc.labyrinth.client.components.LobbyPnl;
 import it.unibs.pajc.labyrinth.client.components.SvgIconButton;
-import it.unibs.pajc.labyrinth.client.controllers.LabyrinthClientController;
+import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthClientController;
+import it.unibs.pajc.labyrinth.client.controllers.lobby.LobbyClientController;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
+import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.lobby.Lobby;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,7 +14,7 @@ import java.util.ArrayList;
 import javax.swing.*;
 
 public class FindOnlineGamePnl extends JPanel {
-  private LabyrinthClientController clientController;
+  private LobbyClientController lobbyController;
   private LobbyPnl currentLobbyPnl;
   private JButton createNewLobbyButton;
   private JButton readyButton;
@@ -21,8 +23,8 @@ public class FindOnlineGamePnl extends JPanel {
   private JList<String> lobbiesJList;
   private Lobby currentLobby;
 
-  public FindOnlineGamePnl(LabyrinthClientController clientController) {
-    this.clientController = clientController;
+  public FindOnlineGamePnl(LobbyClientController lobbyController) {
+    this.lobbyController = lobbyController;
     this.availableLobbies = new ArrayList<>();
     this.currentLobby = null;
     setPreferredSize(new Dimension(800, 600));
@@ -93,7 +95,7 @@ public class FindOnlineGamePnl extends JPanel {
     add(lobbyListPnl, BorderLayout.WEST);
 
     // lobby panel
-    currentLobbyPnl = new LobbyPnl(clientController.getLocalPlayer());
+    currentLobbyPnl = new LobbyPnl(lobbyController, lobbyController.getLocalPlayer());
     add(currentLobbyPnl, BorderLayout.CENTER);
 
     // Action buttons panel
@@ -131,7 +133,7 @@ public class FindOnlineGamePnl extends JPanel {
                     return;
                   }
                 }
-                clientController.createLobby(lobbyName);
+                lobbyController.createLobby(lobbyName);
               } else {
                 JOptionPane.showMessageDialog(
                     FindOnlineGamePnl.this,
@@ -147,7 +149,7 @@ public class FindOnlineGamePnl extends JPanel {
           @Override
           public void actionPerformed(ActionEvent e) {
             if (currentLobby != null) {
-              clientController.togglePlayerReadyToPlay();
+              lobbyController.togglePlayerReadyToPlay();
             }
           }
         });
@@ -157,7 +159,7 @@ public class FindOnlineGamePnl extends JPanel {
           @Override
           public void actionPerformed(ActionEvent e) {
             if (currentLobby != null) {
-              clientController.addBotToLobby();
+              lobbyController.addBotToLobby();
             }
           }
         });
@@ -168,21 +170,25 @@ public class FindOnlineGamePnl extends JPanel {
             int selectedIndex = lobbiesJList.getSelectedIndex();
             if (selectedIndex != -1) {
               currentLobby = availableLobbies.get(selectedIndex);
-              clientController.joinLobby(currentLobby.getLobbyId());
+              lobbyController.joinLobby(currentLobby.getLobbyId());
             }
           }
         });
   }
 
   public void updateData() {
-    currentLobby = clientController.getOnlineGameManager().getSelectedLobby();
+    currentLobby = lobbyController.getSelectedLobby();
 
     // if on an update the game is in progress, this means that the game is started and the
     // so we have to switch to the game panel
     if (currentLobby != null && currentLobby.isGameInProgress()) {
-      Labyrinth labyrinthModel = clientController.getLabyrinthModel();
+      Labyrinth labyrinthModel = lobbyController.getLabyrinth();
+      Player localPlayer = lobbyController.getLocalPlayer();
 
-      GamePnl gamePanel = new GamePnl(clientController);
+      LabyrinthClientController labyrinthClientController =
+          new LabyrinthClientController(
+              lobbyController.getConnectionProtocol(), labyrinthModel, localPlayer);
+      GamePnl gamePanel = new GamePnl(labyrinthClientController);
       labyrinthModel.addChangeListener(e -> gamePanel.update());
 
       // Replace the current panel's content with the game panel
@@ -194,9 +200,9 @@ public class FindOnlineGamePnl extends JPanel {
       parent.repaint();
     }
 
-    this.availableLobbies = clientController.getOnlineGameManager().getAvailableLobbies();
+    this.availableLobbies = lobbyController.getAvailableLobbies();
     updateLobbiesJList();
-    currentLobbyPnl.update(currentLobby);
+    currentLobbyPnl.update();
     revalidate();
     repaint();
   }

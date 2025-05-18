@@ -138,6 +138,7 @@ public class Labyrinth extends BaseModel {
 
   private void advanceToNextPlayer() {
     this.players.add(this.players.poll());
+    // TODO: create a method to reset player state
     this.hasCurrentPlayerInserted = false;
     setWaitingForPlayerAnimation(false);
     setHasUsedPower(false);
@@ -390,6 +391,7 @@ public class Labyrinth extends BaseModel {
     this.lastInsertedCardPosition = insertPosition;
 
     setHasUsedPower(false);
+    setWaitingForCardAnimation(true);
     this.fireChangeListener();
   }
 
@@ -897,7 +899,7 @@ public class Labyrinth extends BaseModel {
   }
 
   public void rotateAvailableCard(int rotationCount) {
-    if(!hasCurrentPlayerInserted) {
+    if (!hasCurrentPlayerInserted) {
       getAvailableCard().rotate(rotationCount);
       fireChangeListener();
     }

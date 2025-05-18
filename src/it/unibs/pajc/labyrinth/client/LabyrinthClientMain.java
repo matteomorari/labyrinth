@@ -1,18 +1,16 @@
 package it.unibs.pajc.labyrinth.client;
 
-import it.unibs.pajc.labyrinth.client.controllers.LabyrinthLocalController;
+import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthLocalController;
 import it.unibs.pajc.labyrinth.client.views.GamePnl;
 import it.unibs.pajc.labyrinth.client.views.StartPnl;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
-
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -23,14 +21,15 @@ public class LabyrinthClientMain {
 
   /** Launch the application. */
   public static void main(String[] args) {
-    EventQueue.invokeLater(() -> {
-      try {
-        LabyrinthClientMain window = new LabyrinthClientMain();
-        window.frame.setVisible(true);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    });
+    EventQueue.invokeLater(
+        () -> {
+          try {
+            LabyrinthClientMain window = new LabyrinthClientMain();
+            window.frame.setVisible(true);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        });
   }
 
   /** Create the application. */
@@ -47,11 +46,13 @@ public class LabyrinthClientMain {
 
     // for debug purposes
     // to create "modelCopy.json" file see LabyrinthGson.createCopy()
+    // TODO: does NOT function
     final boolean LOAD_FROM_FILE = false;
     if (LOAD_FROM_FILE) {
       String deepCopy = "";
       try {
-        deepCopy = new String(Files.readAllBytes(Paths.get("modelCopy.json")), StandardCharsets.UTF_8);
+        deepCopy =
+            new String(Files.readAllBytes(Paths.get("modelCopy.json")), StandardCharsets.UTF_8);
       } catch (IOException e) {
         e.printStackTrace();
       }
@@ -72,6 +73,5 @@ public class LabyrinthClientMain {
     } else {
       frame.add(new StartPnl(), BorderLayout.CENTER);
     }
-
   }
 }

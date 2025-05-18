@@ -5,7 +5,7 @@ import it.unibs.pajc.labyrinth.client.animation.Animator;
 import it.unibs.pajc.labyrinth.client.animation.EasingFunction;
 import it.unibs.pajc.labyrinth.client.components.CardImage;
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
-import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
+import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.PowerType;
@@ -303,8 +303,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
         int x = initialXPosition + player.getPosition().getCol() * cellSize;
         int y = initialYPosition + player.getPosition().getRow() * cellSize;
         g2.drawImage(
-            ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE")
-                .getStandingImage(),
+            ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE").getStandingImage(),
             x + (cellSize - playerSize) / 2,
             y + cellSize / 5,
             playerSize,
@@ -319,8 +318,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
 
       if (playerDirection[0] == 0 && playerDirection[1] == 0) {
         g2.drawImage(
-            ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE")
-                .getStandingImage(),
+            ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE").getStandingImage(),
             playerPosition[0] + (cellSize - playerSize) / 2,
             playerPosition[1] + cellSize / 5,
             playerSize,

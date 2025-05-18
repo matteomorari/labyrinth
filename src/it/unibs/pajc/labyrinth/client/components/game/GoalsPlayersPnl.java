@@ -1,7 +1,7 @@
 package it.unibs.pajc.labyrinth.client.components.game;
 
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
-import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
+import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Player;
 import java.awt.Color;
 import java.awt.Container;
@@ -169,7 +169,7 @@ public class GoalsPlayersPnl extends JPanel {
           leftPosition,
           playerY - 10,
           PLAYER_SIZE,
-          PLAYER_SIZE ,
+          PLAYER_SIZE,
           null);
 
       // Draw player text to the right of the oval

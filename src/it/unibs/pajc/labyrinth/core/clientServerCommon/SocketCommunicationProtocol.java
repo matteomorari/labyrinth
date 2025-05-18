@@ -114,4 +114,12 @@ public class SocketCommunicationProtocol {
   public static CopyOnWriteArrayList<SocketCommunicationProtocol> getConnectedUsers() {
     return connectedUsers;
   }
+
+  public HashMap<String, Consumer<LabyrinthEvent>> getCommandMap() {
+    return commandMap;
+  }
+
+  public void addCommand(String command, Consumer<LabyrinthEvent> commandExe) {
+    commandMap.put(command, commandExe);
+  }
 }

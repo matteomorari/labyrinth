@@ -1,4 +1,4 @@
-package it.unibs.pajc.labyrinth.client.controllers;
+package it.unibs.pajc.labyrinth.client.controllers.labyrinth;
 
 import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.Goal;
@@ -8,8 +8,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 
 public interface LabyrinthController {
-  // void initGame();
-
   int getBoardSize();
 
   ArrayList<ArrayList<Card>> getBoard();

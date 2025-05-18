@@ -6,10 +6,9 @@ import it.unibs.pajc.labyrinth.client.animation.EasingFunction;
 import it.unibs.pajc.labyrinth.client.components.CardImage;
 import it.unibs.pajc.labyrinth.client.components.SvgIconButton;
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
-import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
+import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.utility.Orientation;
-
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -186,7 +185,8 @@ public class AvailableCardPnl extends JPanel implements Animatable {
 
     // check if the orientation of the card has changed
     Card newCard = controller.getAvailableCard();
-    if (availableCardId.equals(newCard.getID()) && availableCardOrientation != newCard.getOrientation()) {
+    if (availableCardId.equals(newCard.getID())
+        && availableCardOrientation != newCard.getOrientation()) {
       startCardRotationAnimation();
     }
     availableCardId = newCard.getID();

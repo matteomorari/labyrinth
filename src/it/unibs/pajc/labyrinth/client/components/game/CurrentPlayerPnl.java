@@ -1,8 +1,7 @@
 package it.unibs.pajc.labyrinth.client.components.game;
 
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
-import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
-
+import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthController;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -134,12 +133,12 @@ public class CurrentPlayerPnl extends JPanel {
       g2.setFont(playerFont.deriveFont(newSize));
       fm = g2.getFontMetrics();
       textWidth = fm.stringWidth(playerText);
-      totalWidth = PLAYER_SIZE  + textWidth;
+      totalWidth = PLAYER_SIZE + textWidth;
     } else {
-      g2.setFont(playerFont.deriveFont((float) PLAYER_FONT_SIZE ));
+      g2.setFont(playerFont.deriveFont((float) PLAYER_FONT_SIZE));
       fm = g2.getFontMetrics();
-      textWidth = fm.stringWidth(playerText) ;
-      totalWidth =  textWidth + PLAYER_SIZE;
+      textWidth = fm.stringWidth(playerText);
+      totalWidth = textWidth + PLAYER_SIZE;
     }
 
     // Calculate left position to center the entire element
@@ -159,7 +158,7 @@ public class CurrentPlayerPnl extends JPanel {
 
     // Draw player text to the right of the image
     g2.setColor(Color.DARK_GRAY);
-    g2.drawString(playerText, leftPosition , currentY - PADDING_Y);
+    g2.drawString(playerText, leftPosition, currentY - PADDING_Y);
 
     currentY += LINE_HEIGHT + PLAYER_BOTTOM_SPACING;
   }

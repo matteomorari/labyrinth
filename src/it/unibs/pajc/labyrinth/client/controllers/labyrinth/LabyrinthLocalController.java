@@ -1,4 +1,4 @@
-package it.unibs.pajc.labyrinth.client.controllers;
+package it.unibs.pajc.labyrinth.client.controllers.labyrinth;
 
 import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.Goal;
@@ -9,102 +9,102 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 
 public class LabyrinthLocalController implements LabyrinthController {
-  private Labyrinth model;
+  private Labyrinth labyrinth;
 
   public LabyrinthLocalController(Labyrinth model) {
-    this.model = model;
+    this.labyrinth = model;
   }
 
   public int getBoardSize() {
-    return model.getBoardSize();
+    return labyrinth.getBoardSize();
   }
 
   public ArrayList<ArrayList<Card>> getBoard() {
-    return model.getBoard();
+    return labyrinth.getBoard();
   }
 
   public Player getCurrentPlayer() {
-    return model.getCurrentPlayer();
+    return labyrinth.getCurrentPlayer();
   }
 
   public ArrayDeque<Player> getPlayers() {
-    return model.getPlayers();
+    return labyrinth.getPlayers();
   }
 
   public void movePlayer(int row, int col) {
-    model.movePlayer(row, col);
+    labyrinth.movePlayer(row, col);
   }
 
   public void insertCard(Position position) {
-    model.insertCard(position);
+    labyrinth.insertCard(position);
   }
 
   public void rotateAvailableCard(int rotation) {
-    model.rotateAvailableCard(rotation);
+    labyrinth.rotateAvailableCard(rotation);
   }
 
   public ArrayList<Position> getLastPlayerMovedPath() {
-    return model.getLastPlayerMovedPath();
+    return labyrinth.getLastPlayerMovedPath();
   }
 
   public Position lastInsertedCardPosition() {
-    return model.lastInsertedCardPosition();
+    return labyrinth.lastInsertedCardPosition();
   }
 
   public Card getAvailableCard() {
-    return model.getAvailableCard();
+    return labyrinth.getAvailableCard();
   }
 
   public void setPlayerToSwap(Player player) {
-    model.setPlayerToSwap(player);
+    labyrinth.setPlayerToSwap(player);
   }
 
   public void setGoalToSwap(Goal goal) {
-    model.setGoalToSwap(goal);
+    labyrinth.setGoalToSwap(goal);
   }
 
   public void skipTurn() {
-    model.skipTurn();
+    labyrinth.skipTurn();
   }
 
   @Override
   public void usePower() {
-    model.usePower();
+    labyrinth.usePower();
   }
 
   @Override
   public boolean getHasUsedPower() {
-    return model.getHasUsedPower();
+    return labyrinth.getHasUsedPower();
   }
 
   @Override
   public boolean getHasCurrentPlayerInserted() {
-    return model.getHasCurrentPlayerInserted();
+    return labyrinth.getHasCurrentPlayerInserted();
   }
 
   public Player getPlayerToSwap() {
-    return model.getPlayerToSwap();
+    return labyrinth.getPlayerToSwap();
   }
 
   public Goal getGoalToSwap() {
-    return model.getGoalToSwap();
+    return labyrinth.getGoalToSwap();
   }
 
   public void cardAnimationEnded() {
-    model.cardAnimationEnded();
+    labyrinth.cardAnimationEnded();
   }
 
   public void playerAnimationEnded() {
-    model.playerAnimationEnded();
+    labyrinth.playerAnimationEnded();
   }
 
   @Override
   public boolean isGameOver() {
-    return model.isGameOver();
+    return labyrinth.isGameOver();
   }
 
   @Override
   public boolean isGameCrashed() {
-    return model.isGameCrashed();
+    return labyrinth.isGameCrashed();
   }
 }

@@ -1,9 +1,9 @@
 package it.unibs.pajc.labyrinth.client.components.game;
 
-import it.unibs.pajc.labyrinth.client.components.SvgIconButton;
 import it.unibs.pajc.labyrinth.client.components.SelectionDialog;
+import it.unibs.pajc.labyrinth.client.components.SvgIconButton;
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
-import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
+import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.Goal;
 import it.unibs.pajc.labyrinth.core.Player;
@@ -186,8 +186,7 @@ public class PowerPnl extends JPanel {
     for (Player player : controller.getPlayers()) {
       if (!player.equals(currentPlayer)) {
         BufferedImage playerImage =
-            ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE")
-                .getStandingImage();
+            ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE").getStandingImage();
         items.add(
             new SelectionDialog.SelectionItem(
                 playerImage, () -> controller.setPlayerToSwap(player)));
