@@ -40,7 +40,7 @@ public class HomePnl extends JPanel {
     gbc.anchor = GridBagConstraints.CENTER; // Center the buttons
 
     // "Local" button
-    SvgIconButton localButton = new SvgIconButton("resource\\icons\\computer.svg", "LOCAL");
+    SvgIconButton localButton = new SvgIconButton("resource\\icons\\computer.svg", null);
     localButton.setBorderRadius(20);
     localButton.setButtonSize(200, 50);
     localButton.setSvgIconSize(150, 150);
@@ -52,20 +52,19 @@ public class HomePnl extends JPanel {
     centerPanel.add(localButton, gbc);
 
     // "Online" button
-    SvgIconButton onlineButton = new SvgIconButton("resource\\icons\\online.svg", "ONLINE");
+    SvgIconButton onlineButton = new SvgIconButton("resource\\icons\\online.svg", null);
     onlineButton.setBorderRadius(20);
     onlineButton.setButtonSize(200, 50);
     onlineButton.setSvgIconSize(150, 150);
     onlineButton.addActionListener(e -> findOnlineGame());
     gbc.gridx = 1;
     gbc.gridy = 0;
-    gbc.insets = new Insets(20, 40, 20, 20); // Add space to the left of the button
+    gbc.insets = new Insets(20, 40, 20, 20);
     centerPanel.add(onlineButton, gbc);
 
     add(centerPanel, BorderLayout.CENTER);
   }
 
-  /** Custom paintComponent method to apply a gradient background. */
   @Override
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
@@ -90,7 +89,6 @@ public class HomePnl extends JPanel {
     LocalGameLobbyPnl localGameLobbyPnl = new LocalGameLobbyPnl(lobbyLocalController);
     onlineGameManager.addChangeListener(
         e -> {
-          // localGameLobbyPnl.repaint();
           localGameLobbyPnl.update();
         });
     replaceParentPnlContent(localGameLobbyPnl);

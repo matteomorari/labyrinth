@@ -17,6 +17,23 @@ import java.util.ArrayList;
 import javax.swing.*;
 
 public class FindOnlineGamePnl extends JPanel {
+  private static final int PANEL_WIDTH = 800;
+  private static final int PANEL_HEIGHT = 600;
+  private static final int BORDER_GAP = 10;
+  private static final int LOBBY_LIST_WIDTH = 250;
+  private static final int BUTTON_PANEL_HEIGHT = 60;
+  private static final int BUTTON_WIDTH = 200;
+  private static final int BUTTON_HEIGHT = 50;
+  private static final int LOBBY_LIST_FONT_SIZE = 16;
+  private static final int LOBBY_LIST_CELL_ARC = 20;
+  private static final int LOBBY_LIST_CELL_INSET = 4;
+  private static final int LOBBY_LIST_CELL_BORDER_TOP = 10;
+  private static final int LOBBY_LIST_CELL_BORDER_LEFT = 15;
+  private static final int LOBBY_LIST_CELL_BORDER_BOTTOM = 10;
+  private static final int LOBBY_LIST_CELL_BORDER_RIGHT = 15;
+  private static final int LOBBY_LIST_ICON_SIZE = 30;
+  private static final int LOBBY_LIST_PANEL_BORDER = 5;
+  private static final int LOBBY_NAME_MAX_LEN = 20;
   private LobbyClientController lobbyController;
   private LobbyPnl currentLobbyPnl;
   private JButton createNewLobbyButton;
@@ -30,9 +47,9 @@ public class FindOnlineGamePnl extends JPanel {
     this.lobbyController = lobbyController;
     this.availableLobbies = new ArrayList<>();
     this.currentLobby = null;
-    setPreferredSize(new Dimension(800, 600));
-    setLayout(new BorderLayout(10, 10));
-    setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
+    setLayout(new BorderLayout(BORDER_GAP, BORDER_GAP));
+    setBorder(BorderFactory.createEmptyBorder(BORDER_GAP, BORDER_GAP, BORDER_GAP, BORDER_GAP));
 
     // Logo panel
     BufferedImage logo = ImageCntrl.LOGO.getImage();
@@ -41,10 +58,11 @@ public class FindOnlineGamePnl extends JPanel {
 
     // Game list panel
     lobbiesJList = new JList<>();
-    lobbiesJList.setFont(new Font("Arial", Font.PLAIN, 16));
+    lobbiesJList.setFont(new Font("Arial", Font.PLAIN, LOBBY_LIST_FONT_SIZE));
+    lobbiesJList.setOpaque(false);
     lobbiesJList.setCellRenderer(
         (list, value, index, isSelected, cellHasFocus) -> {
-          Color bgColor = Color.LIGHT_GRAY;
+          Color bgColor = Color.WHITE;
           JPanel panel =
               new JPanel() {
                 @Override
@@ -54,19 +72,23 @@ public class FindOnlineGamePnl extends JPanel {
                   g2.setRenderingHint(
                       RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                   g2.setColor(bgColor);
-                  int arc = 20;
-                  int inset = 4;
+                  int arc = LOBBY_LIST_CELL_ARC;
+                  int inset = LOBBY_LIST_CELL_INSET;
                   g2.fillRoundRect(
                       inset, inset, getWidth() - 2 * inset, getHeight() - 2 * inset, arc, arc);
                   g2.dispose();
                 }
               };
+          panel.setOpaque(false);
           panel.setLayout(new BorderLayout());
-          panel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+          panel.setBorder(
+              BorderFactory.createEmptyBorder(
+                  LOBBY_LIST_CELL_BORDER_TOP, LOBBY_LIST_CELL_BORDER_LEFT,
+                  LOBBY_LIST_CELL_BORDER_BOTTOM, LOBBY_LIST_CELL_BORDER_RIGHT));
 
           // set the Lobby name and player count
           String displayValue = value;
-          int maxLen = 20;
+          int maxLen = LOBBY_NAME_MAX_LEN;
           boolean truncated = false;
           if (displayValue.length() > maxLen) {
             displayValue = displayValue.substring(0, maxLen - 3) + "...";
@@ -81,17 +103,40 @@ public class FindOnlineGamePnl extends JPanel {
 
           SvgIconButton icon = new SvgIconButton("resource\\icons\\rotate.svg");
           icon.setBorderRadius(-1);
-          icon.setButtonSize(30, 30);
-          icon.setSvgIconSize(30, 30);
+          icon.setButtonSize(LOBBY_LIST_ICON_SIZE, LOBBY_LIST_ICON_SIZE);
+          icon.setSvgIconSize(LOBBY_LIST_ICON_SIZE, LOBBY_LIST_ICON_SIZE);
           icon.setBgColor(bgColor);
           panel.add(icon, BorderLayout.EAST);
           return panel;
         });
-    JScrollPane lobbyListPnl = new JScrollPane(lobbiesJList);
-    lobbyListPnl.setBorder(null);
-    lobbyListPnl.setPreferredSize(new Dimension(250, 0));
-    lobbyListPnl.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-    add(lobbyListPnl, BorderLayout.WEST);
+    JScrollPane lobbyListScrollPanel = new JScrollPane(lobbiesJList);
+    lobbyListScrollPanel.setBorder(null);
+    lobbyListScrollPanel.getViewport().setBackground(Color.LIGHT_GRAY);
+    lobbyListScrollPanel.setPreferredSize(new Dimension(LOBBY_LIST_WIDTH, 0));
+    lobbyListScrollPanel.setHorizontalScrollBarPolicy(
+        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+    JPanel lobbyListPanel =
+        new JPanel() {
+          @Override
+          protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(Color.LIGHT_GRAY);
+            int arc = LOBBY_LIST_CELL_ARC + LOBBY_LIST_PANEL_BORDER;
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), arc, arc);
+            g2.dispose();
+          }
+        };
+    lobbyListPanel.setLayout(new BorderLayout());
+    lobbyListPanel.setBorder(
+        BorderFactory.createEmptyBorder(
+            LOBBY_LIST_PANEL_BORDER, LOBBY_LIST_PANEL_BORDER,
+            LOBBY_LIST_PANEL_BORDER, LOBBY_LIST_PANEL_BORDER));
+    lobbyListPanel.add(lobbyListScrollPanel, BorderLayout.CENTER);
+    lobbyListPanel.setOpaque(false);
+    add(lobbyListPanel, BorderLayout.WEST);
 
     // lobby panel
     currentLobbyPnl = new LobbyPnl(lobbyController, lobbyController.getLocalPlayer());
@@ -99,15 +144,16 @@ public class FindOnlineGamePnl extends JPanel {
 
     // Action buttons panel
     JPanel buttonPanel = new JPanel();
-    buttonPanel.setPreferredSize(new Dimension(0, 60));
+    buttonPanel.setPreferredSize(new Dimension(0, BUTTON_PANEL_HEIGHT));
+    buttonPanel.setOpaque(false);
     add(buttonPanel, BorderLayout.SOUTH);
 
     readyButton = new JButton("READY TO PLAY");
-    readyButton.setPreferredSize(new Dimension(200, 50));
+    readyButton.setPreferredSize(new Dimension(BUTTON_WIDTH, BUTTON_HEIGHT));
     addBotButton = new JButton("ADD BOT");
-    addBotButton.setPreferredSize(new Dimension(200, 50));
+    addBotButton.setPreferredSize(new Dimension(BUTTON_WIDTH, BUTTON_HEIGHT));
     createNewLobbyButton = new JButton("CREATE NEW LOBBY");
-    createNewLobbyButton.setPreferredSize(new Dimension(200, 50));
+    createNewLobbyButton.setPreferredSize(new Dimension(BUTTON_WIDTH, BUTTON_HEIGHT));
 
     buttonPanel.add(readyButton);
     buttonPanel.add(addBotButton);
@@ -192,7 +238,7 @@ public class FindOnlineGamePnl extends JPanel {
 
       // Replace the current panel's content with the game panel
       JPanel parent = (JPanel) getParent();
-      parent.removeAll();
+      parent.remove(this);
       parent.setLayout(new BorderLayout());
       parent.add(gamePanel, BorderLayout.CENTER);
       parent.revalidate();
