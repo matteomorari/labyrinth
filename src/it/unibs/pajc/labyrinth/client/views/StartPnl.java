@@ -1,9 +1,9 @@
 package it.unibs.pajc.labyrinth.client.views;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import it.unibs.pajc.labyrinth.client.components.SvgIconButton;
 import it.unibs.pajc.labyrinth.client.controllers.LabyrinthClientController;
 import it.unibs.pajc.labyrinth.core.lobby.OnlineGameManager;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -54,8 +54,7 @@ public class StartPnl extends JPanel {
     centerPanel.add(localButton, gbc);
 
     // "Online" button
-    SvgIconButton onlineButton =
-        new SvgIconButton("resource\\images\\rotate.svg", "ONLINE");
+    SvgIconButton onlineButton = new SvgIconButton("resource\\images\\rotate.svg", "ONLINE");
     onlineButton.setBorderRadius(20);
     onlineButton.setButtonSize(200, 50);
     onlineButton.setSvgIconSize(150, 150);
@@ -93,10 +92,13 @@ public class StartPnl extends JPanel {
 
   /** Opens the online game finder UI */
   private void findOnlineGame() {
+    Dotenv dotenv = Dotenv.load();
+    String serverIp = dotenv.get("SERVER_IP", "localhost");
+    int serverPort = Integer.parseInt(dotenv.get("SERVER_PORT", "2234"));
     OnlineGameManager onlineGameManager = new OnlineGameManager();
 
     LabyrinthClientController clientCntrl = new LabyrinthClientController(onlineGameManager);
-    clientCntrl.connect("localhost", 1234);
+    clientCntrl.connect(serverIp, serverPort);
 
     // Wait until the protocol thread is initialized
     // TODO: is synchronized needed here?

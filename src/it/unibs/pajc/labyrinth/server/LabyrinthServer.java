@@ -1,5 +1,6 @@
 package it.unibs.pajc.labyrinth.server;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.clientServerCommon.SocketCommunicationProtocol;
 import java.net.ServerSocket;
@@ -9,7 +10,9 @@ import java.time.LocalDateTime;
 public class LabyrinthServer {
   public static void main(String[] args) {
     LabyrinthServer trisServer = new LabyrinthServer();
-    try (ServerSocket server = new ServerSocket(1234)) {
+    Dotenv dotenv = Dotenv.load();
+    int serverPort = Integer.parseInt(dotenv.get("SERVER_PORT", "2234"));
+    try (ServerSocket server = new ServerSocket(serverPort)) {
       log("server started");
 
       while (true) {
