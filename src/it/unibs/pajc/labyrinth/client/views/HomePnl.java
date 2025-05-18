@@ -74,7 +74,13 @@ public class HomePnl extends JPanel {
     int height = getHeight();
 
     GradientPaint gradientPaint =
-        new GradientPaint(-100, height / 2, Color.RED, width / 2, height / 2, Color.YELLOW);
+        new GradientPaint(
+            (int) (0 - width * 0.5),
+            height,
+            Color.YELLOW,
+            (int) (width * 1.5),
+            (int) (0 - width * 0.5),
+            Color.RED);
     g2d.setPaint(gradientPaint);
     g2d.fillRect(0, 0, width, height);
 

@@ -1,5 +1,8 @@
 package it.unibs.pajc.labyrinth.core;
 
+import it.unibs.pajc.labyrinth.core.enums.CardType;
+import it.unibs.pajc.labyrinth.core.enums.GoalType;
+import it.unibs.pajc.labyrinth.core.enums.PowerType;
 import it.unibs.pajc.labyrinth.core.utility.BotMoveCalcListener;
 import it.unibs.pajc.labyrinth.core.utility.NodeComparator;
 import it.unibs.pajc.labyrinth.core.utility.Orientation;

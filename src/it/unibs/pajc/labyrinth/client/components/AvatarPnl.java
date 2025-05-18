@@ -3,6 +3,8 @@ package it.unibs.pajc.labyrinth.client.components;
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.client.controllers.lobby.LobbyController;
 import it.unibs.pajc.labyrinth.core.Player;
+import it.unibs.pajc.labyrinth.core.enums.MyColors;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -54,7 +56,7 @@ public class AvatarPnl extends JPanel {
         player.isBot() ? "resource\\icons\\bot.svg" : "resource\\icons\\player.svg";
 
     SvgIconButton playerTypeButton = new SvgIconButton(playerTypeIconPath);
-    playerTypeButton.setBgColor(Color.LIGHT_GRAY);
+    playerTypeButton.setBgColor(MyColors.MAIN_BG_COLOR.getColor());
     playerTypeButton.setBorderRadius(-1);
     playerTypeButton.setButtonSize(35, 0);
     playerTypeButton.setSvgIconSize(25, 25);
@@ -67,7 +69,7 @@ public class AvatarPnl extends JPanel {
 
     if(canBeRemoved != null && canBeRemoved) {
       SvgIconButton removePlayerButton = new SvgIconButton("resource\\icons\\delete.svg");
-      removePlayerButton.setBgColor(new Color(255, 66, 66));
+      removePlayerButton.setBgColor(MyColors.MAIN_BG_COLOR.getColor());
       removePlayerButton.setBorderRadius(-1);
       removePlayerButton.setButtonSize(35, 0);
       removePlayerButton.setSvgIconSize(25, 25);

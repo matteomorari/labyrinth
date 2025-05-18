@@ -1,5 +1,6 @@
 package it.unibs.pajc.labyrinth.core;
 
+import it.unibs.pajc.labyrinth.core.enums.PowerType;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 
 public class Power {

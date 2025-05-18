@@ -8,7 +8,8 @@ import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.Player;
-import it.unibs.pajc.labyrinth.core.PowerType;
+import it.unibs.pajc.labyrinth.core.enums.MyColors;
+import it.unibs.pajc.labyrinth.core.enums.PowerType;
 import it.unibs.pajc.labyrinth.core.utility.Orientation;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.awt.Color;
@@ -141,7 +142,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
   }
 
   private void drawBackground(Graphics2D g2) {
-    g2.setColor(Color.LIGHT_GRAY); // bg color
+    g2.setColor(MyColors.MAIN_BG_COLOR.getColor());
     int size = Math.min(getWidth(), getHeight());
     int initialXPosition = (getWidth() - size) / 2;
     int initialYPosition = (getHeight() - size) / 2;

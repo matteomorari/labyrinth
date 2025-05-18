@@ -1,4 +1,4 @@
-package it.unibs.pajc.labyrinth.core;
+package it.unibs.pajc.labyrinth.core.enums;
 
 public enum PowerType {
   DOUBLE_CARD_INSERTION,

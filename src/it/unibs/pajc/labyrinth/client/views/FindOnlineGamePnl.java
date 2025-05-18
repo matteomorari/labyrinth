@@ -8,6 +8,7 @@ import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthClientContr
 import it.unibs.pajc.labyrinth.client.controllers.lobby.LobbyClientController;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
+import it.unibs.pajc.labyrinth.core.enums.MyColors;
 import it.unibs.pajc.labyrinth.core.lobby.Lobby;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -111,7 +112,7 @@ public class FindOnlineGamePnl extends JPanel {
         });
     JScrollPane lobbyListScrollPanel = new JScrollPane(lobbiesJList);
     lobbyListScrollPanel.setBorder(null);
-    lobbyListScrollPanel.getViewport().setBackground(Color.LIGHT_GRAY);
+    lobbyListScrollPanel.getViewport().setBackground(MyColors.MAIN_BG_COLOR.getColor());
     lobbyListScrollPanel.setPreferredSize(new Dimension(LOBBY_LIST_WIDTH, 0));
     lobbyListScrollPanel.setHorizontalScrollBarPolicy(
         ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -123,7 +124,7 @@ public class FindOnlineGamePnl extends JPanel {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(Color.LIGHT_GRAY);
+            g2.setColor(MyColors.MAIN_BG_COLOR.getColor());
             int arc = LOBBY_LIST_CELL_ARC + LOBBY_LIST_PANEL_BORDER;
             g2.fillRoundRect(0, 0, getWidth(), getHeight(), arc, arc);
             g2.dispose();

@@ -59,7 +59,7 @@ public class LobbyPnl extends JPanel {
     Graphics2D g2 = (Graphics2D) g.create();
     super.paintComponent(g);
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    g2.setColor(Color.LIGHT_GRAY);
+    g2.setColor(new Color(217, 217, 217));
     g2.fillRoundRect(0, 0, getWidth(), getHeight(), ARC_RADIUS, ARC_RADIUS);
     g2.dispose();
   }

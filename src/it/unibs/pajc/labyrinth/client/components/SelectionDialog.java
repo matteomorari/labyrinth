@@ -1,6 +1,8 @@
 package it.unibs.pajc.labyrinth.client.components;
 
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
+import it.unibs.pajc.labyrinth.core.enums.MyColors;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -54,7 +56,7 @@ public class SelectionDialog {
     // TODO: improve the start dimension of the dialog
     int panelWidth = POPUP_IMAGE_SIZE * items.size() + (BUTTON_PADDING * 2 * items.size());
     panel.setPreferredSize(new Dimension(panelWidth, 200));
-    panel.setBackground(Color.LIGHT_GRAY);
+    panel.setBackground(MyColors.MAIN_BG_COLOR.getColor());
 
     // Create the dialog
     JDialog dialog = new JDialog((Frame) null, null, true);
@@ -68,7 +70,7 @@ public class SelectionDialog {
           ImageCntrl.scaleBufferedImage(item.getImage(), POPUP_IMAGE_SIZE, POPUP_IMAGE_SIZE);
       JButton button = new JButton(new ImageIcon(scaledImage));
       button.setFocusPainted(false);
-      button.setBackground(Color.LIGHT_GRAY);
+      button.setBackground(MyColors.MAIN_BG_COLOR.getColor());
       button.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
 
       button.addMouseListener(

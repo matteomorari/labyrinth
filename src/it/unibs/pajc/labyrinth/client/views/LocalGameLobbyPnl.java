@@ -9,9 +9,12 @@ import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.lobby.Lobby;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -70,6 +73,7 @@ public class LocalGameLobbyPnl extends JPanel {
     startGameButton.setPreferredSize(new Dimension(200, 50));
     startGameButton.addActionListener(e -> startGame());
     buttonPanel.add(startGameButton);
+    buttonPanel.setOpaque(false);
     add(buttonPanel, BorderLayout.SOUTH);
   }
 
@@ -97,6 +101,28 @@ public class LocalGameLobbyPnl extends JPanel {
     } else {
       lobbyPnl.update();
     }
+  }
+
+  @Override
+  protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
+    Graphics2D g2d = (Graphics2D) g.create();
+
+    int width = getWidth();
+    int height = getHeight();
+
+    GradientPaint gradientPaint =
+        new GradientPaint(
+            (int) (0 - width * 0.5),
+            height,
+            Color.YELLOW,
+            (int) (width * 1.5),
+            (int) (0 - width * 0.5),
+            Color.RED);
+    g2d.setPaint(gradientPaint);
+    g2d.fillRect(0, 0, width, height);
+
+    g2d.dispose();
   }
 
   private void addNewPlayer() {
