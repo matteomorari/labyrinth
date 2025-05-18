@@ -102,11 +102,6 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
   }
 
   private void checkNewAnimation() {
-    // TODO: fix animation concurrency due to bot move
-    // if (cardAnimationInProgress || playerPositionInProgress) {
-    //   return;
-    // }
-
     // check if a new card has been inserted
     if (!currentAvailableCard.equals(previousAvailableCard)) {
       lastCardInsertPosition = controller.lastInsertedCardPosition();

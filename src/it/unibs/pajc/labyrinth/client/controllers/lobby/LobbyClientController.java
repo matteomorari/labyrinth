@@ -78,6 +78,16 @@ public class LobbyClientController implements LobbyController {
           }
         });
     connectionProtocol.addCommand(
+      "remove_from_lobby",
+      e -> {
+        try {
+          onlineGameManager.setSelectedLobby(null);
+
+        } catch (Exception exc) {
+          exc.printStackTrace();
+        }
+      });
+    connectionProtocol.addCommand(
         "game_started",
         e -> {
           try {
@@ -220,6 +230,17 @@ public class LobbyClientController implements LobbyController {
     msg.addProperty("command", "request_add_bot");
 
     msg.add("parameters", null);
+    connectionProtocol.sendMsg(connectionProtocol, msg.toString());
+  }
+
+  public void removePlayerFromSelectedLobby(Player player) {
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "remove_player");
+
+    JsonObject parameters = new JsonObject();
+    parameters.addProperty("player_id", player.getId());
+
+    msg.add("parameters", parameters);
     connectionProtocol.sendMsg(connectionProtocol, msg.toString());
   }
 }

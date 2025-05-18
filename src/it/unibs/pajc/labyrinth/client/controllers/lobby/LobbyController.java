@@ -22,6 +22,8 @@ public interface LobbyController {
 
   void setPlayerColor(Player player, PlayerColor color);
 
+  void removePlayerFromSelectedLobby(Player player);
+
   void startGame();
 
   Labyrinth getLabyrinth();

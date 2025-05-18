@@ -65,6 +65,11 @@ public class LobbyPnl extends JPanel {
 
   public void update() {
     removeAll();
+
+    if (lobbyController.getSelectedLobby() == null) {
+      return;
+    }
+
     setLayout(new GridBagLayout());
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.insets = new Insets(GRID_INSET, GRID_INSET, GRID_INSET, GRID_INSET);
@@ -75,11 +80,11 @@ public class LobbyPnl extends JPanel {
 
     ArrayList<Player> players = lobbyController.getPlayers();
     avatarPnlList.clear();
-    if (players != null && !players.isEmpty()) {
+    if (players != null) {
       for (int i = 0; i < AVATAR_COUNT; i++) {
         gbc.gridx = i % columns;
         gbc.gridy = i / columns;
-        AvatarPnl avatarPnl = new AvatarPnl(true);
+        AvatarPnl avatarPnl = new AvatarPnl(lobbyController, true);
         avatarPnl.setPreferredSize(new Dimension(AVATAR_SIZE, AVATAR_SIZE));
         // if there are less players than the max number of players, paint an empty avatar
         if (i < players.size()) {

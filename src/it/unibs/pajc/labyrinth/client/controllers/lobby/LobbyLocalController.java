@@ -48,6 +48,11 @@ public class LobbyLocalController implements LobbyController {
   }
 
   @Override
+  public void removePlayerFromSelectedLobby(Player player) {
+    lobbyManager.removePlayerFromSelectedLobby(player);
+  }
+
+  @Override
   public void setPlayerColor(Player player, PlayerColor color) {
     player.setColor(color);
   }

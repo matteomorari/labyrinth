@@ -105,6 +105,21 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
           }
         });
     commandMap.put(
+        "remove_player",
+        e -> {
+          try {
+            String playerId = e.getParameters().get("player_id").getAsString();
+            Player playerToRemove = currentLobby.getPlayerById(playerId);
+            if (!playerToRemove.isBot()) {
+              sendPlayerRemoveFromLobbyMsg(currentLobby.getPlayerSocket(playerToRemove));
+            }
+            currentLobby.removePlayer(playerToRemove);
+            sendLobbyStateUpdate(currentLobby);
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
+    commandMap.put(
         "toggle_player_ready",
         e -> {
           try {
@@ -269,6 +284,14 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
             exc.printStackTrace();
           }
         });
+  }
+
+  private void sendPlayerRemoveFromLobbyMsg(SocketCommunicationProtocol socket) {
+    JsonObject msg = new JsonObject();
+    msg.addProperty("command", "remove_from_lobby");
+
+    msg.add("parameters", null);
+    socket.sendMsg(socket, msg.toString());
   }
 
   private void sendCardAvailableRotatedMsg(int rotation) {

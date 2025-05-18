@@ -99,7 +99,7 @@ public class GamePnl extends JPanel {
     availableCardPnl = new AvailableCardPnl(controller);
     availableCardPnl.setAlignmentX(CENTER_ALIGNMENT);
 
-    powerPnl = new PowerPnl(controller); // TODO: repaint infinitely
+    powerPnl = new PowerPnl(controller);
     powerPnl.setAlignmentX(CENTER_ALIGNMENT);
 
     // Add components

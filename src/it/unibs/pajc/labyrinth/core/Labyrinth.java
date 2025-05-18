@@ -536,7 +536,6 @@ public class Labyrinth extends BaseModel {
     }
   }
 
-  // ! TODO: seems to not reflect the actual state of the board
   private ArrayList<Orientation> getCardOpenDirection(Card card) {
     ArrayList<Orientation> openOrientation = new ArrayList<>();
     for (Orientation orientation : Orientation.values()) {
@@ -899,7 +898,7 @@ public class Labyrinth extends BaseModel {
   }
 
   public void rotateAvailableCard(int rotationCount) {
-    if (!hasCurrentPlayerInserted) {
+    if(!hasCurrentPlayerInserted) {
       getAvailableCard().rotate(rotationCount);
       fireChangeListener();
     }

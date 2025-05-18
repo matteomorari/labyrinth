@@ -1,6 +1,7 @@
 package it.unibs.pajc.labyrinth.client.components;
 
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
+import it.unibs.pajc.labyrinth.client.controllers.lobby.LobbyController;
 import it.unibs.pajc.labyrinth.core.Player;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -10,16 +11,15 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 
-// ! TODO: add a remove method to remove the avatar from the lobby
-// TODO: add a label to show if a player is a bot or a human
 public class AvatarPnl extends JPanel {
+  private LobbyController controller;
   private Player player;
   private static final Color bgColor = Color.WHITE;
   private BufferedImage avatarImage;
-  private Runnable onPlayerRemove;
   private Boolean canBeRemoved;
 
-  public AvatarPnl(Boolean canBeRemoved) {
+  public AvatarPnl(LobbyController controller, Boolean canBeRemoved) {
+    this.controller = controller;
     this.canBeRemoved = canBeRemoved;
     setPreferredSize(new java.awt.Dimension(120, 120));
     setFocusable(true);
@@ -86,9 +86,7 @@ public class AvatarPnl extends JPanel {
   }
 
   private void handleRemovePlayer() {
-    if (onPlayerRemove != null) {
-      onPlayerRemove.run();
-    }
+    controller.removePlayerFromSelectedLobby(player);
   }
 
   public void setAvatarImage(BufferedImage image) {
@@ -115,10 +113,6 @@ public class AvatarPnl extends JPanel {
 
   public Player getPlayer() {
     return player;
-  }
-
-  public void setOnPlayerRemove(Runnable onPlayerRemove) {
-    this.onPlayerRemove = onPlayerRemove;
   }
 
   public void setCanBeRemoved(Boolean canBeRemoved) {

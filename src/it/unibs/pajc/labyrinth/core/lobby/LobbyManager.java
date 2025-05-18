@@ -55,4 +55,11 @@ public class LobbyManager extends BaseModel {
       fireChangeListener();
     }
   }
+
+  public void removePlayerFromSelectedLobby(Player player) {
+    if (getSelectedLobby() != null) {
+      getSelectedLobby().removePlayer(player);
+      fireChangeListener();
+    }
+  }
 }
