@@ -1,36 +1,32 @@
 package it.unibs.pajc.labyrinth.client.views;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import it.unibs.pajc.labyrinth.client.components.LogoPanel;
 import it.unibs.pajc.labyrinth.client.components.SvgIconButton;
 import it.unibs.pajc.labyrinth.client.controllers.ClientSocketProtocol;
+import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.client.controllers.lobby.LobbyClientController;
 import it.unibs.pajc.labyrinth.client.controllers.lobby.LobbyLocalController;
 import it.unibs.pajc.labyrinth.core.lobby.LobbyManager;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
+import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 
 public class HomePnl extends JPanel {
-
   public HomePnl() {
     setLayout(new BorderLayout());
 
-    // Title label at the top
-    JLabel titleLabel = new JLabel("LABIRINTO", SwingConstants.CENTER);
-    titleLabel.setFont(new Font("SansSerif", Font.BOLD, 48));
-    titleLabel.setForeground(Color.WHITE);
-    titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-    add(titleLabel, BorderLayout.NORTH);
+    // logo panel
+    BufferedImage logo = ImageCntrl.LOGO.getImage();
+    LogoPanel logoPanel = new LogoPanel(logo);
+    add(logoPanel, BorderLayout.NORTH);
 
     // Center panel for buttons
     JPanel centerPanel = new JPanel(new GridBagLayout());

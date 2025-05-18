@@ -1,7 +1,9 @@
 package it.unibs.pajc.labyrinth.client.views;
 
 import it.unibs.pajc.labyrinth.client.components.LobbyPnl;
+import it.unibs.pajc.labyrinth.client.components.LogoPanel;
 import it.unibs.pajc.labyrinth.client.components.SvgIconButton;
+import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthClientController;
 import it.unibs.pajc.labyrinth.client.controllers.lobby.LobbyClientController;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
@@ -10,6 +12,7 @@ import it.unibs.pajc.labyrinth.core.lobby.Lobby;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import javax.swing.*;
 
@@ -31,14 +34,10 @@ public class FindOnlineGamePnl extends JPanel {
     setLayout(new BorderLayout(10, 10));
     setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-    // Title label
-    JLabel titleLabel = new JLabel("LABIRINTO", SwingConstants.CENTER);
-    titleLabel.setFont(new Font("Arial", Font.BOLD, 36));
-    titleLabel.setForeground(Color.BLUE);
-    titleLabel.setPreferredSize(new Dimension(0, 200));
-    titleLabel.setBackground(Color.YELLOW); // TODO: to remove
-    titleLabel.setOpaque(true);
-    add(titleLabel, BorderLayout.NORTH);
+    // Logo panel
+    BufferedImage logo = ImageCntrl.LOGO.getImage();
+    LogoPanel logoPanel = new LogoPanel(logo);
+    add(logoPanel, BorderLayout.NORTH);
 
     // Game list panel
     lobbiesJList = new JList<>();

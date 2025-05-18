@@ -1,20 +1,20 @@
 package it.unibs.pajc.labyrinth.client.views;
 
 import it.unibs.pajc.labyrinth.client.components.LobbyPnl;
+import it.unibs.pajc.labyrinth.client.components.LogoPanel;
+import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthLocalController;
 import it.unibs.pajc.labyrinth.client.controllers.lobby.LobbyLocalController;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.lobby.Lobby;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.image.BufferedImage;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 
 public class LocalGameLobbyPnl extends JPanel {
   private LobbyLocalController lobbyController;
@@ -28,14 +28,10 @@ public class LocalGameLobbyPnl extends JPanel {
     setLayout(new BorderLayout(10, 10));
     setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-    // Title label
-    JLabel titleLabel = new JLabel("LABIRINTO", SwingConstants.CENTER);
-    titleLabel.setFont(new Font("Arial", Font.BOLD, 36));
-    titleLabel.setForeground(Color.BLUE);
-    titleLabel.setPreferredSize(new Dimension(0, 200));
-    titleLabel.setBackground(Color.YELLOW); // TODO: to remove
-    // titleLabel.setOpaque(true);
-    add(titleLabel, BorderLayout.NORTH);
+    // Logo panel
+    BufferedImage logo = ImageCntrl.LOGO.getImage();
+    LogoPanel logoPanel = new LogoPanel(logo);
+    add(logoPanel, BorderLayout.NORTH);
 
     // lobby panel
     lobbyPnl = new LobbyPnl(lobbyController);

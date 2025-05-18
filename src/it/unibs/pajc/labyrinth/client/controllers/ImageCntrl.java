@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 
 public enum ImageCntrl {
   // load images
+  LOGO("logo.png"),
   CARD_L("L.png"),
   CARD_I("I.png"),
   CARD_T("T.png"),
