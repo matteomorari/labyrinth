@@ -16,11 +16,14 @@ public class AvatarPnl extends JPanel {
   private Player player;
   private static final Color bgColor = Color.WHITE;
   private BufferedImage avatarImage;
+  private Runnable onPlayerRemove;
+  private Boolean canBeRemoved;
 
-  public AvatarPnl() {
-    setOpaque(false);
+  public AvatarPnl(Boolean canBeRemoved) {
+    this.canBeRemoved = canBeRemoved;
     setPreferredSize(new java.awt.Dimension(120, 120));
     setFocusable(true);
+    setOpaque(false);
   }
 
   @Override
@@ -33,23 +36,59 @@ public class AvatarPnl extends JPanel {
     g2.setColor(bgColor);
     g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
 
-    // Draw avatar image at center
-    // Draw border
-    if (player != null && player.getColor() != null) {
-      g2.setStroke(new BasicStroke(3));
-      g2.setColor(player.isReadyToPlay() ? Color.GREEN : Color.RED);
-      g2.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 30, 30);
-      avatarImage =
-          ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE").getStandingAnimationImage();
-      avatarImage = ImageCntrl.scaleBufferedImage(avatarImage, 100, 100);
-      int x = (getWidth() - avatarImage.getWidth()) / 2;
-      int y = (getHeight() - avatarImage.getHeight()) / 2;
-      g2.drawImage(avatarImage, x, y, this);
-    } else {
-      // TODO: get random
+    if (player == null || player.getColor() == null) {
+      return;
     }
 
-    g2.dispose();
+    g2.setStroke(new BasicStroke(3));
+    g2.setColor(player.isReadyToPlay() ? Color.GREEN : Color.RED);
+    g2.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 30, 30);
+    avatarImage =
+        ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE").getStandingImage();
+    avatarImage = ImageCntrl.scaleBufferedImage(avatarImage, 100, 100);
+    int x = (getWidth() - avatarImage.getWidth()) / 2;
+    int y = (getHeight() - avatarImage.getHeight()) / 2;
+    g2.drawImage(avatarImage, x, y, this);
+
+    String playerTypeIconPath =
+        player.isBot() ? "resource\\images\\bot.svg" : "resource\\images\\player.svg";
+
+    SvgIconButton playerTypeButton = new SvgIconButton(playerTypeIconPath);
+    playerTypeButton.setBgColor(Color.LIGHT_GRAY);
+    playerTypeButton.setBorderRadius(-1);
+    playerTypeButton.setButtonSize(35, 0);
+    playerTypeButton.setSvgIconSize(25, 25);
+    playerTypeButton.setBounds(
+        x + (avatarImage.getWidth() - playerTypeButton.getIconDiameter()) / 2,
+        getHeight() - playerTypeButton.getIconDiameter() - 5,
+        playerTypeButton.getIconDiameter(),
+        playerTypeButton.getIconDiameter());
+    add(playerTypeButton);
+
+    if(canBeRemoved != null && canBeRemoved) {
+      SvgIconButton removePlayerButton = new SvgIconButton("resource\\images\\delete.svg");
+      removePlayerButton.setBgColor(new Color(255, 66, 66));
+      removePlayerButton.setBorderRadius(-1);
+      removePlayerButton.setButtonSize(35, 0);
+      removePlayerButton.setSvgIconSize(25, 25);
+      // place at the top right corner
+      removePlayerButton.setBounds(
+          getWidth() - playerTypeButton.getIconDiameter() - 5,
+          5,
+          playerTypeButton.getIconDiameter(),
+          playerTypeButton.getIconDiameter());
+      removePlayerButton.addActionListener(
+          e -> {
+            handleRemovePlayer();
+          });
+      add(removePlayerButton);
+    }
+  }
+
+  private void handleRemovePlayer() {
+    if (onPlayerRemove != null) {
+      onPlayerRemove.run();
+    }
   }
 
   public void setAvatarImage(BufferedImage image) {
@@ -76,5 +115,14 @@ public class AvatarPnl extends JPanel {
 
   public Player getPlayer() {
     return player;
+  }
+
+  public void setOnPlayerRemove(Runnable onPlayerRemove) {
+    this.onPlayerRemove = onPlayerRemove;
+  }
+
+  public void setCanBeRemoved(Boolean canBeRemoved) {
+    this.canBeRemoved = canBeRemoved;
+    repaint();
   }
 }

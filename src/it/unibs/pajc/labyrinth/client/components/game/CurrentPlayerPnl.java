@@ -150,7 +150,7 @@ public class CurrentPlayerPnl extends JPanel {
         currentY - PLAYER_SIZE / 2 - OVAL_Y_ADJUSTMENT; // Align vertically with text center
     g2.drawImage(
         ImageCntrl.valueOf(controller.getCurrentPlayer().getColorName() + "_PLAYER_SPRITE")
-            .getStandingAnimationImage(),
+            .getStandingImage(),
         leftPosition + textWidth + TEXT_OVAL_SPACING - PADDING_X,
         playerY - 20,
         PLAYER_SIZE,

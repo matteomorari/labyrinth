@@ -1,6 +1,7 @@
 package it.unibs.pajc.labyrinth.client.components;
 
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
+import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.PlayerColor;
 import it.unibs.pajc.labyrinth.core.lobby.Lobby;
@@ -82,13 +83,11 @@ public class LobbyPnl extends JPanel {
       for (int i = 0; i < AVATAR_COUNT; i++) {
         gbc.gridx = i % columns;
         gbc.gridy = i / columns;
-        AvatarPnl avatarPnl = new AvatarPnl();
+        AvatarPnl avatarPnl = new AvatarPnl(true);
         avatarPnl.setPreferredSize(new Dimension(AVATAR_SIZE, AVATAR_SIZE));
+        // if there are less players than the max number of players, paint an empty avatar
         if (i < players.size()) {
           avatarPnl.setPlayer(players.get(i));
-        } else {
-          // TODO: if the are no more players, set the "add bot" or "add player" button
-          // based if is an online or local game
         }
         add(avatarPnl, gbc);
         avatarPnlList.add(avatarPnl);
@@ -97,10 +96,12 @@ public class LobbyPnl extends JPanel {
 
     // Add mouse listener to each AvatarPnl in the lobby panel
     for (AvatarPnl avatarPnl : getAvatarPanels()) {
-      if ((this.localPlayer != null && avatarPnl.getPlayer() != null)
-          && !avatarPnl.getPlayer().equals(this.localPlayer)) {
-        // for more details see the comment in the class attribute definition
-        continue;
+
+      if ((this.localPlayer != null && avatarPnl.getPlayer() != null)) {
+        if (!avatarPnl.getPlayer().equals(this.localPlayer)) {
+          // the local player can change only his avatar and bots
+          continue;
+        }
       }
 
       avatarPnl.addMouseListener(
@@ -117,12 +118,11 @@ public class LobbyPnl extends JPanel {
               List<SelectionDialog.SelectionItem> items = new ArrayList<>();
               for (PlayerColor color : availableColors) {
                 BufferedImage img =
-                    ImageCntrl.valueOf(color.name() + "_PLAYER_SPRITE").getStandingAnimationImage();
+                    ImageCntrl.valueOf(color.name() + "_PLAYER_SPRITE").getStandingImage();
                 // Create a Runnable variable for the color selection action
-                Runnable colorSelectionAction =
+                Runnable onAvatarChange =
                     () -> {
                       lobby.setPlayerColor(player, color);
-                      avatarPnl.repaint();
                       repaint();
                     };
 
@@ -130,9 +130,7 @@ public class LobbyPnl extends JPanel {
                     new SelectionDialog.SelectionItem(
                         img,
                         () -> {
-                          colorSelectionAction.run();
-                          // avatarPnl.repaint();
-                          // repaint();
+                          onAvatarChange.run();
                         }));
               }
 

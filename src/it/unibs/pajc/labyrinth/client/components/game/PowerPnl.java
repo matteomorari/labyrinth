@@ -1,6 +1,6 @@
 package it.unibs.pajc.labyrinth.client.components.game;
 
-import it.unibs.pajc.labyrinth.client.components.RoundedIconButton;
+import it.unibs.pajc.labyrinth.client.components.SvgIconButton;
 import it.unibs.pajc.labyrinth.client.components.SelectionDialog;
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
@@ -34,12 +34,12 @@ public class PowerPnl extends JPanel {
   private int cardWidth = DEFAULT_CARD_WIDTH;
   private final Font titleFont = new Font(TITLE_FONT_FAMILY, Font.BOLD, TITLE_FONT_SIZE);
   private int panelWidth;
-  private RoundedIconButton useButton;
+  private SvgIconButton useButton;
 
   public PowerPnl(LabyrinthController controller) {
     this.controller = controller;
 
-    useButton = new RoundedIconButton("resource\\images\\power.svg");
+    useButton = new SvgIconButton("resource\\images\\power.svg");
     useButton.setButtonSize(50, 0);
     useButton.setBorderRadius(40);
     useButton.setSvgIconSize(40, 40);
@@ -187,7 +187,7 @@ public class PowerPnl extends JPanel {
       if (!player.equals(currentPlayer)) {
         BufferedImage playerImage =
             ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE")
-                .getStandingAnimationImage();
+                .getStandingImage();
         items.add(
             new SelectionDialog.SelectionItem(
                 playerImage, () -> controller.setPlayerToSwap(player)));

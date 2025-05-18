@@ -1,6 +1,6 @@
 package it.unibs.pajc.labyrinth.client.views;
 
-import it.unibs.pajc.labyrinth.client.components.RoundedIconButton;
+import it.unibs.pajc.labyrinth.client.components.SvgIconButton;
 import it.unibs.pajc.labyrinth.client.controllers.LabyrinthClientController;
 import it.unibs.pajc.labyrinth.core.lobby.OnlineGameManager;
 
@@ -42,7 +42,7 @@ public class StartPnl extends JPanel {
     gbc.anchor = GridBagConstraints.CENTER; // Center the buttons
 
     // "Local" button
-    RoundedIconButton localButton = new RoundedIconButton("resource\\images\\rotate.svg", "LOCAL");
+    SvgIconButton localButton = new SvgIconButton("resource\\images\\rotate.svg", "LOCAL");
     localButton.setBorderRadius(20);
     localButton.setButtonSize(200, 50);
     localButton.setSvgIconSize(150, 150);
@@ -54,8 +54,8 @@ public class StartPnl extends JPanel {
     centerPanel.add(localButton, gbc);
 
     // "Online" button
-    RoundedIconButton onlineButton =
-        new RoundedIconButton("resource\\images\\rotate.svg", "ONLINE");
+    SvgIconButton onlineButton =
+        new SvgIconButton("resource\\images\\rotate.svg", "ONLINE");
     onlineButton.setBorderRadius(20);
     onlineButton.setButtonSize(200, 50);
     onlineButton.setSvgIconSize(150, 150);

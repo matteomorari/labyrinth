@@ -114,7 +114,7 @@ public enum ImageCntrl {
     return playerAnimation;
   }
 
-  public BufferedImage getStandingAnimationImage() {
+  public BufferedImage getStandingImage() {
     return getSprite(1, 0);
   }
 

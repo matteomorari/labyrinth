@@ -4,7 +4,7 @@ import it.unibs.pajc.labyrinth.client.animation.Animatable;
 import it.unibs.pajc.labyrinth.client.animation.Animator;
 import it.unibs.pajc.labyrinth.client.animation.EasingFunction;
 import it.unibs.pajc.labyrinth.client.components.CardImage;
-import it.unibs.pajc.labyrinth.client.components.RoundedIconButton;
+import it.unibs.pajc.labyrinth.client.components.SvgIconButton;
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Card;
@@ -48,8 +48,8 @@ public class AvailableCardPnl extends JPanel implements Animatable {
   private int cardWidth = DEFAULT_CARD_WIDTH;
   private final Font titleFont = new Font(TITLE_FONT_FAMILY, Font.BOLD, TITLE_FONT_SIZE);
   private int panelWidth;
-  private RoundedIconButton rotateButton;
-  private RoundedIconButton skipTurnButton;
+  private SvgIconButton rotateButton;
+  private SvgIconButton skipTurnButton;
   private Animator animator;
   private int animationCardAngle;
   private boolean isRotating = false;
@@ -61,14 +61,14 @@ public class AvailableCardPnl extends JPanel implements Animatable {
     availableCardImage = getCardImage();
 
     // Initialize the rotate button
-    rotateButton = new RoundedIconButton("resource\\images\\rotate.svg");
+    rotateButton = new SvgIconButton("resource\\images\\rotate.svg");
     rotateButton.setButtonSize(50, 0);
     rotateButton.setBorderRadius(40);
     rotateButton.setSvgIconSize(40, 40);
     rotateButton.addActionListener(e -> handleRotationCardBtn());
 
     // Initialize the skip turn button
-    skipTurnButton = new RoundedIconButton("resource\\images\\skip.svg");
+    skipTurnButton = new SvgIconButton("resource\\images\\skip.svg");
     skipTurnButton.setButtonSize(50, 0);
     skipTurnButton.setBorderRadius(40);
     skipTurnButton.setSvgIconSize(40, 40);

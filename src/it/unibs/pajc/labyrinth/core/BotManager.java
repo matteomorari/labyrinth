@@ -11,10 +11,11 @@ public class BotManager {
   Labyrinth model;
   CardInsertMove bestCardInsertMove = null;
   Position bestPosition = null;
-  
+
   public BotManager(Labyrinth model) {
     this.model = model;
   }
+
   public class newPositionWithDistance {
     Position position;
     int distance;
@@ -101,7 +102,6 @@ public class BotManager {
       }
     }
   }
-
 
   private newPositionWithDistance findClosestGoalPosition(
       ArrayList<Position> positions, Position goalPosition) {

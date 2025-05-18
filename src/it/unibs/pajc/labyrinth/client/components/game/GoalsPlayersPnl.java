@@ -165,7 +165,7 @@ public class GoalsPlayersPnl extends JPanel {
       int playerY =
           currentY - PLAYER_SIZE / 2 - OVAL_Y_ADJUSTMENT; // Align vertically with text center
       g2.drawImage(
-          ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE").getStandingAnimationImage(),
+          ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE").getStandingImage(),
           leftPosition,
           playerY - 10,
           PLAYER_SIZE,

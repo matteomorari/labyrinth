@@ -1,7 +1,7 @@
 package it.unibs.pajc.labyrinth.client.views;
 
 import it.unibs.pajc.labyrinth.client.components.LobbyPnl;
-import it.unibs.pajc.labyrinth.client.components.RoundedIconButton;
+import it.unibs.pajc.labyrinth.client.components.SvgIconButton;
 import it.unibs.pajc.labyrinth.client.controllers.LabyrinthClientController;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.lobby.Lobby;
@@ -78,7 +78,7 @@ public class FindOnlineGamePnl extends JPanel {
           }
           panel.add(label, BorderLayout.WEST);
 
-          RoundedIconButton icon = new RoundedIconButton("resource\\images\\rotate.svg");
+          SvgIconButton icon = new SvgIconButton("resource\\images\\rotate.svg");
           icon.setBorderRadius(-1);
           icon.setButtonSize(30, 30);
           icon.setSvgIconSize(30, 30);
