@@ -7,7 +7,7 @@ import it.unibs.pajc.labyrinth.client.controllers.ClientSocketProtocol;
 import it.unibs.pajc.labyrinth.core.BotManager;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
-import it.unibs.pajc.labyrinth.core.PlayerColor;
+import it.unibs.pajc.labyrinth.core.AvatarColor;
 import it.unibs.pajc.labyrinth.core.lobby.Lobby;
 import it.unibs.pajc.labyrinth.core.lobby.LobbyManager;
 import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
@@ -165,7 +165,7 @@ public class LobbyClientController implements LobbyController {
   }
 
   @Override
-  public HashSet<PlayerColor> getAvailableColors() {
+  public HashSet<AvatarColor> getAvailableColors() {
     return onlineGameManager.getSelectedLobby().getAvailableColors();
   }
 
@@ -180,7 +180,7 @@ public class LobbyClientController implements LobbyController {
   }
 
   @Override
-  public void setPlayerColor(Player player, PlayerColor color) {
+  public void setPlayerColor(Player player, AvatarColor color) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'setPlayerColor'");
   }

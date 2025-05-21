@@ -7,7 +7,6 @@ import it.unibs.pajc.labyrinth.core.lobby.Lobby;
 
 import java.awt.Color;
 
-// TODO: do same oop solution as in LabyrinthGson
 public class LobbyGson {
   private static final Gson gson =
       new GsonBuilder().registerTypeAdapter(Color.class, new ColorAdapter()).create();

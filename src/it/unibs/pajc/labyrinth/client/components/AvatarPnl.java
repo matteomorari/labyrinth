@@ -38,7 +38,7 @@ public class AvatarPnl extends JPanel {
     g2.setColor(bgColor);
     g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
 
-    if (player == null || player.getColor() == null) {
+    if (player == null || player.getAvatarColor() == null) {
       return;
     }
 

@@ -6,14 +6,14 @@ import java.util.UUID;
 
 public class Player {
   private String id;
-  private PlayerColor color;
+  private AvatarColor color;
   private Position startPosition;
   private Position position;
   private Boolean isReadyToPlay = false;
   private Boolean isBot = false;
   private ArrayDeque<Goal> goalsQueue;
 
-  public Player(PlayerColor color, String id, boolean isBot) {
+  public Player(AvatarColor color, String id, boolean isBot) {
     this.goalsQueue = new ArrayDeque<>();
     this.position = new Position();
     this.startPosition = new Position();
@@ -22,11 +22,11 @@ public class Player {
     this.isBot = isBot;
   }
 
-  public Player(PlayerColor color, String id) {
+  public Player(AvatarColor color, String id) {
     this(color, id, false);
   }
 
-  public Player(PlayerColor color) {
+  public Player(AvatarColor color) {
     this(color, UUID.randomUUID().toString(), false);
   }
 
@@ -58,12 +58,11 @@ public class Player {
     return this.color != null ? this.color.getColorName() : null;
   }
 
-  public PlayerColor getColor() {
+  public AvatarColor getAvatarColor() {
     return this.color;
   }
 
   public Position getPosition() {
-    // TODO: leaked reference
     return this.position;
   }
 
@@ -73,11 +72,10 @@ public class Player {
   }
 
   public Position getStartPosition() {
-    // TODO: leaked reference
     return this.startPosition;
   }
 
-  public void setColor(PlayerColor color) {
+  public void setColor(AvatarColor color) {
     this.color = color;
   }
 

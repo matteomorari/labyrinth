@@ -2,7 +2,7 @@ package it.unibs.pajc.labyrinth.client.controllers.lobby;
 
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
-import it.unibs.pajc.labyrinth.core.PlayerColor;
+import it.unibs.pajc.labyrinth.core.AvatarColor;
 import it.unibs.pajc.labyrinth.core.lobby.Lobby;
 import it.unibs.pajc.labyrinth.core.lobby.LobbyManager;
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class LobbyLocalController implements LobbyController {
   }
 
   @Override
-  public HashSet<PlayerColor> getAvailableColors() {
+  public HashSet<AvatarColor> getAvailableColors() {
     return lobbyManager.getSelectedLobby().getAvailableColors();
   }
 
@@ -53,7 +53,7 @@ public class LobbyLocalController implements LobbyController {
   }
 
   @Override
-  public void setPlayerColor(Player player, PlayerColor color) {
+  public void setPlayerColor(Player player, AvatarColor color) {
     player.setColor(color);
   }
 

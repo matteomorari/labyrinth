@@ -148,7 +148,7 @@ public class CurrentGoalPnl extends JPanel {
       int x = (goalCardWidth - ovalWidth) / 2;
       int y = (goalCardHeight - ovalHeight) / 2;
 
-      g2.setColor(player.getColor().getColor());
+      g2.setColor(player.getAvatarColor().getColor());
       g2.setStroke(new BasicStroke(OVAL_STROKE_WIDTH));
       g2.fillOval(x, y, ovalWidth, ovalHeight);
 

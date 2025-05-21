@@ -2,7 +2,7 @@ package it.unibs.pajc.labyrinth.core.lobby;
 
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
-import it.unibs.pajc.labyrinth.core.PlayerColor;
+import it.unibs.pajc.labyrinth.core.AvatarColor;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.UUID;
@@ -13,7 +13,7 @@ public class Lobby {
   private ArrayList<Player> playersList;
   private final String LOBBY_ID;
   private Boolean isGameInProgress;
-  private HashSet<PlayerColor> availableColors;
+  private HashSet<AvatarColor> availableColors;
 
   public Lobby(String lobbyName, Labyrinth.EnvironmentType environmentType) {
     this.playersList = new ArrayList<>();
@@ -22,7 +22,7 @@ public class Lobby {
     this.isGameInProgress = false;
     this.labyrinth = new Labyrinth(7, environmentType);
     this.availableColors = new HashSet<>();
-    availableColors = new HashSet<>(java.util.Arrays.asList(PlayerColor.values()));
+    availableColors = new HashSet<>(java.util.Arrays.asList(AvatarColor.values()));
   }
 
   public void addPlayer(Player player) {
@@ -106,7 +106,7 @@ public class Lobby {
     return labyrinth;
   }
 
-  public void setPlayerColor(Player player, PlayerColor color) {
+  public void setPlayerColor(Player player, AvatarColor color) {
     if (!getPlayers().contains(player)) {
       throw new IllegalArgumentException("Player not found in the lobby.");
     }
@@ -129,7 +129,7 @@ public class Lobby {
       throw new IllegalArgumentException("Player not found in the lobby.");
     }
 
-    PlayerColor color = getFreeColor();
+    AvatarColor color = getFreeColor();
     if (color == null) {
       throw new IllegalStateException("No more colors available.");
     }
@@ -137,23 +137,23 @@ public class Lobby {
     setPlayerColor(player, color);
   }
 
-  private PlayerColor getFreeColor() {
+  private AvatarColor getFreeColor() {
     if (availableColors.isEmpty()) {
       return null; // No more colors available
     }
-    PlayerColor randomColor = availableColors.iterator().next();
+    AvatarColor randomColor = availableColors.iterator().next();
     availableColors.remove(randomColor);
     return randomColor;
   }
 
-  public HashSet<PlayerColor> getAvailableColors() {
+  public HashSet<AvatarColor> getAvailableColors() {
     return availableColors;
   }
 
   public void removePlayerColor(Player player) {
     // add the previous color from the available colors
-    if (player.getColor() != null) {
-      availableColors.add(player.getColor());
+    if (player.getAvatarColor() != null) {
+      availableColors.add(player.getAvatarColor());
       player.setColor(null);
     }
   }

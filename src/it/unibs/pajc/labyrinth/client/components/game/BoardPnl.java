@@ -175,8 +175,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
       int startX = initialXPosition + startPos.getCol() * cellSize;
       int startY = initialYPosition + startPos.getRow() * cellSize;
 
-      // TODO: non la cosa più bella da vedere (controllare anche da altre parti)
-      g2.setColor(player.getColor().getColor());
+      g2.setColor(player.getAvatarColor().getColor());
       g2.fillOval(startX + cellSize / 3, startY + cellSize / 3, cellSize / 3, cellSize / 3);
     }
   }

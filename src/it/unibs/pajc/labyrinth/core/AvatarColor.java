@@ -3,7 +3,7 @@ package it.unibs.pajc.labyrinth.core;
 import java.awt.Color;
 
 // TODO: improve name
-public enum PlayerColor {
+public enum AvatarColor {
   RED("RED", Color.RED),
   BLUE("BLUE", Color.BLUE),
   GREEN("GREEN", Color.GREEN),
@@ -21,7 +21,7 @@ public enum PlayerColor {
   private final String colorName;
   private final Color color;
 
-  PlayerColor(String colorName, Color color) {
+  AvatarColor(String colorName, Color color) {
     this.colorName = colorName;
     this.color = color;
   }

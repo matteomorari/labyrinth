@@ -3,7 +3,7 @@ package it.unibs.pajc.labyrinth.client.components;
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.client.controllers.lobby.LobbyController;
 import it.unibs.pajc.labyrinth.core.Player;
-import it.unibs.pajc.labyrinth.core.PlayerColor;
+import it.unibs.pajc.labyrinth.core.AvatarColor;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -114,11 +114,11 @@ public class LobbyPnl extends JPanel {
               if (player == null) return;
 
               // Get available colors from the lobby
-              HashSet<PlayerColor> availableColors = lobbyController.getAvailableColors();
+              HashSet<AvatarColor> availableColors = lobbyController.getAvailableColors();
 
               // Build selection items for the dialog
               List<SelectionDialog.SelectionItem> items = new ArrayList<>();
-              for (PlayerColor color : availableColors) {
+              for (AvatarColor color : availableColors) {
                 BufferedImage img =
                     ImageCntrl.valueOf(color.name() + "_PLAYER_SPRITE").getStandingImage();
                 // Create a Runnable variable for the color selection action

@@ -52,7 +52,7 @@ public class SocketCommunicationProtocol {
         Consumer<LabyrinthEvent> commandExe =
             e.getCommand() != null && commandMap.containsKey(e.getCommand())
                 ? commandMap.get(e.getCommand())
-                : commandMap.get("@debug@"); // TODO: ??
+                : commandMap.get("@debug@"); // TODO: to implement?
 
         if (commandExe != null) commandExe.accept(e);
         else System.out.println("comando non riconosciuto");

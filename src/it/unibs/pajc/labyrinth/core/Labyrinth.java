@@ -356,7 +356,10 @@ public class Labyrinth extends BaseModel {
   }
 
   public void insertCard(Position insertPosition) {
-    validatePosition(insertPosition);
+    if(!isPositionValid(insertPosition.row, insertPosition.col)) {
+      System.out.println("Illegal move");
+      return;
+    }
 
     if (this.availableCard == null) {
       throw new IllegalStateException("No available card");
@@ -477,16 +480,6 @@ public class Labyrinth extends BaseModel {
     setGoalToSwap(null);
   }
 
-  // TODO: there is a duplicate
-  private void validatePosition(Position insertPosition) {
-    if (insertPosition.row < 0
-        || insertPosition.row >= this.boardSize
-        || insertPosition.col < 0
-        || insertPosition.col >= this.boardSize) {
-      throw new IllegalArgumentException("Invalid position");
-    }
-  }
-
   public ArrayList<Position> getAvailableCardInsertionPoint() {
     ArrayList<Position> availableCardInsertionPoint = new ArrayList<>();
     for (int i = 1; i < this.boardSize - 1; i++) {
@@ -544,8 +537,7 @@ public class Labyrinth extends BaseModel {
     for (Orientation orientation : Orientation.values()) {
       Position neighborPosition = getNeighborPosition(card.getPosition(), orientation);
       // Check if the neighbor position is within the board boundaries
-      // TODO: move in the getNeighborPosition, if out of bounds return Exception
-      if (isPositionWithinBounds(neighborPosition.getRow(), neighborPosition.getCol())) {
+      if (isPositionValid(neighborPosition.getRow(), neighborPosition.getCol())) {
         Boolean isOpen =
             isPathOpenBetweenCards(
                 card,
@@ -641,7 +633,7 @@ public class Labyrinth extends BaseModel {
     int neighborCol = neighborPosition.getCol();
 
     // Check if position is valid
-    if (!isPositionWithinBounds(neighborRow, neighborCol)) {
+    if (!isPositionValid(neighborRow, neighborCol)) {
       return;
     }
 
@@ -700,7 +692,7 @@ public class Labyrinth extends BaseModel {
     }
   }
 
-  private boolean isPositionWithinBounds(int row, int col) {
+  private boolean isPositionValid(int row, int col) {
     return row >= 0 && row < this.boardSize && col >= 0 && col < this.boardSize;
   }
 
@@ -713,13 +705,16 @@ public class Labyrinth extends BaseModel {
       return;
     }
 
-    // TODO: use proper Card method
+    // remove the player from the previous card
     Card previousPlayerCard =
         this.board
             .get(currentPlayer.getPosition().getRow())
             .get(currentPlayer.getPosition().getCol());
     previousPlayerCard.removePlayer(currentPlayer);
-    this.board.get(row).get(col).addPlayer(currentPlayer);
+  
+    // add the player to the new card
+    Card newPlayerCard = this.board.get(row).get(col);
+    newPlayerCard.addPlayer(currentPlayer);
     currentPlayer.setPosition(row, col);
 
     setWaitingForPlayerAnimation(true);
@@ -727,7 +722,6 @@ public class Labyrinth extends BaseModel {
     this.fireChangeListener();
   }
 
-  // TODO: without leaked reference can be improved
   public void swapPlayers() {
     Player currentPlayer = getCurrentPlayer();
     if (currentPlayer == null || playerToSwap == null) {
@@ -738,8 +732,8 @@ public class Labyrinth extends BaseModel {
     System.out.println("Current player position" + currentPlayerPosition);
     System.out.println("swap player position " + playerToSwap.getPosition());
 
-    int x = playerToSwap.getPosition().getRow();
-    int y = playerToSwap.getPosition().getCol();
+    int swapPlayerRow = playerToSwap.getPosition().getRow();
+    int swapPlayerCol = playerToSwap.getPosition().getCol();
     int xCurrent = currentPlayer.getPosition().getRow();
     int yCurrent = currentPlayer.getPosition().getCol();
 
@@ -748,7 +742,7 @@ public class Labyrinth extends BaseModel {
     Card playerToSwapCard = getPlayerCard(playerToSwap);
 
     playerToSwap.setPosition(xCurrent, yCurrent);
-    currentPlayer.setPosition(x, y);
+    currentPlayer.setPosition(swapPlayerRow, swapPlayerCol);
 
     // Remove players from their current cards
     currentPlayerCard.removePlayer(currentPlayer);
