@@ -4,10 +4,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import it.unibs.pajc.labyrinth.client.controllers.ClientSocketProtocol;
+import it.unibs.pajc.labyrinth.core.AvatarColor;
 import it.unibs.pajc.labyrinth.core.BotManager;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
-import it.unibs.pajc.labyrinth.core.AvatarColor;
+import it.unibs.pajc.labyrinth.core.clientServerCommon.SocketCommunicationProtocol;
 import it.unibs.pajc.labyrinth.core.lobby.Lobby;
 import it.unibs.pajc.labyrinth.core.lobby.LobbyManager;
 import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
@@ -78,15 +79,15 @@ public class LobbyClientController implements LobbyController {
           }
         });
     connectionProtocol.addCommand(
-      "remove_from_lobby",
-      e -> {
-        try {
-          onlineGameManager.setSelectedLobby(null);
+        "remove_from_lobby",
+        e -> {
+          try {
+            onlineGameManager.setSelectedLobby(null);
 
-        } catch (Exception exc) {
-          exc.printStackTrace();
-        }
-      });
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
     connectionProtocol.addCommand(
         "game_started",
         e -> {
@@ -149,9 +150,8 @@ public class LobbyClientController implements LobbyController {
   }
 
   public void fetchLobby() {
-    // TODO: to check static access
     connectionProtocol.sendMsg(
-        connectionProtocol, connectionProtocol.createMessage("fetch_lobbies", null));
+        connectionProtocol, SocketCommunicationProtocol.createMessage("fetch_lobbies", null));
   }
 
   @Override

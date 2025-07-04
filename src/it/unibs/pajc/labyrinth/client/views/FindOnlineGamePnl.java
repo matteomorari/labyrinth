@@ -7,7 +7,6 @@ import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthClientController;
 import it.unibs.pajc.labyrinth.client.controllers.lobby.LobbyClientController;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
-import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.enums.MyColors;
 import it.unibs.pajc.labyrinth.core.lobby.Lobby;
 import java.awt.*;
@@ -229,11 +228,11 @@ public class FindOnlineGamePnl extends JPanel {
     // so we have to switch to the game panel
     if (currentLobby != null && currentLobby.isGameInProgress()) {
       Labyrinth labyrinthModel = lobbyController.getLabyrinth();
-      Player localPlayer = lobbyController.getLocalPlayer();
+      String localPlayerId = lobbyController.getLocalPlayer().getId();
 
       LabyrinthClientController labyrinthClientController =
           new LabyrinthClientController(
-              lobbyController.getConnectionProtocol(), labyrinthModel, localPlayer);
+              lobbyController.getConnectionProtocol(), labyrinthModel, localPlayerId);
       GamePnl gamePanel = new GamePnl(labyrinthClientController);
       labyrinthModel.addChangeListener(e -> gamePanel.update());
 

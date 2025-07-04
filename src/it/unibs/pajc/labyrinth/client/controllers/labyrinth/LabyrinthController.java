@@ -51,4 +51,6 @@ public interface LabyrinthController {
   boolean isGameOver();
 
   boolean isGameCrashed();
+
+  Player getPlayerForGoalDisplay();
 }

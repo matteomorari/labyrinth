@@ -107,4 +107,10 @@ public class LabyrinthLocalController implements LabyrinthController {
   public boolean isGameCrashed() {
     return labyrinth.isGameCrashed();
   }
+
+  @Override
+  public Player getPlayerForGoalDisplay() {
+    // In local mode, we always show the current player's goal
+    return getCurrentPlayer();
+  }
 }

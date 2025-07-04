@@ -13,15 +13,14 @@ import java.util.ArrayList;
 
 public class LabyrinthClientController implements LabyrinthController {
   private Labyrinth labyrinth;
-  private Player localPlayer;
+  private String localPlayerId;
   private final ClientSocketProtocol connectionProtocol;
 
   public LabyrinthClientController(
-      ClientSocketProtocol connectionProtocol, Labyrinth labyrinth, Player localPlayer) {
-    this.localPlayer = localPlayer;
+      ClientSocketProtocol connectionProtocol, Labyrinth labyrinth, String localPlayerId) {
     this.connectionProtocol = connectionProtocol;
-    this.localPlayer = localPlayer;
     this.labyrinth = labyrinth;
+    this.localPlayerId = localPlayerId;
     createCommandMap();
   }
 
@@ -138,7 +137,7 @@ public class LabyrinthClientController implements LabyrinthController {
   }
 
   public Player getLocalPlayer() {
-    return localPlayer;
+    return labyrinth.getPlayerById(localPlayerId);
   }
 
   @Override
@@ -163,7 +162,7 @@ public class LabyrinthClientController implements LabyrinthController {
 
   @Override
   public void movePlayer(int row, int col) {
-    if (localPlayer.equals(labyrinth.getCurrentPlayer())) {
+    if (getLocalPlayer().equals(labyrinth.getCurrentPlayer())) {
       JsonObject msg = new JsonObject();
       msg.addProperty("command", "move_player");
 
@@ -178,7 +177,7 @@ public class LabyrinthClientController implements LabyrinthController {
 
   @Override
   public void insertCard(Position position) {
-    if (localPlayer.equals(labyrinth.getCurrentPlayer())) {
+    if (getLocalPlayer().equals(labyrinth.getCurrentPlayer())) {
       JsonObject msg = new JsonObject();
       msg.addProperty("command", "insert_card");
 
@@ -193,7 +192,7 @@ public class LabyrinthClientController implements LabyrinthController {
 
   @Override
   public void rotateAvailableCard(int rotation) {
-    if (localPlayer.equals(labyrinth.getCurrentPlayer())) {
+    if (getLocalPlayer().equals(labyrinth.getCurrentPlayer())) {
       JsonObject msg = new JsonObject();
       msg.addProperty("command", "rotate_available_card");
 
@@ -222,7 +221,7 @@ public class LabyrinthClientController implements LabyrinthController {
 
   @Override
   public void setPlayerToSwap(Player player) {
-    if (localPlayer.equals(labyrinth.getCurrentPlayer())) {
+    if (getLocalPlayer().equals(labyrinth.getCurrentPlayer())) {
       JsonObject msg = new JsonObject();
       msg.addProperty("command", "set_player_to_swap");
 
@@ -236,7 +235,7 @@ public class LabyrinthClientController implements LabyrinthController {
 
   @Override
   public void setGoalToSwap(Goal goal) {
-    if (localPlayer.equals(labyrinth.getCurrentPlayer())) {
+    if (getLocalPlayer().equals(labyrinth.getCurrentPlayer())) {
       JsonObject msg = new JsonObject();
       msg.addProperty("command", "set_goal_to_swap");
 
@@ -251,7 +250,7 @@ public class LabyrinthClientController implements LabyrinthController {
 
   @Override
   public void skipTurn() {
-    if (localPlayer.equals(labyrinth.getCurrentPlayer())) {
+    if (getLocalPlayer().equals(labyrinth.getCurrentPlayer())) {
       JsonObject msg = new JsonObject();
       msg.addProperty("command", "skip_turn");
 
@@ -262,7 +261,7 @@ public class LabyrinthClientController implements LabyrinthController {
 
   @Override
   public void usePower() {
-    if (localPlayer.equals(labyrinth.getCurrentPlayer())) {
+    if (getLocalPlayer().equals(labyrinth.getCurrentPlayer())) {
       JsonObject msg = new JsonObject();
       msg.addProperty("command", "use_power");
 
@@ -331,5 +330,11 @@ public class LabyrinthClientController implements LabyrinthController {
   @Override
   public boolean isGameCrashed() {
     return labyrinth.isGameCrashed();
+  }
+
+  @Override
+  public Player getPlayerForGoalDisplay() {
+    // In online mode, we always show the local player's goal
+    return labyrinth.getPlayerById(getLocalPlayer().getId());
   }
 }

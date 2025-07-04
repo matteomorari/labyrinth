@@ -4,7 +4,6 @@ import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.enums.MyColors;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
@@ -120,7 +119,9 @@ public class CurrentGoalPnl extends JPanel {
     BufferedImage goalCardBackground =
         scaleImage(goalCardBgCntrl.getImage(), cardWidth, Integer.MAX_VALUE);
 
-    Player player = controller.getCurrentPlayer();
+    // Get the player whose goal we should display using the controller
+    Player player = controller.getPlayerForGoalDisplay();
+
     int goalCardWidth = goalCardBackground.getWidth();
     int goalCardHeight = goalCardBackground.getHeight();
 
