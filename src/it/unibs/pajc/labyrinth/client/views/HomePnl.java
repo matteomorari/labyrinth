@@ -10,6 +10,7 @@ import it.unibs.pajc.labyrinth.client.controllers.lobby.LobbyLocalController;
 import it.unibs.pajc.labyrinth.core.lobby.LobbyManager;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -40,10 +41,11 @@ public class HomePnl extends JPanel {
     gbc.anchor = GridBagConstraints.CENTER; // Center the buttons
 
     // "Local" button
-    SvgIconButton localButton = new SvgIconButton("resource\\icons\\computer.svg", null);
+    SvgIconButton localButton = new SvgIconButton("resource\\icons\\computer.svg", "LOCAL GAME");
     localButton.setBorderRadius(20);
     localButton.setButtonSize(200, 50);
     localButton.setSvgIconSize(150, 150);
+    localButton.setFont(new Font("Times New Roman", Font.BOLD, 30));
     localButton.addActionListener(e -> createLocalGame());
     gbc.gridx = 0;
     gbc.gridy = 0;
@@ -52,10 +54,11 @@ public class HomePnl extends JPanel {
     centerPanel.add(localButton, gbc);
 
     // "Online" button
-    SvgIconButton onlineButton = new SvgIconButton("resource\\icons\\online.svg", null);
+    SvgIconButton onlineButton = new SvgIconButton("resource\\icons\\online.svg", "ONLINE GAME");
     onlineButton.setBorderRadius(20);
     onlineButton.setButtonSize(200, 50);
     onlineButton.setSvgIconSize(150, 150);
+    onlineButton.setFont(new Font("Times New Roman", Font.BOLD, 30));
     onlineButton.addActionListener(e -> findOnlineGame());
     gbc.gridx = 1;
     gbc.gridy = 0;

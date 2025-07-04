@@ -2,6 +2,7 @@ package it.unibs.pajc.labyrinth.client.components;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -54,13 +55,13 @@ public class SvgIconButton extends JButton {
     repaint();
   }
 
-  /**
-   * Get the current border radius.
-   *
-   * @return the border radius, or -1 if the button is circular
-   */
   public int getBorderRadius() {
     return borderRadius;
+  }
+
+  public void setLabelFont(Font font) {
+    setFont(font);
+    repaint();
   }
 
   public void setLabel(String label) {
@@ -150,6 +151,8 @@ public class SvgIconButton extends JButton {
     // If a label is provided, draw it in the area below the icon.
     if (label != null && !label.isEmpty()) {
       g2.setColor(getForeground());
+      g2.setFont(getFont());
+
       FontMetrics fm = g2.getFontMetrics();
       int textWidth = fm.stringWidth(label);
       int textX = (width - textWidth) / 2;
