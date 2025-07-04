@@ -3,6 +3,7 @@ package it.unibs.pajc.labyrinth.server;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import it.unibs.pajc.labyrinth.core.AvatarColor;
 import it.unibs.pajc.labyrinth.core.Goal;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
@@ -115,6 +116,24 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
             }
             currentLobby.removePlayer(playerToRemove);
             sendLobbyStateUpdate(currentLobby);
+          } catch (Exception exc) {
+            exc.printStackTrace();
+          }
+        });
+    commandMap.put(
+        "set_player_color",
+        e -> {
+          try {
+            String playerId = e.getParameters().get("player_id").getAsString();
+            String colorName = e.getParameters().get("color").getAsString();
+
+            Player targetPlayer = currentLobby.getPlayerById(playerId);
+            AvatarColor color = AvatarColor.valueOf(colorName);
+
+            if (targetPlayer != null && color != null) {
+              currentLobby.setPlayerColor(targetPlayer, color);
+              sendLobbyStateUpdate(currentLobby);
+            }
           } catch (Exception exc) {
             exc.printStackTrace();
           }

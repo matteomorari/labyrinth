@@ -181,8 +181,17 @@ public class LobbyClientController implements LobbyController {
 
   @Override
   public void setPlayerColor(Player player, AvatarColor color) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'setPlayerColor'");
+    if (player != null && color != null && onlineGameManager.getSelectedLobby() != null) {
+      JsonObject msg = new JsonObject();
+      msg.addProperty("command", "set_player_color");
+
+      JsonObject parameters = new JsonObject();
+      parameters.addProperty("player_id", player.getId());
+      parameters.addProperty("color", color.name());
+
+      msg.add("parameters", parameters);
+      connectionProtocol.sendMsg(connectionProtocol, msg.toString());
+    }
   }
 
   @Override

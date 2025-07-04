@@ -2,7 +2,6 @@ package it.unibs.pajc.labyrinth.client.components;
 
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.core.enums.MyColors;
-
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -49,7 +48,8 @@ public class SelectionDialog {
    * @param title The title of the dialog
    * @param items The list of selectable items to display
    */
-  public static void show(Component parent, String title, List<SelectionItem> items) {
+  public static void displaySelectionDialog(
+      Component parent, String title, List<SelectionItem> items) {
     // Create the content panel
     JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, BUTTON_PADDING, BUTTON_PADDING));
     // Calculate the width based on number of items

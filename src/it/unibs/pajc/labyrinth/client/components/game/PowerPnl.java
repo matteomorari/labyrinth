@@ -9,7 +9,6 @@ import it.unibs.pajc.labyrinth.core.Goal;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.enums.MyColors;
 import it.unibs.pajc.labyrinth.core.enums.PowerType;
-
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
@@ -195,7 +194,7 @@ public class PowerPnl extends JPanel {
       }
     }
 
-    SelectionDialog.show(this, "SELECT   PLAYER", items);
+    SelectionDialog.displaySelectionDialog(this, "SELECT   PLAYER", items);
   }
 
   private void showSwapGoalPopup() {
@@ -210,7 +209,7 @@ public class PowerPnl extends JPanel {
       }
     }
 
-    SelectionDialog.show(this, "SELECT   GOAL", items);
+    SelectionDialog.displaySelectionDialog(this, "SELECT   GOAL", items);
   }
 
   private void showSwapSecondGoalPopup() {
@@ -223,6 +222,6 @@ public class PowerPnl extends JPanel {
       items.add(new SelectionDialog.SelectionItem(goalImage, () -> controller.setGoalToSwap(goal)));
     }
 
-    SelectionDialog.show(this, "SELECT   GOAL", items);
+    SelectionDialog.displaySelectionDialog(this, "SELECT   GOAL", items);
   }
 }
