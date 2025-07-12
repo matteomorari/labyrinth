@@ -19,6 +19,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
+import javax.swing.event.ChangeEvent;
 
 public class HomePnl extends JPanel {
   public HomePnl() {
@@ -132,10 +133,7 @@ public class HomePnl extends JPanel {
           new LobbyClientController(clientSocketController, onlineGameManager);
       lobbyClientController.waitForPlayer();
       FindOnlineGamePnl findOnlineGamePnl = new FindOnlineGamePnl(lobbyClientController);
-      onlineGameManager.addChangeListener(
-          e -> {
-            findOnlineGamePnl.updateData();
-          });
+      onlineGameManager.addChangeListener((ChangeEvent e) -> findOnlineGamePnl.updateData());
       lobbyClientController.fetchLobby();
       replaceParentPnlContent(findOnlineGamePnl);
     } catch (InterruptedException e) {

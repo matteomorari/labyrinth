@@ -28,14 +28,14 @@ public class LabyrinthServer {
   }
 
   private static void log(String format, Object... params) {
-    System.out.printf("[%s] %s\n", LocalDateTime.now(), String.format(format, params));
+    System.out.printf("[%s] %s%n", LocalDateTime.now(), String.format(format, params));
   }
 
   public SocketCommunicationProtocol addPlayer(Socket playerSocket) {
     Player player = new Player();
     LabyrinthServerProtocol playerProtocol = new LabyrinthServerProtocol(player, playerSocket);
 
-    new Thread(() -> playerProtocol.run()).start();
+    new Thread(playerProtocol::run).start();
 
     // Wait until the protocol thread is initialized
     synchronized (playerProtocol) {

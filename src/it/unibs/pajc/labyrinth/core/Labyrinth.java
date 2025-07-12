@@ -3,6 +3,7 @@ package it.unibs.pajc.labyrinth.core;
 import it.unibs.pajc.labyrinth.core.enums.CardType;
 import it.unibs.pajc.labyrinth.core.enums.GoalType;
 import it.unibs.pajc.labyrinth.core.enums.PowerType;
+import it.unibs.pajc.labyrinth.core.utility.BaseModel;
 import it.unibs.pajc.labyrinth.core.utility.BotMoveCalcListener;
 import it.unibs.pajc.labyrinth.core.utility.NodeComparator;
 import it.unibs.pajc.labyrinth.core.utility.Orientation;
@@ -36,7 +37,6 @@ public class Labyrinth extends BaseModel {
   private Card availableCard;
   private Position lastInsertedCardPosition;
   private ArrayList<Position> lastPlayerMovedPath;
-  // TODO: to move to the player class?
   private boolean hasCurrentPlayerInserted = false;
   private boolean hasCurrentPlayerDoubleTurn = false;
   private boolean hasUsedPower = false;
@@ -538,7 +538,7 @@ public class Labyrinth extends BaseModel {
       Position neighborPosition = getNeighborPosition(card.getPosition(), orientation);
       // Check if the neighbor position is within the board boundaries
       if (isPositionValid(neighborPosition.getRow(), neighborPosition.getCol())) {
-        Boolean isOpen =
+        boolean isOpen =
             isPathOpenBetweenCards(
                 card,
                 this.board.get(neighborPosition.getRow()).get(neighborPosition.getCol()),
@@ -802,7 +802,7 @@ public class Labyrinth extends BaseModel {
     this.hasCurrentPlayerDoubleTurn = hasDoubleTurn;
   }
 
-  public boolean getHasUsedPower() {
+  public boolean isPowerUsed() {
     return hasUsedPower;
   }
 
@@ -827,11 +827,11 @@ public class Labyrinth extends BaseModel {
     this.goalToSwap = goalToSwap;
   }
 
-  public boolean getHasCurrentPlayerInserted() {
+  public boolean isCurrentPlayerInserted() {
     return hasCurrentPlayerInserted;
   }
 
-  public boolean getHasCurrentPlayerDoubleTurn() {
+  public boolean isCurrentPlayerDoubleTurnActive() {
     return hasCurrentPlayerDoubleTurn;
   }
 

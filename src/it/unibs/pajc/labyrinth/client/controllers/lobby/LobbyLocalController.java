@@ -64,6 +64,6 @@ public class LobbyLocalController implements LobbyController {
 
   @Override
   public Labyrinth getLabyrinth() {
-    return lobbyManager.getSelectedLobby().getLabyrinth();
+    return lobbyManager.getSelectedLobby().getModel();
   }
 }

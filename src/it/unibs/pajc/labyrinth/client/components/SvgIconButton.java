@@ -64,6 +64,7 @@ public class SvgIconButton extends JButton {
     repaint();
   }
 
+  @Override
   public void setLabel(String label) {
     this.label = label;
     // Adjust preferred size based on label presence.

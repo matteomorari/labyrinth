@@ -3,7 +3,7 @@ package it.unibs.pajc.labyrinth.client.animation;
 import javax.swing.Timer;
 
 public class Animator {
-  private static final int TIMER_CYCLE_DURATION = 16; // 60 FPS (~16 ms per frame)
+  private static final int TIMER_CYCLE_DURATION = 33; // 30 FPS (~33 ms per frame)
 
   private Animatable target;
   private long duration;

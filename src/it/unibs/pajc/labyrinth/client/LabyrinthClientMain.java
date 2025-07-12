@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.WindowConstants;
 
 public class LabyrinthClientMain {
 
@@ -41,7 +42,7 @@ public class LabyrinthClientMain {
   private void initialize() {
     frame = new JFrame("Labyrinth");
     frame.setBounds(20, 20, 1400, 850);
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     frame.setLayout(new BorderLayout(10, 10));
 
     // for debug purposes

@@ -5,6 +5,9 @@ import com.google.gson.JsonParser;
 
 public class SocketEvent<T> {
 
+  private static final String COMMAND_KEY = "command";
+  private static final String PARAMETERS_KEY = "parameters";
+
   protected T sender;
   protected JsonObject message;
   protected String command;
@@ -13,17 +16,17 @@ public class SocketEvent<T> {
   public SocketEvent(T sender, String message) {
     this.sender = sender;
     this.message = JsonParser.parseString(message).getAsJsonObject();
-    this.command = this.message.get("command").getAsString();
-    if (this.message.has("parameters") && !this.message.get("parameters").isJsonNull()) {
-      this.parameters = this.message.getAsJsonObject("parameters");
+    this.command = this.message.get(COMMAND_KEY).getAsString();
+    if (this.message.has(PARAMETERS_KEY) && !this.message.get(PARAMETERS_KEY).isJsonNull()) {
+      this.parameters = this.message.getAsJsonObject(PARAMETERS_KEY);
     }
   }
 
-  public static String createMessage(String comand, JsonObject parameters) {
+  public static String createMessage(String command, JsonObject parameters) {
     JsonObject msg = new JsonObject();
-    msg.addProperty("command", comand);
+    msg.addProperty(COMMAND_KEY, command);
     if (parameters != null) {
-      msg.add("parameters", parameters);
+      msg.add(PARAMETERS_KEY, parameters);
     }
     return msg.toString();
   }

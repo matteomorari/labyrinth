@@ -11,10 +11,10 @@ import it.unibs.pajc.labyrinth.core.enums.MyColors;
 import it.unibs.pajc.labyrinth.core.lobby.Lobby;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
 
 public class FindOnlineGamePnl extends JPanel {
   private static final int PANEL_WIDTH = 800;
@@ -51,64 +51,25 @@ public class FindOnlineGamePnl extends JPanel {
     setLayout(new BorderLayout(BORDER_GAP, BORDER_GAP));
     setBorder(BorderFactory.createEmptyBorder(BORDER_GAP, BORDER_GAP, BORDER_GAP, BORDER_GAP));
 
-    // Logo panel
+    initLogoPanel();
+    initLobbyListPanel();
+    initLobbyPanel();
+    initButtonPanel();
+    initListeners();
+  }
+
+  private void initLogoPanel() {
     BufferedImage logo = ImageCntrl.LOGO.getImage();
     LogoPanel logoPanel = new LogoPanel(logo);
     add(logoPanel, BorderLayout.NORTH);
+  }
 
-    // Game list panel
+  private void initLobbyListPanel() {
     lobbiesJList = new JList<>();
     lobbiesJList.setFont(new Font("Arial", Font.PLAIN, LOBBY_LIST_FONT_SIZE));
     lobbiesJList.setOpaque(false);
     lobbiesJList.setCellRenderer(
-        (list, value, index, isSelected, cellHasFocus) -> {
-          Color bgColor = Color.WHITE;
-          JPanel panel =
-              new JPanel() {
-                @Override
-                protected void paintComponent(Graphics g) {
-                  super.paintComponent(g);
-                  Graphics2D g2 = (Graphics2D) g.create();
-                  g2.setRenderingHint(
-                      RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                  g2.setColor(bgColor);
-                  int arc = LOBBY_LIST_CELL_ARC;
-                  int inset = LOBBY_LIST_CELL_INSET;
-                  g2.fillRoundRect(
-                      inset, inset, getWidth() - 2 * inset, getHeight() - 2 * inset, arc, arc);
-                  g2.dispose();
-                }
-              };
-          panel.setOpaque(false);
-          panel.setLayout(new BorderLayout());
-          panel.setBorder(
-              BorderFactory.createEmptyBorder(
-                  LOBBY_LIST_CELL_BORDER_TOP, LOBBY_LIST_CELL_BORDER_LEFT,
-                  LOBBY_LIST_CELL_BORDER_BOTTOM, LOBBY_LIST_CELL_BORDER_RIGHT));
-
-          // set the Lobby name and player count
-          String displayValue = value;
-          int maxLen = LOBBY_NAME_MAX_LEN;
-          boolean truncated = false;
-          if (displayValue.length() > maxLen) {
-            displayValue = displayValue.substring(0, maxLen - 3) + "...";
-            truncated = true;
-          }
-          JLabel label = new JLabel(displayValue);
-          label.setFont(list.getFont());
-          if (truncated) {
-            panel.setToolTipText(value);
-          }
-          panel.add(label, BorderLayout.WEST);
-
-          SvgIconButton icon = new SvgIconButton("resource\\icons\\rotate.svg");
-          icon.setBorderRadius(-1);
-          icon.setButtonSize(LOBBY_LIST_ICON_SIZE, LOBBY_LIST_ICON_SIZE);
-          icon.setSvgIconSize(LOBBY_LIST_ICON_SIZE, LOBBY_LIST_ICON_SIZE);
-          icon.setBgColor(bgColor);
-          panel.add(icon, BorderLayout.EAST);
-          return panel;
-        });
+        (list, value, index, isSelected, cellHasFocus) -> createLobbyListCell(list, value));
     JScrollPane lobbyListScrollPanel = new JScrollPane(lobbiesJList);
     lobbyListScrollPanel.setBorder(null);
     lobbyListScrollPanel.getViewport().setBackground(MyColors.MAIN_BG_COLOR.getColor());
@@ -137,12 +98,62 @@ public class FindOnlineGamePnl extends JPanel {
     lobbyListPanel.add(lobbyListScrollPanel, BorderLayout.CENTER);
     lobbyListPanel.setOpaque(false);
     add(lobbyListPanel, BorderLayout.WEST);
+  }
 
-    // lobby panel
+  private JPanel createLobbyListCell(JList<?> list, String value) {
+    Color bgColor = Color.WHITE;
+    JPanel panel =
+        new JPanel() {
+          @Override
+          protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(bgColor);
+            int arc = LOBBY_LIST_CELL_ARC;
+            int inset = LOBBY_LIST_CELL_INSET;
+            g2.fillRoundRect(
+                inset, inset, getWidth() - 2 * inset, getHeight() - 2 * inset, arc, arc);
+            g2.dispose();
+          }
+        };
+    panel.setOpaque(false);
+    panel.setLayout(new BorderLayout());
+    panel.setBorder(
+        BorderFactory.createEmptyBorder(
+            LOBBY_LIST_CELL_BORDER_TOP, LOBBY_LIST_CELL_BORDER_LEFT,
+            LOBBY_LIST_CELL_BORDER_BOTTOM, LOBBY_LIST_CELL_BORDER_RIGHT));
+
+    // set the Lobby name and player count
+    String displayValue = value;
+    int maxLen = LOBBY_NAME_MAX_LEN;
+    boolean truncated = false;
+    if (displayValue.length() > maxLen) {
+      displayValue = displayValue.substring(0, maxLen - 3) + "...";
+      truncated = true;
+    }
+    JLabel label = new JLabel(displayValue);
+    label.setFont(list.getFont());
+    if (truncated) {
+      panel.setToolTipText(value);
+    }
+    panel.add(label, BorderLayout.WEST);
+
+    SvgIconButton icon = new SvgIconButton("resource\\icons\\rotate.svg");
+    icon.setBorderRadius(-1);
+    icon.setButtonSize(LOBBY_LIST_ICON_SIZE, LOBBY_LIST_ICON_SIZE);
+    icon.setSvgIconSize(LOBBY_LIST_ICON_SIZE, LOBBY_LIST_ICON_SIZE);
+    icon.setBgColor(bgColor);
+    panel.add(icon, BorderLayout.EAST);
+    return panel;
+  }
+
+  private void initLobbyPanel() {
     currentLobbyPnl = new LobbyPnl(lobbyController, lobbyController.getLocalPlayer());
     add(currentLobbyPnl, BorderLayout.CENTER);
+  }
 
-    // Action buttons panel
+  private void initButtonPanel() {
     JPanel buttonPanel = new JPanel();
     buttonPanel.setPreferredSize(new Dimension(0, BUTTON_PANEL_HEIGHT));
     buttonPanel.setOpaque(false);
@@ -158,67 +169,68 @@ public class FindOnlineGamePnl extends JPanel {
     buttonPanel.add(readyButton);
     buttonPanel.add(addBotButton);
     buttonPanel.add(createNewLobbyButton);
+  }
 
-    // Add action listeners
-    createNewLobbyButton.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            String lobbyName = JOptionPane.showInputDialog("Enter lobby name:");
-            if (lobbyName != null) {
-              if (!lobbyName.trim().isEmpty()) {
-                // check if the lobby name is already taken
-                for (Lobby lobby : availableLobbies) {
-                  if (lobby.getLobbyName().equalsIgnoreCase(lobbyName)) {
-                    JOptionPane.showMessageDialog(
-                        FindOnlineGamePnl.this,
-                        "Lobby name already taken. Please choose another name.",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                    return;
-                  }
-                }
-                lobbyController.createLobby(lobbyName);
-              } else {
-                JOptionPane.showMessageDialog(
-                    FindOnlineGamePnl.this,
-                    "Lobby name cannot be empty.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-              }
-            }
-          }
-        });
+  private void initListeners() {
+    createNewLobbyButton.addActionListener((ActionEvent e) -> handleCreateNewLobby());
     readyButton.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            if (currentLobby != null) {
-              lobbyController.togglePlayerReadyToPlay();
-            }
+        (ActionEvent e) -> {
+          if (currentLobby != null) {
+            lobbyController.togglePlayerReadyToPlay();
           }
         });
 
     addBotButton.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            if (currentLobby != null) {
-              lobbyController.addBotToLobby();
-            }
+        (ActionEvent e) -> {
+          if (currentLobby != null) {
+            lobbyController.addBotToLobby();
           }
         });
 
-    lobbiesJList.addListSelectionListener(
-        e -> {
-          if (!e.getValueIsAdjusting()) { // Ensure the event is not fired multiple times
-            int selectedIndex = lobbiesJList.getSelectedIndex();
-            if (selectedIndex != -1) {
-              currentLobby = availableLobbies.get(selectedIndex);
-              lobbyController.joinLobby(currentLobby.getLobbyId());
-            }
-          }
-        });
+    lobbiesJList.addListSelectionListener(this::handleLobbySelection);
+  }
+
+  private void handleCreateNewLobby() {
+    String lobbyName = JOptionPane.showInputDialog("Enter lobby name:");
+    if (lobbyName == null) {
+      return;
+    }
+    if (lobbyName.trim().isEmpty()) {
+      JOptionPane.showMessageDialog(
+          FindOnlineGamePnl.this,
+          "Lobby name cannot be empty.",
+          "Error",
+          JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+    if (isLobbyNameTaken(lobbyName)) {
+      JOptionPane.showMessageDialog(
+          FindOnlineGamePnl.this,
+          "Lobby name already taken. Please choose another name.",
+          "Error",
+          JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+    lobbyController.createLobby(lobbyName);
+  }
+
+  private void handleLobbySelection(ListSelectionEvent e) {
+    if (!e.getValueIsAdjusting()) {
+      int selectedIndex = lobbiesJList.getSelectedIndex();
+      if (selectedIndex != -1) {
+        currentLobby = availableLobbies.get(selectedIndex);
+        lobbyController.joinLobby(currentLobby.getLobbyId());
+      }
+    }
+  }
+
+  private boolean isLobbyNameTaken(String lobbyName) {
+    for (Lobby lobby : availableLobbies) {
+      if (lobby.getLobbyName().equalsIgnoreCase(lobbyName)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public void updateData() {
@@ -253,11 +265,10 @@ public class FindOnlineGamePnl extends JPanel {
   }
 
   private void updateLobbiesJList() {
-    if (currentLobby == null) {}
-
     DefaultListModel<String> listModel = new DefaultListModel<>();
     for (Lobby lobby : availableLobbies) {
       if (lobby.isGameInProgress()) {
+        // don't show lobbies with game in progress
         continue;
       }
 

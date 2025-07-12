@@ -32,9 +32,9 @@ public interface LabyrinthController {
 
   void usePower();
 
-  boolean getHasUsedPower();
+  boolean isPowerUsed();
 
-  boolean getHasCurrentPlayerInserted();
+  boolean isCurrentPlayerInserted();
 
   void setPlayerToSwap(Player player);
 

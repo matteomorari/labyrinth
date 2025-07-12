@@ -9,8 +9,8 @@ public class Player {
   private AvatarColor color;
   private Position startPosition;
   private Position position;
-  private Boolean isReadyToPlay = false;
-  private Boolean isBot = false;
+  private boolean isReadyToPlay = false;
+  private boolean isBot = false;
   private ArrayDeque<Goal> goalsQueue;
 
   public Player(AvatarColor color, String id, boolean isBot) {
@@ -87,26 +87,30 @@ public class Player {
     return id;
   }
 
-  public void setIsReadyToPlay(Boolean isReadyToPlay) {
+  public void setIsReadyToPlay(boolean isReadyToPlay) {
     this.isReadyToPlay = isReadyToPlay;
   }
 
-  public Boolean isReadyToPlay() {
+  public boolean isReadyToPlay() {
     return isReadyToPlay;
   }
 
-  public Boolean isBot() {
+  public boolean isBot() {
     return isBot;
   }
 
-  public void setIsBot(Boolean isBot) {
+  public void setIsBot(boolean isBot) {
     this.isBot = isBot;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null || getClass() != obj.getClass()) return false;
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
 
     Player other = (Player) obj;
     return id != null ? id.equals(other.id) : other.id == null;

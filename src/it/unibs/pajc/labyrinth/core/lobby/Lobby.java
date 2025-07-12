@@ -12,7 +12,7 @@ public class Lobby {
   private volatile String lobbyName;
   private ArrayList<Player> playersList;
   private final String LOBBY_ID;
-  private Boolean isGameInProgress;
+  private boolean isGameInProgress;
   private HashSet<AvatarColor> availableColors;
 
   public Lobby(String lobbyName, Labyrinth.EnvironmentType environmentType) {
@@ -94,16 +94,12 @@ public class Lobby {
     return LOBBY_ID;
   }
 
-  public void setIsGameInProgress(Boolean gameInProgress) {
+  public void setIsGameInProgress(boolean gameInProgress) {
     this.isGameInProgress = gameInProgress;
   }
 
-  public Boolean isGameInProgress() {
+  public boolean isGameInProgress() {
     return isGameInProgress;
-  }
-
-  public Labyrinth getLabyrinth() {
-    return labyrinth;
   }
 
   public void setPlayerColor(Player player, AvatarColor color) {

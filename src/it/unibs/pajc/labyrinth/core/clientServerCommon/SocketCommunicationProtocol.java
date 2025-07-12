@@ -31,12 +31,14 @@ public class SocketCommunicationProtocol {
 
   public void run() {
 
-    try {
-      inputStream = new BufferedReader(new InputStreamReader(remoteHost.getInputStream()));
+    try (
+      BufferedReader in = new BufferedReader(new InputStreamReader(remoteHost.getInputStream()));
+      PrintWriter out = new PrintWriter(remoteHost.getOutputStream(), true)
+    ) {
+      this.inputStream = in;
+      this.outputStream = out;
 
-      outputStream = new PrintWriter(remoteHost.getOutputStream(), true);
-
-      System.out.printf("Player collegato\n");
+      System.out.print("Player collegato");
 
       isRunning = true;
       synchronized (this) {
@@ -45,7 +47,7 @@ public class SocketCommunicationProtocol {
       }
       String request;
       while (isRunning && (request = inputStream.readLine()) != null) {
-        System.out.printf("Processing request: %s\n", request);
+        System.out.printf("Processing request: %s%n", request);
 
         LabyrinthEvent e = new LabyrinthEvent(this, request);
 
@@ -54,8 +56,11 @@ public class SocketCommunicationProtocol {
                 ? commandMap.get(e.getCommand())
                 : commandMap.get("@debug@"); // TODO: to implement?
 
-        if (commandExe != null) commandExe.accept(e);
-        else System.out.println("comando non riconosciuto");
+        if (commandExe != null) {
+          commandExe.accept(e);
+        } else {
+          System.out.println("comando non riconosciuto");
+        }
       }
 
     } catch (Exception ex) {
@@ -67,7 +72,7 @@ public class SocketCommunicationProtocol {
   }
 
   public void disconnectUser() {
-    System.out.printf("Collegamento terminato\n");
+    System.out.print("Collegamento terminato");
     connectedUsers.remove(this);
   }
 
@@ -78,8 +83,6 @@ public class SocketCommunicationProtocol {
   private synchronized void close() {
     try {
       isRunning = false;
-      outputStream.close();
-      inputStream.close();
       remoteHost.close();
     } catch (Exception ex) {
       ex.printStackTrace();
@@ -96,11 +99,11 @@ public class SocketCommunicationProtocol {
 
   public synchronized void sendMsg(SocketCommunicationProtocol sender, String msg) {
     if (outputStream != null) {
-      System.out.printf("invio messaggio: %s\n", msg);
+      System.out.printf("invio messaggio: %s%n", msg);
       outputStream.println(msg);
       outputStream.flush();
     } else {
-      System.out.printf("impossibile inviare messaggio, outputStream nullo\n");
+      System.out.print("impossibile inviare messaggio, outputStream nullo");
     }
   }
 

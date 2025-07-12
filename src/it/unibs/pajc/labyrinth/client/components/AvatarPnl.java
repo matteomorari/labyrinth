@@ -4,12 +4,12 @@ import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.client.controllers.lobby.LobbyController;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.enums.MyColors;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 
@@ -18,9 +18,9 @@ public class AvatarPnl extends JPanel {
   private Player player;
   private static final Color bgColor = Color.WHITE;
   private BufferedImage avatarImage;
-  private Boolean canBeRemoved;
+  private boolean canBeRemoved;
 
-  public AvatarPnl(LobbyController controller, Boolean canBeRemoved) {
+  public AvatarPnl(LobbyController controller, boolean canBeRemoved) {
     this.controller = controller;
     this.canBeRemoved = canBeRemoved;
     setPreferredSize(new java.awt.Dimension(120, 120));
@@ -45,8 +45,7 @@ public class AvatarPnl extends JPanel {
     g2.setStroke(new BasicStroke(3));
     g2.setColor(player.isReadyToPlay() ? Color.GREEN : Color.RED);
     g2.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 30, 30);
-    avatarImage =
-        ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE").getStandingImage();
+    avatarImage = ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE").getStandingImage();
     avatarImage = ImageCntrl.scaleBufferedImage(avatarImage, 100, 100);
     int x = (getWidth() - avatarImage.getWidth()) / 2;
     int y = (getHeight() - avatarImage.getHeight()) / 2;
@@ -67,7 +66,7 @@ public class AvatarPnl extends JPanel {
         playerTypeButton.getIconDiameter());
     add(playerTypeButton);
 
-    if(canBeRemoved != null && canBeRemoved) {
+    if (canBeRemoved) {
       SvgIconButton removePlayerButton = new SvgIconButton("resource\\icons\\delete.svg");
       removePlayerButton.setBgColor(MyColors.MAIN_BG_COLOR.getColor());
       removePlayerButton.setBorderRadius(-1);
@@ -79,10 +78,7 @@ public class AvatarPnl extends JPanel {
           5,
           playerTypeButton.getIconDiameter(),
           playerTypeButton.getIconDiameter());
-      removePlayerButton.addActionListener(
-          e -> {
-            handleRemovePlayer();
-          });
+      removePlayerButton.addActionListener((ActionEvent e) -> handleRemovePlayer());
       add(removePlayerButton);
     }
   }
@@ -117,7 +113,7 @@ public class AvatarPnl extends JPanel {
     return player;
   }
 
-  public void setCanBeRemoved(Boolean canBeRemoved) {
+  public void setCanBeRemoved(boolean canBeRemoved) {
     this.canBeRemoved = canBeRemoved;
     repaint();
   }

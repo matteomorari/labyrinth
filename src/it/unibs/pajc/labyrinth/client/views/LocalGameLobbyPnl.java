@@ -14,6 +14,7 @@ import java.awt.Dimension;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -52,19 +53,13 @@ public class LocalGameLobbyPnl extends JPanel {
     // Add player button
     addPlayerButton = new JButton("ADD PLAYER");
     addPlayerButton.setPreferredSize(new Dimension(200, 50));
-    addPlayerButton.addActionListener(
-        e -> {
-          addNewPlayer();
-        });
+    addPlayerButton.addActionListener((ActionEvent e) -> addNewPlayer());
     buttonPanel.add(addPlayerButton);
 
     // Add bot button
     addBotButton = new JButton("ADD BOT");
     addBotButton.setPreferredSize(new Dimension(200, 50));
-    addBotButton.addActionListener(
-        e -> {
-          addNewBot();
-        });
+    addBotButton.addActionListener((ActionEvent e) -> addNewBot());
     buttonPanel.add(addBotButton);
 
     // Start game button

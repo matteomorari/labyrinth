@@ -32,7 +32,6 @@ public class CurrentGoalPnl extends JPanel {
   private LabyrinthController controller;
   private ImageCntrl goalCardBgCntrl;
   private BufferedImage currentGoalImage;
-  private int cardWidth = DEFAULT_CARD_WIDTH;
   private final Font titleFont = new Font(TITLE_FONT_FAMILY, Font.BOLD, TITLE_FONT_SIZE);
   private int panelWidth;
 
@@ -115,7 +114,7 @@ public class CurrentGoalPnl extends JPanel {
 
   public void updateGoalImage() {
     // Check if we need to recreate the scaled background
-    cardWidth = Math.max(DEFAULT_CARD_WIDTH, panelWidth - CARD_HORIZONTAL_MARGIN);
+    int cardWidth = Math.max(DEFAULT_CARD_WIDTH, panelWidth - CARD_HORIZONTAL_MARGIN);
     BufferedImage goalCardBackground =
         scaleImage(goalCardBgCntrl.getImage(), cardWidth, Integer.MAX_VALUE);
 
@@ -175,9 +174,7 @@ public class CurrentGoalPnl extends JPanel {
       width = (int) (height * aspectRatio);
     }
 
-    BufferedImage scaledImage = ImageCntrl.scaleBufferedImage(original, width, height);
-
-    return scaledImage;
+    return ImageCntrl.scaleBufferedImage(original, width, height);
   }
 
   private BufferedImage createCombinedImage(

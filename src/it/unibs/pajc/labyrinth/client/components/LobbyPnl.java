@@ -106,7 +106,7 @@ public class LobbyPnl extends JPanel {
       gbc.gridx = i % columns;
       gbc.gridy = i / columns;
 
-      boolean canBeRemoved = (i < players.size()) ? canInteractWithPlayer(players.get(i)) : false;
+      boolean canBeRemoved = i < players.size() && canInteractWithPlayer(players.get(i));
       AvatarPnl avatarPnl = new AvatarPnl(lobbyController, canBeRemoved);
       avatarPnl.setPreferredSize(new Dimension(AVATAR_SIZE, AVATAR_SIZE));
 
@@ -124,13 +124,8 @@ public class LobbyPnl extends JPanel {
     for (AvatarPnl avatarPnl : getAvatarPanels()) {
       Player player = avatarPnl.getPlayer();
 
-      // Skip empty avatar panels
-      if (player == null) {
-        continue;
-      }
-
-      // In online mode, only allow interaction with local player's avatar or bots
-      if (!canInteractWithPlayer(player)) {
+      // Combine the two skip conditions into one
+      if (player == null || !canInteractWithPlayer(player)) {
         continue;
       }
 
@@ -156,17 +151,9 @@ public class LobbyPnl extends JPanel {
   }
 
   private boolean canInteractWithPlayer(Player player) {
-    if (localPlayer == null) {
-      // If localPlayer is null, it means it's a local game and all players can interact
-      return true;
-    } else if (player.isBot()) {
-      return true;
-    } else if (player.equals(localPlayer)) {
-      return true;
-    } else {
-      // In online mode, only allow interaction with the local player or bots
-      return false;
-    }
+    // If localPlayer is null, it means it's a local game and all players can interact.
+    // In online mode, only allow interaction with the local player or bots.
+    return localPlayer == null || player.isBot() || player.equals(localPlayer);
   }
 
   private void showAvatarSelectionDialog(AvatarPnl avatarPnl, Player player) {

@@ -3,6 +3,7 @@ package it.unibs.pajc.labyrinth.client.components;
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.core.enums.MyColors;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -87,7 +88,7 @@ public class SelectionDialog {
           });
 
       button.addActionListener(
-          e -> {
+          (ActionEvent e) -> {
             item.getOnSelectAction().run();
             dialog.dispose();
           });
@@ -106,7 +107,7 @@ public class SelectionDialog {
    * @return The complete panel with title and content
    */
   private static JPanel createCustomPanel(JPanel panel, String title) {
-    JLabel messageLabel = new JLabel(title, JLabel.CENTER);
+    JLabel messageLabel = new JLabel(title, SwingConstants.CENTER);
     messageLabel.setFont(new Font("Times New Roman", Font.BOLD, 15));
     JPanel customPanel = new JPanel(new BorderLayout());
     customPanel.add(messageLabel, BorderLayout.NORTH);

@@ -1,4 +1,4 @@
-package it.unibs.pajc.labyrinth.core;
+package it.unibs.pajc.labyrinth.core.utility;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;

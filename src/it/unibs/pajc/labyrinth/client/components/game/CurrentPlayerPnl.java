@@ -24,10 +24,8 @@ public class CurrentPlayerPnl extends JPanel {
   // Layout constants
   private static final int CORNER_RADIUS = 20;
   private static final int STARTING_Y = 50;
-  private static final int LINE_HEIGHT = 25;
   private static final int PADDING_X = 10;
   private static final int PADDING_Y = 7;
-  private static final int PLAYER_BOTTOM_SPACING = 20;
   private static final int PLAYER_SIZE = 35;
   private static final int TEXT_OVAL_SPACING = 10;
   private static final int OVAL_Y_ADJUSTMENT = 2;
@@ -161,7 +159,5 @@ public class CurrentPlayerPnl extends JPanel {
     // Draw player text to the right of the image
     g2.setColor(Color.DARK_GRAY);
     g2.drawString(playerText, leftPosition, currentY - PADDING_Y);
-
-    currentY += LINE_HEIGHT + PLAYER_BOTTOM_SPACING;
   }
 }

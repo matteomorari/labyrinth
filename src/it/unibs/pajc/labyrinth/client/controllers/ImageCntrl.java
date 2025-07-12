@@ -62,7 +62,6 @@ public enum ImageCntrl {
   SKYBLUE_PLAYER_SPRITE("skyblue_sprite.png"),
   ;
 
-  // private static final int IMAGE_SIZE = 72;
   private static final int IMAGE_SIZE = 32;
   private final Path path;
   private BufferedImage image;

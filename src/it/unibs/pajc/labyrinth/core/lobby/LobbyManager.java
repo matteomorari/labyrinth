@@ -1,8 +1,9 @@
 package it.unibs.pajc.labyrinth.core.lobby;
 
-import it.unibs.pajc.labyrinth.core.BaseModel;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
+import it.unibs.pajc.labyrinth.core.utility.BaseModel;
+
 import java.util.ArrayList;
 
 public class LobbyManager extends BaseModel {

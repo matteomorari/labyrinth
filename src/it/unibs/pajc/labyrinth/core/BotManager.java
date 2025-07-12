@@ -16,11 +16,11 @@ public class BotManager {
     this.model = model;
   }
 
-  public class newPositionWithDistance {
+  public class NewPositionWithDistance {
     Position position;
     int distance;
 
-    public newPositionWithDistance(Position position, int distance) {
+    public NewPositionWithDistance(Position position, int distance) {
       this.position = position;
       this.distance = distance;
     }
@@ -59,7 +59,7 @@ public class BotManager {
     }
 
     ArrayList<Position> availableCardInsertionPoint = getModel().getAvailableCardInsertionPoint();
-    HashMap<CardInsertMove, newPositionWithDistance> closestGoalPositionsMap = new HashMap<>();
+    HashMap<CardInsertMove, NewPositionWithDistance> closestGoalPositionsMap = new HashMap<>();
     for (Position cardInsertionPosition : availableCardInsertionPoint) {
       for (int i = 0; i < Orientation.values().length; i++) {
         Labyrinth modelCopy = LabyrinthGson.createCopy(getModel());
@@ -85,7 +85,7 @@ public class BotManager {
         ArrayList<Position> reachablePlayerPositions =
             modelCopy.findPath(currentPlayerCopy.getPosition(), currentGoalPosition);
 
-        newPositionWithDistance closestGoalPosition =
+        NewPositionWithDistance closestGoalPosition =
             findClosestGoalPosition(reachablePlayerPositions, currentGoalPosition);
 
         closestGoalPositionsMap.put(move, closestGoalPosition);
@@ -94,7 +94,7 @@ public class BotManager {
 
     int minDistance = Integer.MAX_VALUE;
     for (CardInsertMove move : closestGoalPositionsMap.keySet()) {
-      newPositionWithDistance closestGoalPosition = closestGoalPositionsMap.get(move);
+      NewPositionWithDistance closestGoalPosition = closestGoalPositionsMap.get(move);
       if (closestGoalPosition.distance < minDistance) {
         minDistance = closestGoalPosition.distance;
         setBestCardInsertMove(move);
@@ -103,7 +103,7 @@ public class BotManager {
     }
   }
 
-  private newPositionWithDistance findClosestGoalPosition(
+  private NewPositionWithDistance findClosestGoalPosition(
       ArrayList<Position> positions, Position goalPosition) {
     Position closestPosition = null;
     int minDistance = Integer.MAX_VALUE;
@@ -116,7 +116,7 @@ public class BotManager {
       }
     }
 
-    return new newPositionWithDistance(closestPosition, minDistance);
+    return new NewPositionWithDistance(closestPosition, minDistance);
   }
 
   private int calculateDistance(Position p1, Position p2) {

@@ -45,7 +45,6 @@ public class AvailableCardPnl extends JPanel implements Animatable {
   private String availableCardId;
   private Orientation availableCardOrientation;
   private BufferedImage availableCardImage;
-  private int cardWidth = DEFAULT_CARD_WIDTH;
   private final Font titleFont = new Font(TITLE_FONT_FAMILY, Font.BOLD, TITLE_FONT_SIZE);
   private int panelWidth;
   private SvgIconButton rotateButton;
@@ -80,14 +79,7 @@ public class AvailableCardPnl extends JPanel implements Animatable {
 
     // set animation
     animationCardAngle = 0;
-    animator =
-        new Animator(
-            this,
-            1000,
-            EasingFunction.EASE_OUT_BOUNCE,
-            () -> {
-              onAnimationEnded();
-            });
+    animator = new Animator(this, 1000, EasingFunction.EASE_OUT_BOUNCE, this::onAnimationEnded);
   }
 
   private void updatePanelSize(int width) {
@@ -182,7 +174,7 @@ public class AvailableCardPnl extends JPanel implements Animatable {
 
   public void updateCardImage() {
     // Check if we need to recreate the scaled background
-    cardWidth = Math.max(DEFAULT_CARD_WIDTH, panelWidth - CARD_HORIZONTAL_MARGIN);
+    int cardWidth = Math.max(DEFAULT_CARD_WIDTH, panelWidth - CARD_HORIZONTAL_MARGIN);
 
     // check if the orientation of the card has changed
     Card newCard = controller.getAvailableCard();
@@ -214,9 +206,7 @@ public class AvailableCardPnl extends JPanel implements Animatable {
       width = (int) (height * aspectRatio);
     }
 
-    BufferedImage scaledImage = ImageCntrl.scaleBufferedImage(original, width, height);
-
-    return scaledImage;
+    return ImageCntrl.scaleBufferedImage(original, width, height);
   }
 
   private BufferedImage getCardImage() {
@@ -224,7 +214,7 @@ public class AvailableCardPnl extends JPanel implements Animatable {
     CardImage cardImage =
         new CardImage(
             ImageCntrl.valueOf("CARD_" + card.getType()), (Graphics2D) this.getGraphics());
-    cardImage.rotate(card.getOrientation().ordinal() * 90 + animationCardAngle);
+    cardImage.rotate(card.getOrientation().ordinal() * 90 + (double) animationCardAngle);
     return cardImage.getImage();
   }
 
@@ -253,7 +243,7 @@ public class AvailableCardPnl extends JPanel implements Animatable {
     repaint();
   }
 
-  private boolean onAnimationEnded() {
-    return isRotating = false;
+  private void onAnimationEnded() {
+    isRotating = false;
   }
 }

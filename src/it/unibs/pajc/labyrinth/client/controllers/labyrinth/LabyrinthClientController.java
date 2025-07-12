@@ -6,6 +6,7 @@ import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.Goal;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
+import it.unibs.pajc.labyrinth.core.clientServerCommon.LabyrinthEvent;
 import it.unibs.pajc.labyrinth.core.utility.CardInsertMove;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.util.ArrayDeque;
@@ -15,6 +16,10 @@ public class LabyrinthClientController implements LabyrinthController {
   private Labyrinth labyrinth;
   private String localPlayerId;
   private final ClientSocketProtocol connectionProtocol;
+
+  private static final String COMMAND_PROPERTY = "command";
+  private static final String PARAMETERS_PROPERTY = "parameters";
+  private static final String PLAYER_ID_PROPERTY = "player_id";
 
   public LabyrinthClientController(
       ClientSocketProtocol connectionProtocol, Labyrinth labyrinth, String localPlayerId) {
@@ -28,7 +33,7 @@ public class LabyrinthClientController implements LabyrinthController {
 
     connectionProtocol.addCommand(
         "player_moved",
-        e -> {
+        (LabyrinthEvent e) -> {
           try {
             int newRow = e.getParameters().get("row").getAsInt();
             int newCol = e.getParameters().get("col").getAsInt();
@@ -40,7 +45,7 @@ public class LabyrinthClientController implements LabyrinthController {
         });
     connectionProtocol.addCommand(
         "bot_move_calculated",
-        e -> {
+        (LabyrinthEvent e) -> {
           try {
             int cardRotateNumber = e.getParameters().get("card_rotate_number").getAsInt();
             int cardRow = e.getParameters().get("card_row").getAsInt();
@@ -62,7 +67,7 @@ public class LabyrinthClientController implements LabyrinthController {
         });
     connectionProtocol.addCommand(
         "card_available_rotated",
-        e -> {
+        (LabyrinthEvent e) -> {
           try {
             int rotation = e.getParameters().get("rotation").getAsInt();
             labyrinth.rotateAvailableCard(rotation);
@@ -72,7 +77,7 @@ public class LabyrinthClientController implements LabyrinthController {
         });
     connectionProtocol.addCommand(
         "card_inserted",
-        e -> {
+        (LabyrinthEvent e) -> {
           try {
             int row = e.getParameters().get("row").getAsInt();
             int col = e.getParameters().get("col").getAsInt();
@@ -84,7 +89,7 @@ public class LabyrinthClientController implements LabyrinthController {
         });
     connectionProtocol.addCommand(
         "turn_skipped",
-        e -> {
+        (LabyrinthEvent e) -> {
           try {
             labyrinth.skipTurn();
           } catch (Exception exc) {
@@ -93,7 +98,7 @@ public class LabyrinthClientController implements LabyrinthController {
         });
     connectionProtocol.addCommand(
         "power_used",
-        e -> {
+        (LabyrinthEvent e) -> {
           try {
             labyrinth.usePower();
           } catch (Exception exc) {
@@ -102,9 +107,9 @@ public class LabyrinthClientController implements LabyrinthController {
         });
     connectionProtocol.addCommand(
         "set_player_to_swap",
-        e -> {
+        (LabyrinthEvent e) -> {
           try {
-            String playerId = e.getParameters().get("player_id").getAsString();
+            String playerId = e.getParameters().get(PLAYER_ID_PROPERTY).getAsString();
             Player playerToSwap = labyrinth.getPlayerById(playerId);
             labyrinth.setPlayerToSwap(playerToSwap);
           } catch (Exception exc) {
@@ -113,7 +118,7 @@ public class LabyrinthClientController implements LabyrinthController {
         });
     connectionProtocol.addCommand(
         "set_goal_to_swap",
-        e -> {
+        (LabyrinthEvent e) -> {
           try {
             int row = e.getParameters().get("goal_position_row").getAsInt();
             int col = e.getParameters().get("goal_position_col").getAsInt();
@@ -125,10 +130,10 @@ public class LabyrinthClientController implements LabyrinthController {
         });
     connectionProtocol.addCommand(
         "player_disconnected",
-        e -> {
+        (LabyrinthEvent e) -> {
           try {
             // TODO: to implement
-            String playerId = e.getParameters().get("player_id").getAsString();
+            String playerId = e.getParameters().get(PLAYER_ID_PROPERTY).getAsString();
             labyrinth.setGameCrashed(true);
           } catch (Exception exc) {
             exc.printStackTrace();
@@ -164,13 +169,13 @@ public class LabyrinthClientController implements LabyrinthController {
   public void movePlayer(int row, int col) {
     if (getLocalPlayer().equals(labyrinth.getCurrentPlayer())) {
       JsonObject msg = new JsonObject();
-      msg.addProperty("command", "move_player");
+      msg.addProperty(COMMAND_PROPERTY, "move_player");
 
       JsonObject parameters = new JsonObject();
       parameters.addProperty("row", row);
       parameters.addProperty("col", col);
 
-      msg.add("parameters", parameters);
+      msg.add(PARAMETERS_PROPERTY, parameters);
       connectionProtocol.sendMsg(connectionProtocol, msg.toString());
     }
   }
@@ -179,13 +184,13 @@ public class LabyrinthClientController implements LabyrinthController {
   public void insertCard(Position position) {
     if (getLocalPlayer().equals(labyrinth.getCurrentPlayer())) {
       JsonObject msg = new JsonObject();
-      msg.addProperty("command", "insert_card");
+      msg.addProperty(COMMAND_PROPERTY, "insert_card");
 
       JsonObject parameters = new JsonObject();
       parameters.addProperty("row", position.getRow());
       parameters.addProperty("col", position.getCol());
 
-      msg.add("parameters", parameters);
+      msg.add(PARAMETERS_PROPERTY, parameters);
       connectionProtocol.sendMsg(connectionProtocol, msg.toString());
     }
   }
@@ -194,12 +199,12 @@ public class LabyrinthClientController implements LabyrinthController {
   public void rotateAvailableCard(int rotation) {
     if (getLocalPlayer().equals(labyrinth.getCurrentPlayer())) {
       JsonObject msg = new JsonObject();
-      msg.addProperty("command", "rotate_available_card");
+      msg.addProperty(COMMAND_PROPERTY, "rotate_available_card");
 
       JsonObject parameters = new JsonObject();
       parameters.addProperty("rotation", rotation);
 
-      msg.add("parameters", parameters);
+      msg.add(PARAMETERS_PROPERTY, parameters);
       connectionProtocol.sendMsg(connectionProtocol, msg.toString());
     }
   }
@@ -223,12 +228,12 @@ public class LabyrinthClientController implements LabyrinthController {
   public void setPlayerToSwap(Player player) {
     if (getLocalPlayer().equals(labyrinth.getCurrentPlayer())) {
       JsonObject msg = new JsonObject();
-      msg.addProperty("command", "set_player_to_swap");
+      msg.addProperty(COMMAND_PROPERTY, "set_player_to_swap");
 
       JsonObject parameters = new JsonObject();
-      parameters.addProperty("player_id", player.getId());
+      parameters.addProperty(PLAYER_ID_PROPERTY, player.getId());
 
-      msg.add("parameters", parameters);
+      msg.add(PARAMETERS_PROPERTY, parameters);
       connectionProtocol.sendMsg(connectionProtocol, msg.toString());
     }
   }
@@ -237,13 +242,13 @@ public class LabyrinthClientController implements LabyrinthController {
   public void setGoalToSwap(Goal goal) {
     if (getLocalPlayer().equals(labyrinth.getCurrentPlayer())) {
       JsonObject msg = new JsonObject();
-      msg.addProperty("command", "set_goal_to_swap");
+      msg.addProperty(COMMAND_PROPERTY, "set_goal_to_swap");
 
       JsonObject parameters = new JsonObject();
       parameters.addProperty("goal_position_row", goal.getPosition().getRow());
       parameters.addProperty("goal_position_col", goal.getPosition().getCol());
 
-      msg.add("parameters", parameters);
+      msg.add(PARAMETERS_PROPERTY, parameters);
       connectionProtocol.sendMsg(connectionProtocol, msg.toString());
     }
   }
@@ -252,9 +257,9 @@ public class LabyrinthClientController implements LabyrinthController {
   public void skipTurn() {
     if (getLocalPlayer().equals(labyrinth.getCurrentPlayer())) {
       JsonObject msg = new JsonObject();
-      msg.addProperty("command", "skip_turn");
+      msg.addProperty(COMMAND_PROPERTY, "skip_turn");
 
-      msg.add("parameters", null);
+      msg.add(PARAMETERS_PROPERTY, null);
       connectionProtocol.sendMsg(connectionProtocol, msg.toString());
     }
   }
@@ -263,21 +268,21 @@ public class LabyrinthClientController implements LabyrinthController {
   public void usePower() {
     if (getLocalPlayer().equals(labyrinth.getCurrentPlayer())) {
       JsonObject msg = new JsonObject();
-      msg.addProperty("command", "use_power");
+      msg.addProperty(COMMAND_PROPERTY, "use_power");
 
-      msg.add("parameters", null);
+      msg.add(PARAMETERS_PROPERTY, null);
       connectionProtocol.sendMsg(connectionProtocol, msg.toString());
     }
   }
 
   @Override
-  public boolean getHasUsedPower() {
-    return labyrinth.getHasUsedPower();
+  public boolean isPowerUsed() {
+    return labyrinth.isPowerUsed();
   }
 
   @Override
-  public boolean getHasCurrentPlayerInserted() {
-    return labyrinth.getHasCurrentPlayerInserted();
+  public boolean isCurrentPlayerInserted() {
+    return labyrinth.isCurrentPlayerInserted();
   }
 
   @Override
@@ -298,9 +303,9 @@ public class LabyrinthClientController implements LabyrinthController {
 
   private void sendCardAnimationEndedMsg() {
     JsonObject msg = new JsonObject();
-    msg.addProperty("command", "card_animation_ended");
+    msg.addProperty(COMMAND_PROPERTY, "card_animation_ended");
 
-    msg.add("parameters", null);
+    msg.add(PARAMETERS_PROPERTY, null);
     connectionProtocol.sendMsg(connectionProtocol, msg.toString());
   }
 
@@ -312,9 +317,9 @@ public class LabyrinthClientController implements LabyrinthController {
 
   private void sendPlayerAnimationEndedMsg() {
     JsonObject msg = new JsonObject();
-    msg.addProperty("command", "player_animation_ended");
+    msg.addProperty(COMMAND_PROPERTY, "player_animation_ended");
 
-    msg.add("parameters", null);
+    msg.add(PARAMETERS_PROPERTY, null);
     connectionProtocol.sendMsg(connectionProtocol, msg.toString());
   }
 

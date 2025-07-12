@@ -9,7 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class ServerLobby extends Lobby {
   private final transient ReentrantLock lock = new ReentrantLock();
-  private transient ConcurrentHashMap<Player, LabyrinthServerProtocol> playersSocket;
+  private final transient ConcurrentHashMap<Player, LabyrinthServerProtocol> playersSocket;
 
   public ServerLobby(String lobbyName, Labyrinth.EnvironmentType environmentType) {
     super(lobbyName, environmentType);
@@ -43,9 +43,9 @@ public class ServerLobby extends Lobby {
     lock.lock();
     try {
       for (Player player : getPlayers()) {
-        getLabyrinth().addPlayer(player);
+        getModel().addPlayer(player);
       }
-      getLabyrinth().initGame();
+      getModel().initGame();
       setIsGameInProgress(true);
 
     } finally {

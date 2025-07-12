@@ -114,7 +114,7 @@ public class PowerPnl extends JPanel {
     updatePowerImage();
     cardWidth = Math.max(DEFAULT_CARD_WIDTH, panelWidth - CARD_HORIZONTAL_MARGIN);
     // Center the power image
-    int imageY = textY2; // + GOAL_IMAGE_TOP_MARGIN; // Position below the text with some padding
+    int imageY = textY2; // Position below the text with some padding
     if (powerImage != null) {
       int imageX = (getWidth() - powerImage.getWidth()) / 2;
       g2.drawImage(powerImage, imageX, imageY, null);
@@ -139,7 +139,7 @@ public class PowerPnl extends JPanel {
     if (card.getPower() != null) {
       powerImage = ImageCntrl.valueOf(card.getPower().getType().toString()).getImage();
       powerImage = ImageCntrl.scaleBufferedImage(powerImage, cardWidth, cardWidth);
-      if (controller.getHasUsedPower()) {
+      if (controller.isPowerUsed()) {
         // Make the border of the image green
         Graphics2D g2d = powerImage.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -165,8 +165,8 @@ public class PowerPnl extends JPanel {
 
   private void handleUsePowerBtn() {
     if (controller.getAvailableCard().getPower() != null
-        && !controller.getHasUsedPower()
-        && controller.getHasCurrentPlayerInserted()) {
+        && !controller.isPowerUsed()
+        && controller.isCurrentPlayerInserted()) {
       if (controller.getAvailableCard().getPower().getType() == PowerType.SWAP_POSITION) {
         showSwapPlayerPopup();
       }

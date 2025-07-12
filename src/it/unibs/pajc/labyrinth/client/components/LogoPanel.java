@@ -40,9 +40,14 @@ public class LogoPanel extends JPanel {
   }
 
   private void updateLogoIcon() {
-    if (logo == null) return;
+    if (logo == null) {
+      return;
+    }
+
     int panelWidth = getWidth();
-    if (panelWidth == 0) panelWidth = INITIAL_PANEL_WIDTH; // fallback for initial layout
+    if (panelWidth == 0) {
+      panelWidth = INITIAL_PANEL_WIDTH; // fallback for initial layout
+    }
 
     int availableWidth = Math.max(0, panelWidth - LEFT_RIGHT_PADDING * 2);
 
