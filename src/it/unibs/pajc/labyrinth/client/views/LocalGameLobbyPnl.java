@@ -2,6 +2,7 @@ package it.unibs.pajc.labyrinth.client.views;
 
 import it.unibs.pajc.labyrinth.client.components.LobbyPnl;
 import it.unibs.pajc.labyrinth.client.components.LogoPanel;
+import it.unibs.pajc.labyrinth.client.components.SvgIconButton;
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthLocalController;
 import it.unibs.pajc.labyrinth.client.controllers.lobby.LobbyLocalController;
@@ -23,19 +24,23 @@ import javax.swing.JPanel;
 public class LocalGameLobbyPnl extends JPanel {
   private LobbyLocalController lobbyController;
   private LobbyPnl lobbyPnl;
-  private JButton startGameButton;
-  private JButton addPlayerButton;
-  private JButton addBotButton;
+  private SvgIconButton backButton;
 
   public LocalGameLobbyPnl(LobbyLocalController lobbyController) {
     this.lobbyController = lobbyController;
     setLayout(new BorderLayout(10, 10));
     setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-    // Logo panel
+    // Top panel with back button and logo
+    initBackButton();
     BufferedImage logo = ImageCntrl.LOGO.getImage();
     LogoPanel logoPanel = new LogoPanel(logo);
-    add(logoPanel, BorderLayout.NORTH);
+
+    JPanel topPanel = new JPanel(new BorderLayout());
+    topPanel.setOpaque(false);
+    topPanel.add(backButton, BorderLayout.WEST);
+    topPanel.add(logoPanel, BorderLayout.CENTER);
+    add(topPanel, BorderLayout.NORTH);
 
     // lobby panel
     lobbyPnl = new LobbyPnl(lobbyController);
@@ -43,33 +48,55 @@ public class LocalGameLobbyPnl extends JPanel {
 
     // add 2 players (the minimum to start a game)
     addNewPlayer();
-    // addNewPlayer();
     addNewBot();
-    // addNewBot();
 
     // Action buttons panel
     JPanel buttonPanel = new JPanel();
+    buttonPanel.setPreferredSize(new Dimension(0, 60));
+    buttonPanel.setOpaque(false);
 
-    // Add player button
-    addPlayerButton = new JButton("ADD PLAYER");
+    initAddPlayerButton(buttonPanel);
+    initAddBotButton(buttonPanel);
+    initStartGameButton(buttonPanel);
+
+    add(buttonPanel, BorderLayout.SOUTH);
+  }
+
+  private void initBackButton() {
+    backButton = new SvgIconButton("resource\\icons\\arrow_back.svg");
+    backButton.setButtonSize(40, 40); // Adjust size as needed
+    backButton.setSvgIconSize(30, 30); // Adjust icon size as needed
+    backButton.setBgColor(Color.LIGHT_GRAY);
+    backButton.addActionListener(e -> navigateToHome());
+  }
+
+  private void initAddPlayerButton(JPanel buttonPanel) {
+    JButton addPlayerButton = new JButton("ADD PLAYER");
     addPlayerButton.setPreferredSize(new Dimension(200, 50));
     addPlayerButton.addActionListener((ActionEvent e) -> addNewPlayer());
     buttonPanel.add(addPlayerButton);
+  }
 
-    // Add bot button
-    addBotButton = new JButton("ADD BOT");
+  private void initAddBotButton(JPanel buttonPanel) {
+    JButton addBotButton = new JButton("ADD BOT");
     addBotButton.setPreferredSize(new Dimension(200, 50));
     addBotButton.addActionListener((ActionEvent e) -> addNewBot());
     buttonPanel.add(addBotButton);
+  }
 
-    // Start game button
-    buttonPanel.setPreferredSize(new Dimension(0, 60));
-    startGameButton = new JButton("START GAME");
+  private void initStartGameButton(JPanel buttonPanel) {
+    JButton startGameButton = new JButton("START GAME");
     startGameButton.setPreferredSize(new Dimension(200, 50));
     startGameButton.addActionListener(e -> startGame());
     buttonPanel.add(startGameButton);
-    buttonPanel.setOpaque(false);
-    add(buttonPanel, BorderLayout.SOUTH);
+  }
+
+  private void navigateToHome() {
+    JPanel parent = (JPanel) getParent();
+    parent.removeAll();
+    parent.add(new HomePnl(), BorderLayout.CENTER);
+    parent.revalidate();
+    parent.repaint();
   }
 
   public void update() {

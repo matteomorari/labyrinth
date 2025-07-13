@@ -39,6 +39,7 @@ public class FindOnlineGamePnl extends JPanel {
   private JButton createNewLobbyButton;
   private JButton readyButton;
   private JButton addBotButton;
+  private SvgIconButton backButton;
   private ArrayList<Lobby> availableLobbies;
   private JList<String> lobbiesJList;
   private Lobby currentLobby;
@@ -51,6 +52,7 @@ public class FindOnlineGamePnl extends JPanel {
     setLayout(new BorderLayout(BORDER_GAP, BORDER_GAP));
     setBorder(BorderFactory.createEmptyBorder(BORDER_GAP, BORDER_GAP, BORDER_GAP, BORDER_GAP));
 
+    initBackButton();
     initLogoPanel();
     initLobbyListPanel();
     initLobbyPanel();
@@ -58,10 +60,33 @@ public class FindOnlineGamePnl extends JPanel {
     initListeners();
   }
 
+  private void initBackButton() {
+    backButton = new SvgIconButton("resource\\icons\\arrow_back.svg");
+    backButton.setButtonSize(40, 40); // Adjust size as needed
+    backButton.setSvgIconSize(30, 30); // Adjust icon size as needed
+    backButton.setBgColor(Color.LIGHT_GRAY);
+    backButton.addActionListener(e -> navigateToHome());
+  }
+
+  private void navigateToHome() {
+    JPanel parent = (JPanel) getParent();
+    parent.removeAll();
+    parent.add(new HomePnl(), BorderLayout.CENTER);
+    parent.revalidate();
+    parent.repaint();
+  }
+
   private void initLogoPanel() {
     BufferedImage logo = ImageCntrl.LOGO.getImage();
     LogoPanel logoPanel = new LogoPanel(logo);
-    add(logoPanel, BorderLayout.NORTH);
+
+    JPanel topPanel = new JPanel(new BorderLayout());
+    topPanel.setOpaque(false);
+
+    topPanel.add(backButton, BorderLayout.WEST);
+    topPanel.add(logoPanel, BorderLayout.CENTER);
+
+    add(topPanel, BorderLayout.NORTH);
   }
 
   private void initLobbyListPanel() {
