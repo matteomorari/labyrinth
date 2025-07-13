@@ -18,6 +18,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 
@@ -97,10 +98,7 @@ public class HomePnl extends JPanel {
     LobbyLocalController lobbyLocalController = new LobbyLocalController(onlineGameManager);
     lobbyLocalController.createLobby("Local Game");
     LocalGameLobbyPnl localGameLobbyPnl = new LocalGameLobbyPnl(lobbyLocalController);
-    onlineGameManager.addChangeListener(
-        e -> {
-          localGameLobbyPnl.update();
-        });
+    onlineGameManager.addChangeListener((ChangeEvent e) -> localGameLobbyPnl.update());
     replaceParentPnlContent(localGameLobbyPnl);
   }
 
@@ -111,7 +109,18 @@ public class HomePnl extends JPanel {
     int serverPort = Integer.parseInt(dotenv.get("SERVER_PORT", "2234"));
 
     ClientSocketProtocol clientSocketController = new ClientSocketProtocol();
-    clientSocketController.connect(serverIp, serverPort);
+    boolean connected = clientSocketController.connect(serverIp, serverPort);
+    if (!connected) {
+      JOptionPane.showMessageDialog(
+          this,
+          String.format(
+              "Unable to connect to the server at %s:%d. Please check your connection and try"
+                  + " again.",
+              serverIp, serverPort),
+          "Connection Error",
+          JOptionPane.ERROR_MESSAGE);
+      return; // Exit the method if connection fails
+    }
 
     // Wait until the protocol thread is initialized
     // TODO: is synchronized needed here?
