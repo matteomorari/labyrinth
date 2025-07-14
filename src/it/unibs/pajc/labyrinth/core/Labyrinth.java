@@ -222,7 +222,6 @@ public class Labyrinth extends BaseModel {
     }
 
     // assign goals to the cards
-    // TODO: improve
     for (Player player : this.players) {
       for (Goal goal : player.getGoals()) {
         boolean isAssigned = false;
@@ -239,16 +238,14 @@ public class Labyrinth extends BaseModel {
       }
     }
 
-    // powers
+    // assign powers to the cards
     ArrayList<PowerType> powerList = new ArrayList<>(Arrays.asList(PowerType.values()));
-    // TODO: set a number of powers for each type
     while (!powerList.isEmpty()) {
       int row = random.nextInt(this.boardSize);
       int col = random.nextInt(this.boardSize);
       Card card = this.board.get(row).get(col);
 
       if (card.getPower() == null && isPowerPositionValid(row, col)) {
-        // Power power = new Power(PowersList.remove(0));
         Power power = new Power(powerList.removeFirst());
         card.setPower(power);
         power.setPosition(card.getPosition());
@@ -356,7 +353,7 @@ public class Labyrinth extends BaseModel {
   }
 
   public void insertCard(Position insertPosition) {
-    if(!isPositionValid(insertPosition.row, insertPosition.col)) {
+    if (!isPositionValid(insertPosition.row, insertPosition.col)) {
       System.out.println("Illegal move");
       return;
     }
@@ -512,7 +509,6 @@ public class Labyrinth extends BaseModel {
   private void updateNextAvailableCard(Card card) {
     card.setPosition(-1, -1);
     card.shiftPlayersToNewCard(this.availableCard);
-    // TODO: to improve e put together with the others
     if (card.getGoal() != null) {
       card.getGoal().setPosition(new Position(-1, -1));
     }
@@ -563,7 +559,6 @@ public class Labyrinth extends BaseModel {
   }
 
   // using Dijkstra's algorithm
-  // TODO: https://www.baeldung.com/java-solve-maze
   public ArrayList<Position> findPath(Position startPosition, Position endPosition) {
     PriorityQueue<Card> nodeDistanceQueue = new PriorityQueue<>(new NodeComparator());
     ArrayList<Position> path = new ArrayList<>();
@@ -711,7 +706,7 @@ public class Labyrinth extends BaseModel {
             .get(currentPlayer.getPosition().getRow())
             .get(currentPlayer.getPosition().getCol());
     previousPlayerCard.removePlayer(currentPlayer);
-  
+
     // add the player to the new card
     Card newPlayerCard = this.board.get(row).get(col);
     newPlayerCard.addPlayer(currentPlayer);
@@ -895,7 +890,7 @@ public class Labyrinth extends BaseModel {
   }
 
   public void rotateAvailableCard(int rotationCount) {
-    if(!hasCurrentPlayerInserted) {
+    if (!hasCurrentPlayerInserted) {
       getAvailableCard().rotate(rotationCount);
       fireChangeListener();
     }

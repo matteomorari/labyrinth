@@ -2,7 +2,7 @@ package it.unibs.pajc.labyrinth.client.components;
 
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.client.controllers.lobby.LobbyController;
-import it.unibs.pajc.labyrinth.core.AvatarColor;
+import it.unibs.pajc.labyrinth.core.Avatar;
 import it.unibs.pajc.labyrinth.core.Player;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -139,7 +139,7 @@ public class LobbyPnl extends JPanel {
               }
 
               // Only proceed if there are available colors to choose from
-              HashSet<AvatarColor> availableColors = lobbyController.getAvailableColors();
+              HashSet<Avatar> availableColors = lobbyController.getAvailableColors();
               if (availableColors == null || availableColors.isEmpty()) {
                 return;
               }
@@ -158,11 +158,11 @@ public class LobbyPnl extends JPanel {
 
   private void showAvatarSelectionDialog(AvatarPnl avatarPnl, Player player) {
     // Get available colors from the lobby
-    HashSet<AvatarColor> availableColors = lobbyController.getAvailableColors();
+    HashSet<Avatar> availableColors = lobbyController.getAvailableColors();
 
     // Build selection items for the dialog
     List<SelectionDialog.SelectionItem> items = new ArrayList<>();
-    for (AvatarColor color : availableColors) {
+    for (Avatar color : availableColors) {
       BufferedImage img = ImageCntrl.valueOf(color.name() + "_PLAYER_SPRITE").getStandingImage();
       items.add(
           new SelectionDialog.SelectionItem(

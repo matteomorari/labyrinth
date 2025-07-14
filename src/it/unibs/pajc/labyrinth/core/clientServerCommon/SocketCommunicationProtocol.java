@@ -31,10 +31,9 @@ public class SocketCommunicationProtocol {
 
   public void run() {
 
-    try (
-      BufferedReader in = new BufferedReader(new InputStreamReader(remoteHost.getInputStream()));
-      PrintWriter out = new PrintWriter(remoteHost.getOutputStream(), true)
-    ) {
+    try (BufferedReader in =
+            new BufferedReader(new InputStreamReader(remoteHost.getInputStream()));
+        PrintWriter out = new PrintWriter(remoteHost.getOutputStream(), true)) {
       this.inputStream = in;
       this.outputStream = out;
 
@@ -54,12 +53,12 @@ public class SocketCommunicationProtocol {
         Consumer<LabyrinthEvent> commandExe =
             e.getCommand() != null && commandMap.containsKey(e.getCommand())
                 ? commandMap.get(e.getCommand())
-                : commandMap.get("@debug@"); // TODO: to implement?
+                : null;
 
         if (commandExe != null) {
           commandExe.accept(e);
         } else {
-          System.out.println("comando non riconosciuto");
+          System.out.printf("comando non riconosciuto: %s%n", e.getCommand());
         }
       }
 

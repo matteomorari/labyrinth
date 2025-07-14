@@ -32,7 +32,8 @@ import javax.swing.JPanel;
 public class BoardPnl extends JPanel implements MouseListener, Animatable {
   private static final int BOARD_ARC_RADIUS = 30;
   private static final int PADDING = 40;
-  private static final long ANIMATION_DURATION = 600;
+  private static final long CARD_ANIMATION_DURATION = 900;
+  private static final long PLAYER_ANIMATION_DURATION = 600;
   private static final String PLAYER_SPRITE_SUFFIX = "_PLAYER_SPRITE";
 
   private int boardSize;
@@ -51,16 +52,18 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
   private Position playerAnimationFuturePoint;
   private Position lastCardInsertPosition;
   private int animationOffset = 0;
-  private Animator animator;
+  private Animator cardAnimator;
+  private Animator playerAnimator;
   private HashMap<List<Integer>, Orientation> playerDirectionImage;
 
   public BoardPnl(LabyrinthController controller) {
     setLayout(null);
     addMouseListener(this);
     this.controller = controller;
-    // TODO: create two separate Animator for player and card
-    this.animator =
-        new Animator(this, ANIMATION_DURATION, EasingFunction.LINEAR, this::endAnimation);
+    this.cardAnimator =
+        new Animator(this, CARD_ANIMATION_DURATION, EasingFunction.EASE_OUT_CUBIC, this::endCardAnimation);
+    this.playerAnimator =
+        new Animator(this, PLAYER_ANIMATION_DURATION, EasingFunction.LINEAR, this::endPlayerAnimation);
     this.arrowBoundsList = new ArrayList<>();
     this.lastCardInsertPosition = new Position();
     this.lastPlayerMovedPath = new ArrayList<>();
@@ -128,18 +131,14 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
 
   private void fireCardInsertAnimation() {
     cardAnimationInProgress = true;
-    startAnimation();
+    cardAnimator.initializeAnimation(new int[] {0}, new int[] {cellSize}).start();
   }
 
   private void firePlayerMoveAnimation() {
-    startAnimation();
+    playerAnimationInProgress = true;
     playerAnimationPreviousPoint = lastPlayerMovedPath.get(0);
     playerAnimationFuturePoint = lastPlayerMovedPath.get(1);
-    playerAnimationInProgress = true;
-  }
-
-  private void startAnimation() {
-    animator.initializeAnimation(new int[] {0}, new int[] {cellSize}).start();
+    playerAnimator.initializeAnimation(new int[] {0}, new int[] {cellSize}).start();
   }
 
   private void drawBackground(Graphics2D g2) {
@@ -484,23 +483,22 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     repaint();
   }
 
-  private void endAnimation() {
-    if (cardAnimationInProgress) {
-      cardAnimationInProgress = false;
-      controller.cardAnimationEnded();
-    }
+  private void endCardAnimation() {
+    cardAnimationInProgress = false;
+    controller.cardAnimationEnded();
+    animationOffset = 0;
+  }
 
-    if (playerAnimationInProgress) {
-      int index = lastPlayerMovedPath.indexOf(playerAnimationFuturePoint);
-      if (index < lastPlayerMovedPath.size() - 1) {
-        animator.initializeAnimation(new int[] {0}, new int[] {cellSize}).start();
-        playerAnimationPreviousPoint = playerAnimationFuturePoint;
-        playerAnimationFuturePoint = lastPlayerMovedPath.get(index + 1);
-      } else {
-        playerAnimationInProgress = false;
-        frameCount = 0;
-        controller.playerAnimationEnded();
-      }
+  private void endPlayerAnimation() {
+    int index = lastPlayerMovedPath.indexOf(playerAnimationFuturePoint);
+    if (index < lastPlayerMovedPath.size() - 1) {
+      playerAnimationPreviousPoint = playerAnimationFuturePoint;
+      playerAnimationFuturePoint = lastPlayerMovedPath.get(index + 1);
+      playerAnimator.initializeAnimation(new int[] {0}, new int[] {cellSize}).start();
+    } else {
+      playerAnimationInProgress = false;
+      frameCount = 0;
+      controller.playerAnimationEnded();
     }
     animationOffset = 0;
   }

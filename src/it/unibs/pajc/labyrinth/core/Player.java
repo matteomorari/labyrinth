@@ -6,14 +6,14 @@ import java.util.UUID;
 
 public class Player {
   private String id;
-  private AvatarColor color;
+  private Avatar color;
   private Position startPosition;
   private Position position;
   private boolean isReadyToPlay = false;
   private boolean isBot = false;
   private ArrayDeque<Goal> goalsQueue;
 
-  public Player(AvatarColor color, String id, boolean isBot) {
+  public Player(Avatar color, String id, boolean isBot) {
     this.goalsQueue = new ArrayDeque<>();
     this.position = new Position();
     this.startPosition = new Position();
@@ -22,11 +22,11 @@ public class Player {
     this.isBot = isBot;
   }
 
-  public Player(AvatarColor color, String id) {
+  public Player(Avatar color, String id) {
     this(color, id, false);
   }
 
-  public Player(AvatarColor color) {
+  public Player(Avatar color) {
     this(color, UUID.randomUUID().toString(), false);
   }
 
@@ -58,7 +58,7 @@ public class Player {
     return this.color != null ? this.color.getColorName() : null;
   }
 
-  public AvatarColor getAvatarColor() {
+  public Avatar getAvatarColor() {
     return this.color;
   }
 
@@ -75,7 +75,7 @@ public class Player {
     return this.startPosition;
   }
 
-  public void setColor(AvatarColor color) {
+  public void setColor(Avatar color) {
     this.color = color;
   }
 

@@ -24,7 +24,6 @@ public class LabyrinthGson {
 
   public static Labyrinth fromJson(String json) {
     Labyrinth modelCopy = gson.fromJson(json, Labyrinth.class);
-    // TODO: hard solution, to improve
     // we need the goal class to be the same instance in the board and in the player
     // and the player card list the same instance of the model players
     for (int i = 0; i < modelCopy.getBoardSize(); i++) {

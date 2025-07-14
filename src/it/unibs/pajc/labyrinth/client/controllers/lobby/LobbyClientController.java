@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import it.unibs.pajc.labyrinth.client.controllers.ClientSocketProtocol;
-import it.unibs.pajc.labyrinth.core.AvatarColor;
+import it.unibs.pajc.labyrinth.core.Avatar;
 import it.unibs.pajc.labyrinth.core.BotManager;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
@@ -170,7 +170,7 @@ public class LobbyClientController implements LobbyController {
   }
 
   @Override
-  public HashSet<AvatarColor> getAvailableColors() {
+  public HashSet<Avatar> getAvailableColors() {
     return onlineGameManager.getSelectedLobby().getAvailableColors();
   }
 
@@ -185,7 +185,7 @@ public class LobbyClientController implements LobbyController {
   }
 
   @Override
-  public void setPlayerColor(Player player, AvatarColor color) {
+  public void setPlayerColor(Player player, Avatar color) {
     if (player != null && color != null && onlineGameManager.getSelectedLobby() != null) {
       JsonObject msg = new JsonObject();
       msg.addProperty(COMMAND_KEY, "set_player_color");
