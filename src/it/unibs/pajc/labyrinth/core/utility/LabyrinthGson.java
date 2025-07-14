@@ -77,10 +77,4 @@ public class LabyrinthGson {
     }
     return modelCopy;
   }
-
-  // TODO: use generics
-  // public <T> T createCopy(T object, Class<T> classOfT) {
-  // String json = gson.toJson(object);
-  // return gson.fromJson(json, classOfT);
-  // }
 }

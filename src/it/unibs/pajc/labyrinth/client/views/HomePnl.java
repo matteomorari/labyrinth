@@ -123,7 +123,6 @@ public class HomePnl extends JPanel {
     }
 
     // Wait until the protocol thread is initialized
-    // TODO: is synchronized needed here?
     synchronized (clientSocketController) {
       while (!clientSocketController.isInitialized()) {
         try {

@@ -27,7 +27,7 @@ public class LobbyPnl extends JPanel {
   private static final int GRID_INSET = 20;
   private static final int ARC_RADIUS = 40;
   private static final Color BACKGROUND_COLOR = new Color(217, 217, 217);
-  private static final String AVATAR_SELECTION_DIALOG_TITLE = "Select Player Color";
+  private static final String AVATAR_SELECTION_DIALOG_TITLE = "SELECT PLAYER COLOR";
   private static final int DEFAULT_PANEL_WIDTH = 800;
 
   private LobbyController lobbyController;
