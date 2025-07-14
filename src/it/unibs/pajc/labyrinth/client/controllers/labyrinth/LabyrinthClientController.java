@@ -16,6 +16,7 @@ public class LabyrinthClientController implements LabyrinthController {
   private Labyrinth labyrinth;
   private String localPlayerId;
   private final ClientSocketProtocol connectionProtocol;
+  private String lastDisconnectedPlayer;
 
   private static final String COMMAND_PROPERTY = "command";
   private static final String PARAMETERS_PROPERTY = "parameters";
@@ -132,8 +133,8 @@ public class LabyrinthClientController implements LabyrinthController {
         "player_disconnected",
         (LabyrinthEvent e) -> {
           try {
-            // TODO: to implement
             String playerId = e.getParameters().get(PLAYER_ID_PROPERTY).getAsString();
+            lastDisconnectedPlayer = labyrinth.getPlayerById(playerId).getColorName();
             labyrinth.setGameCrashed(true);
           } catch (Exception exc) {
             exc.printStackTrace();
@@ -341,5 +342,10 @@ public class LabyrinthClientController implements LabyrinthController {
   public Player getPlayerForGoalDisplay() {
     // In online mode, we always show the local player's goal
     return labyrinth.getPlayerById(getLocalPlayer().getId());
+  }
+
+  @Override
+  public String getLastDisconnectedPlayer() {
+    return lastDisconnectedPlayer;
   }
 }

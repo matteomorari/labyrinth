@@ -113,4 +113,10 @@ public class LabyrinthLocalController implements LabyrinthController {
     // In local mode, we always show the current player's goal
     return getCurrentPlayer();
   }
+
+  @Override
+  public String getLastDisconnectedPlayer() {
+    // In local mode, there is no disconnected player
+    return null;
+  }
 }

@@ -177,7 +177,8 @@ public class GamePnl extends JPanel {
     if (controller.isGameCrashed()) {
       JOptionPane.showMessageDialog(
           this,
-          "A player has crashed. You will be redirected to the home page.",
+          controller.getLastDisconnectedPlayer()
+              + " player has crashed. You will be redirected to the home page.",
           "Game Crashed",
           JOptionPane.ERROR_MESSAGE);
       goBackToHome();

@@ -53,4 +53,6 @@ public interface LabyrinthController {
   boolean isGameCrashed();
 
   Player getPlayerForGoalDisplay();
+
+  String getLastDisconnectedPlayer();
 }
