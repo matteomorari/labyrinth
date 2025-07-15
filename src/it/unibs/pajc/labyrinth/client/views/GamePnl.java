@@ -8,7 +8,11 @@ import it.unibs.pajc.labyrinth.client.components.game.GoalsPlayersPnl;
 import it.unibs.pajc.labyrinth.client.components.game.PowerPnl;
 import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthController;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import javax.swing.BorderFactory;
@@ -50,6 +54,7 @@ public class GamePnl extends JPanel {
     JPanel leftPanel = createLeftPanel();
     JPanel rightPanel = createRightPanel();
     JPanel gameBoardPanel = new BoardPnl(controller);
+    gameBoardPanel.setOpaque(false);
 
     // Initialize scroll panes
     leftScrollPnl = createScrollPane(leftPanel, leftColumnWidth);
@@ -73,13 +78,16 @@ public class GamePnl extends JPanel {
   private JPanel createLeftPanel() {
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    panel.setOpaque(false);
 
     // Create components
     currentGoalsPnl = new CurrentGoalPnl(controller);
     currentGoalsPnl.setAlignmentX(CENTER_ALIGNMENT);
+    currentGoalsPnl.setOpaque(false);
 
     playersGoalsPnl = new GoalsPlayersPnl(controller, leftColumnWidth);
     playersGoalsPnl.setAlignmentX(CENTER_ALIGNMENT);
+    playersGoalsPnl.setOpaque(false);
 
     // Add components
     panel.add(currentGoalsPnl);
@@ -92,16 +100,20 @@ public class GamePnl extends JPanel {
   private JPanel createRightPanel() {
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    panel.setOpaque(false);
 
     // Create components
     currentPlayerPnl = new CurrentPlayerPnl(controller, rightColumnWidth);
     currentPlayerPnl.setAlignmentX(CENTER_ALIGNMENT);
+    currentPlayerPnl.setOpaque(false);
 
     availableCardPnl = new AvailableCardPnl(controller);
     availableCardPnl.setAlignmentX(CENTER_ALIGNMENT);
+    availableCardPnl.setOpaque(false);
 
     powerPnl = new PowerPnl(controller);
     powerPnl.setAlignmentX(CENTER_ALIGNMENT);
+    powerPnl.setOpaque(false);
 
     // Add components
     panel.add(currentPlayerPnl);
@@ -119,6 +131,8 @@ public class GamePnl extends JPanel {
     scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     scrollPane.setBorder(BorderFactory.createEmptyBorder());
     scrollPane.setPreferredSize(new Dimension(width, 0));
+    scrollPane.setOpaque(false);
+    scrollPane.getViewport().setOpaque(false); 
 
     // Customize scrollbar appearance
     JScrollBar verticalScrollBar = scrollPane.getVerticalScrollBar();
@@ -185,6 +199,28 @@ public class GamePnl extends JPanel {
     }
 
     repaint();
+  }
+
+  @Override
+  protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
+    Graphics2D g2d = (Graphics2D) g.create();
+
+    int width = getWidth();
+    int height = getHeight();
+
+    GradientPaint gradientPaint =
+        new GradientPaint(
+            (int) (0 - width * 0.5),
+            height,
+            Color.YELLOW,
+            (int) (width * 1.5),
+            (int) (0 - width * 0.5),
+            Color.RED);
+    g2d.setPaint(gradientPaint);
+    g2d.fillRect(0, 0, width, height);
+
+    g2d.dispose();
   }
 
   private void goBackToHome() {
