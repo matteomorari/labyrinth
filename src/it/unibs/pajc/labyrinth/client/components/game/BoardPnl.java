@@ -9,7 +9,6 @@ import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.enums.MyColors;
-import it.unibs.pajc.labyrinth.core.enums.PowerType;
 import it.unibs.pajc.labyrinth.core.utility.Orientation;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.awt.Color;
@@ -41,7 +40,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
   private LabyrinthController controller;
   private Card currentAvailableCard;
   private Card previousAvailableCard;
-  private HashMap<Player, Position> lastPlayerPositions;
+  private HashMap<Player, Position> lastPlayersPosition;
   private ArrayList<Position> lastPlayerMovedPath;
   private ArrayList<Shape> arrowBoundsList;
   private int cellSize;
@@ -61,13 +60,15 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     addMouseListener(this);
     this.controller = controller;
     this.cardAnimator =
-        new Animator(this, CARD_ANIMATION_DURATION, EasingFunction.EASE_OUT_CUBIC, this::endCardAnimation);
+        new Animator(
+            this, CARD_ANIMATION_DURATION, EasingFunction.EASE_OUT_CUBIC, this::endCardAnimation);
     this.playerAnimator =
-        new Animator(this, PLAYER_ANIMATION_DURATION, EasingFunction.LINEAR, this::endPlayerAnimation);
+        new Animator(
+            this, PLAYER_ANIMATION_DURATION, EasingFunction.LINEAR, this::endPlayerAnimation);
     this.arrowBoundsList = new ArrayList<>();
     this.lastCardInsertPosition = new Position();
     this.lastPlayerMovedPath = new ArrayList<>();
-    this.lastPlayerPositions = new HashMap<>();
+    this.lastPlayersPosition = new HashMap<>();
     this.playerDirectionImage = new HashMap<>();
 
     initData();
@@ -83,7 +84,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
 
   private void updateLastPlayerPosition() {
     for (Player player : controller.getPlayers()) {
-      lastPlayerPositions.put(player, new Position(player.getPosition()));
+      lastPlayersPosition.put(player, new Position(player.getPosition()));
     }
   }
 
@@ -118,14 +119,19 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     }
 
     // check if a player has moved
-    for (Player player : controller.getPlayers()) {
-      if (!player.getPosition().equals(lastPlayerPositions.get(player))) {
-        this.lastPlayerPositions.put(player, new Position(player.getPosition()));
-        this.lastPlayerMovedPath = controller.getLastPlayerMovedPath();
-        this.playerToAnimate = player;
-        firePlayerMoveAnimation();
+    Player player = controller.getCurrentPlayer();
+    if (!player.getPosition().equals(lastPlayersPosition.get(player))) {
+      // the value of playerToSwap is used to know if the view update is due to swap player or
+      // player moved
+      if (controller.getPlayerToSwap() != null) {
+        controller.setPlayerToSwap(null);
+        updateLastPlayerPosition();
         return;
       }
+      this.lastPlayersPosition.put(player, new Position(player.getPosition()));
+      this.lastPlayerMovedPath = controller.getLastPlayerMovedPath();
+      this.playerToAnimate = player;
+      firePlayerMoveAnimation();
     }
   }
 
@@ -254,22 +260,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     this.setAnimationDirection();
 
     int playerSize = (int) (cellSize * 0.5);
-    if (controller.getAvailableCard().getPower() != null
-        && controller.getAvailableCard().getPower().getType() == PowerType.SWAP_POSITION
-        && controller.isPowerUsed()) {
-      for (Player player : controller.getPlayers()) {
-        int x = initialXPosition + player.getPosition().getCol() * cellSize;
-        int y = initialYPosition + player.getPosition().getRow() * cellSize;
-        g2.drawImage(
-            ImageCntrl.valueOf(player.getColorName() + PLAYER_SPRITE_SUFFIX).getStandingImage(),
-            x + (cellSize - playerSize) / 2,
-            y + cellSize / 5,
-            playerSize,
-            playerSize,
-            null);
-      }
-      return;
-    }
+
     for (Player player : controller.getPlayers()) {
       int[] playerPosition = getPlayerAnimationPosition(player, initialXPosition, initialYPosition);
       int[] playerDirection = getPlayerDirection(player);
