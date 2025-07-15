@@ -306,4 +306,26 @@ public class FindOnlineGamePnl extends JPanel {
     }
     lobbiesJList.setModel(listModel);
   }
+
+  @Override
+  protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
+    Graphics2D g2d = (Graphics2D) g.create();
+
+    int width = getWidth();
+    int height = getHeight();
+
+    GradientPaint gradientPaint =
+        new GradientPaint(
+            (int) (0 - width * 0.5),
+            height,
+            Color.YELLOW,
+            (int) (width * 1.5),
+            (int) (0 - width * 0.5),
+            Color.RED);
+    g2d.setPaint(gradientPaint);
+    g2d.fillRect(0, 0, width, height);
+
+    g2d.dispose();
+  }
 }
