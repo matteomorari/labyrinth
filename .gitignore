@@ -17,6 +17,7 @@ effective-pom.xml
 .classpath
 .project
 .settings/
+.factorypath
 
 # IDEA specific files
 .idea/
@@ -37,3 +38,4 @@ nbdist/
 Thumbs.db
 
 *.json
+.VSCodeCounter

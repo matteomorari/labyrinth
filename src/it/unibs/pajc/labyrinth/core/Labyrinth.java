@@ -1,5 +1,9 @@
 package it.unibs.pajc.labyrinth.core;
 
+import it.unibs.pajc.labyrinth.core.enums.CardType;
+import it.unibs.pajc.labyrinth.core.enums.GoalType;
+import it.unibs.pajc.labyrinth.core.enums.PowerType;
+import it.unibs.pajc.labyrinth.core.utility.BaseModel;
 import it.unibs.pajc.labyrinth.core.utility.BotMoveCalcListener;
 import it.unibs.pajc.labyrinth.core.utility.NodeComparator;
 import it.unibs.pajc.labyrinth.core.utility.Orientation;
@@ -24,6 +28,8 @@ public class Labyrinth extends BaseModel {
   private transient BotMoveCalcListener botMoveListener = null;
   private boolean waitingForCardAnimation = false;
   private boolean waitingForPlayerAnimation = false;
+  private boolean isGameOver = false;
+  private boolean isGameCrashed = false; // due to user disconnection
 
   private int boardSize;
   private ArrayDeque<Player> players;
@@ -31,7 +37,6 @@ public class Labyrinth extends BaseModel {
   private Card availableCard;
   private Position lastInsertedCardPosition;
   private ArrayList<Position> lastPlayerMovedPath;
-  // TODO: to move to the player class?
   private boolean hasCurrentPlayerInserted = false;
   private boolean hasCurrentPlayerDoubleTurn = false;
   private boolean hasUsedPower = false;
@@ -136,6 +141,7 @@ public class Labyrinth extends BaseModel {
 
   private void advanceToNextPlayer() {
     this.players.add(this.players.poll());
+    // TODO: create a method to reset player state
     this.hasCurrentPlayerInserted = false;
     setWaitingForPlayerAnimation(false);
     setHasUsedPower(false);
@@ -184,6 +190,12 @@ public class Labyrinth extends BaseModel {
   public void playerAnimationEnded() {
     isGoalFound(getCurrentPlayer());
     setWaitingForPlayerAnimation(false);
+    checkIfGameIsOver();
+
+    if (isGameOver() || isGameCrashed()) {
+      fireChangeListener();
+      return;
+    }
 
     if (hasCurrentPlayerDoubleTurn) {
       hasCurrentPlayerInserted = false;
@@ -191,8 +203,6 @@ public class Labyrinth extends BaseModel {
     } else {
       skipTurn();
     }
-
-    isGameFinished();
   }
 
   public void initGame() {
@@ -212,7 +222,6 @@ public class Labyrinth extends BaseModel {
     }
 
     // assign goals to the cards
-    // TODO: improve
     for (Player player : this.players) {
       for (Goal goal : player.getGoals()) {
         boolean isAssigned = false;
@@ -229,16 +238,14 @@ public class Labyrinth extends BaseModel {
       }
     }
 
-    // powers
+    // assign powers to the cards
     ArrayList<PowerType> powerList = new ArrayList<>(Arrays.asList(PowerType.values()));
-    // TODO: set a number of powers for each type
     while (!powerList.isEmpty()) {
       int row = random.nextInt(this.boardSize);
       int col = random.nextInt(this.boardSize);
       Card card = this.board.get(row).get(col);
 
       if (card.getPower() == null && isPowerPositionValid(row, col)) {
-        // Power power = new Power(PowersList.remove(0));
         Power power = new Power(powerList.removeFirst());
         card.setPower(power);
         power.setPosition(card.getPosition());
@@ -346,7 +353,10 @@ public class Labyrinth extends BaseModel {
   }
 
   public void insertCard(Position insertPosition) {
-    validatePosition(insertPosition);
+    if (!isPositionValid(insertPosition.row, insertPosition.col)) {
+      System.out.println("Illegal move");
+      return;
+    }
 
     if (this.availableCard == null) {
       throw new IllegalStateException("No available card");
@@ -384,6 +394,7 @@ public class Labyrinth extends BaseModel {
     this.lastInsertedCardPosition = insertPosition;
 
     setHasUsedPower(false);
+    setWaitingForCardAnimation(true);
     this.fireChangeListener();
   }
 
@@ -466,16 +477,6 @@ public class Labyrinth extends BaseModel {
     setGoalToSwap(null);
   }
 
-  // TODO: there is a duplicate
-  private void validatePosition(Position insertPosition) {
-    if (insertPosition.row < 0
-        || insertPosition.row >= this.boardSize
-        || insertPosition.col < 0
-        || insertPosition.col >= this.boardSize) {
-      throw new IllegalArgumentException("Invalid position");
-    }
-  }
-
   public ArrayList<Position> getAvailableCardInsertionPoint() {
     ArrayList<Position> availableCardInsertionPoint = new ArrayList<>();
     for (int i = 1; i < this.boardSize - 1; i++) {
@@ -508,7 +509,6 @@ public class Labyrinth extends BaseModel {
   private void updateNextAvailableCard(Card card) {
     card.setPosition(-1, -1);
     card.shiftPlayersToNewCard(this.availableCard);
-    // TODO: to improve e put together with the others
     if (card.getGoal() != null) {
       card.getGoal().setPosition(new Position(-1, -1));
     }
@@ -528,15 +528,13 @@ public class Labyrinth extends BaseModel {
     }
   }
 
-  // ! TODO: seems to not reflect the actual state of the board
   private ArrayList<Orientation> getCardOpenDirection(Card card) {
     ArrayList<Orientation> openOrientation = new ArrayList<>();
     for (Orientation orientation : Orientation.values()) {
       Position neighborPosition = getNeighborPosition(card.getPosition(), orientation);
       // Check if the neighbor position is within the board boundaries
-      // TODO: move in the getNeighborPosition, if out of bounds return Exception
-      if (isPositionWithinBounds(neighborPosition.getRow(), neighborPosition.getCol())) {
-        Boolean isOpen =
+      if (isPositionValid(neighborPosition.getRow(), neighborPosition.getCol())) {
+        boolean isOpen =
             isPathOpenBetweenCards(
                 card,
                 this.board.get(neighborPosition.getRow()).get(neighborPosition.getCol()),
@@ -561,7 +559,6 @@ public class Labyrinth extends BaseModel {
   }
 
   // using Dijkstra's algorithm
-  // TODO: https://www.baeldung.com/java-solve-maze
   public ArrayList<Position> findPath(Position startPosition, Position endPosition) {
     PriorityQueue<Card> nodeDistanceQueue = new PriorityQueue<>(new NodeComparator());
     ArrayList<Position> path = new ArrayList<>();
@@ -631,7 +628,7 @@ public class Labyrinth extends BaseModel {
     int neighborCol = neighborPosition.getCol();
 
     // Check if position is valid
-    if (!isPositionWithinBounds(neighborRow, neighborCol)) {
+    if (!isPositionValid(neighborRow, neighborCol)) {
       return;
     }
 
@@ -690,7 +687,7 @@ public class Labyrinth extends BaseModel {
     }
   }
 
-  private boolean isPositionWithinBounds(int row, int col) {
+  private boolean isPositionValid(int row, int col) {
     return row >= 0 && row < this.boardSize && col >= 0 && col < this.boardSize;
   }
 
@@ -703,13 +700,16 @@ public class Labyrinth extends BaseModel {
       return;
     }
 
-    // TODO: use proper Card method
+    // remove the player from the previous card
     Card previousPlayerCard =
         this.board
             .get(currentPlayer.getPosition().getRow())
             .get(currentPlayer.getPosition().getCol());
     previousPlayerCard.removePlayer(currentPlayer);
-    this.board.get(row).get(col).addPlayer(currentPlayer);
+
+    // add the player to the new card
+    Card newPlayerCard = this.board.get(row).get(col);
+    newPlayerCard.addPlayer(currentPlayer);
     currentPlayer.setPosition(row, col);
 
     setWaitingForPlayerAnimation(true);
@@ -717,7 +717,6 @@ public class Labyrinth extends BaseModel {
     this.fireChangeListener();
   }
 
-  // TODO: without leaked reference can be improved
   public void swapPlayers() {
     Player currentPlayer = getCurrentPlayer();
     if (currentPlayer == null || playerToSwap == null) {
@@ -728,8 +727,8 @@ public class Labyrinth extends BaseModel {
     System.out.println("Current player position" + currentPlayerPosition);
     System.out.println("swap player position " + playerToSwap.getPosition());
 
-    int x = playerToSwap.getPosition().getRow();
-    int y = playerToSwap.getPosition().getCol();
+    int swapPlayerRow = playerToSwap.getPosition().getRow();
+    int swapPlayerCol = playerToSwap.getPosition().getCol();
     int xCurrent = currentPlayer.getPosition().getRow();
     int yCurrent = currentPlayer.getPosition().getCol();
 
@@ -738,7 +737,7 @@ public class Labyrinth extends BaseModel {
     Card playerToSwapCard = getPlayerCard(playerToSwap);
 
     playerToSwap.setPosition(xCurrent, yCurrent);
-    currentPlayer.setPosition(x, y);
+    currentPlayer.setPosition(swapPlayerRow, swapPlayerCol);
 
     // Remove players from their current cards
     currentPlayerCard.removePlayer(currentPlayer);
@@ -767,14 +766,13 @@ public class Labyrinth extends BaseModel {
     this.lastInsertedCardPosition = lastInsertedCardPosition;
   }
 
-  public boolean isGameFinished() {
+  public void checkIfGameIsOver() {
     for (Player player : players) {
       if (player.getGoals().isEmpty() && player.getPosition().equals(player.getStartPosition())) {
         System.out.println("game over");
-        return true;
+        setGameOver(true);
       }
     }
-    return false;
   }
 
   public boolean isGoalFound(Player player) {
@@ -799,7 +797,7 @@ public class Labyrinth extends BaseModel {
     this.hasCurrentPlayerDoubleTurn = hasDoubleTurn;
   }
 
-  public boolean getHasUsedPower() {
+  public boolean isPowerUsed() {
     return hasUsedPower;
   }
 
@@ -824,11 +822,11 @@ public class Labyrinth extends BaseModel {
     this.goalToSwap = goalToSwap;
   }
 
-  public boolean getHasCurrentPlayerInserted() {
+  public boolean isCurrentPlayerInserted() {
     return hasCurrentPlayerInserted;
   }
 
-  public boolean getHasCurrentPlayerDoubleTurn() {
+  public boolean isCurrentPlayerDoubleTurnActive() {
     return hasCurrentPlayerDoubleTurn;
   }
 
@@ -870,5 +868,31 @@ public class Labyrinth extends BaseModel {
 
   public void setBotManager(BotManager botManager) {
     this.botManager = botManager;
+  }
+
+  public boolean isGameOver() {
+    return isGameOver;
+  }
+
+  public void setGameOver(boolean isGameEnded) {
+    this.isGameOver = isGameEnded;
+  }
+
+  public boolean isGameCrashed() {
+    return isGameCrashed;
+  }
+
+  public void setGameCrashed(boolean isGameCrashed) {
+    this.isGameCrashed = isGameCrashed;
+    if (isGameCrashed) {
+      fireChangeListener();
+    }
+  }
+
+  public void rotateAvailableCard(int rotationCount) {
+    if (!hasCurrentPlayerInserted) {
+      getAvailableCard().rotate(rotationCount);
+      fireChangeListener();
+    }
   }
 }

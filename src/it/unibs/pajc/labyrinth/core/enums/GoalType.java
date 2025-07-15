@@ -1,4 +1,4 @@
-package it.unibs.pajc.labyrinth.core;
+package it.unibs.pajc.labyrinth.core.enums;
 
 public enum GoalType {
   HELMET,

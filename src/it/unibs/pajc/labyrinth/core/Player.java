@@ -6,14 +6,14 @@ import java.util.UUID;
 
 public class Player {
   private String id;
-  private PlayerColor color;
+  private Avatar color;
   private Position startPosition;
   private Position position;
-  private Boolean isReadyToPlay = false;
-  private Boolean isBot = false;
+  private boolean isReadyToPlay = false;
+  private boolean isBot = false;
   private ArrayDeque<Goal> goalsQueue;
 
-  public Player(PlayerColor color, String id, boolean isBot) {
+  public Player(Avatar color, String id, boolean isBot) {
     this.goalsQueue = new ArrayDeque<>();
     this.position = new Position();
     this.startPosition = new Position();
@@ -22,11 +22,11 @@ public class Player {
     this.isBot = isBot;
   }
 
-  public Player(PlayerColor color, String id) {
+  public Player(Avatar color, String id) {
     this(color, id, false);
   }
 
-  public Player(PlayerColor color) {
+  public Player(Avatar color) {
     this(color, UUID.randomUUID().toString(), false);
   }
 
@@ -58,12 +58,11 @@ public class Player {
     return this.color != null ? this.color.getColorName() : null;
   }
 
-  public PlayerColor getColor() {
+  public Avatar getAvatarColor() {
     return this.color;
   }
 
   public Position getPosition() {
-    // TODO: leaked reference
     return this.position;
   }
 
@@ -73,11 +72,10 @@ public class Player {
   }
 
   public Position getStartPosition() {
-    // TODO: leaked reference
     return this.startPosition;
   }
 
-  public void setColor(PlayerColor color) {
+  public void setColor(Avatar color) {
     this.color = color;
   }
 
@@ -89,26 +87,30 @@ public class Player {
     return id;
   }
 
-  public void setIsReadyToPlay(Boolean isReadyToPlay) {
+  public void setIsReadyToPlay(boolean isReadyToPlay) {
     this.isReadyToPlay = isReadyToPlay;
   }
 
-  public Boolean isReadyToPlay() {
+  public boolean isReadyToPlay() {
     return isReadyToPlay;
   }
 
-  public Boolean isBot() {
+  public boolean isBot() {
     return isBot;
   }
 
-  public void setIsBot(Boolean isBot) {
+  public void setIsBot(boolean isBot) {
     this.isBot = isBot;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null || getClass() != obj.getClass()) return false;
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
 
     Player other = (Player) obj;
     return id != null ? id.equals(other.id) : other.id == null;

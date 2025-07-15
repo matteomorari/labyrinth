@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 
 public enum ImageCntrl {
   // load images
+  LOGO("logo.png"),
   CARD_L("L.png"),
   CARD_I("I.png"),
   CARD_T("T.png"),
@@ -61,7 +62,6 @@ public enum ImageCntrl {
   SKYBLUE_PLAYER_SPRITE("skyblue_sprite.png"),
   ;
 
-  // private static final int IMAGE_SIZE = 72;
   private static final int IMAGE_SIZE = 32;
   private final Path path;
   private BufferedImage image;
@@ -114,7 +114,7 @@ public enum ImageCntrl {
     return playerAnimation;
   }
 
-  public BufferedImage getStandingAnimationImage() {
+  public BufferedImage getStandingImage() {
     return getSprite(1, 0);
   }
 

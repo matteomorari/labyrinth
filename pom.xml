@@ -15,6 +15,27 @@
 
   <build>
     <sourceDirectory>src</sourceDirectory>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>client</id>
+            <configuration>
+              <mainClass>it.unibs.pajc.labyrinth.client.LabyrinthClientMain</mainClass>
+            </configuration>
+          </execution>
+          <execution>
+            <id>server</id>
+            <configuration>
+              <mainClass>it.unibs.pajc.labyrinth.server.LabyrinthServer</mainClass>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 
 
@@ -25,24 +46,19 @@
       <version>2.12.1</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>3.14.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>2.17.2</version>
-    </dependency>
-    <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-all</artifactId>
       <version>1.14</version>
     </dependency>
     <dependency>
-      <groupId>com.formdev</groupId>
-      <artifactId>svgSalamander</artifactId>
-      <version>1.1.4</version>
+      <groupId>io.github.cdimascio</groupId>
+      <artifactId>dotenv-java</artifactId>
+      <version>3.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>xerces</groupId>
+      <artifactId>xercesImpl</artifactId>
+      <version>2.12.2</version>
     </dependency>
   </dependencies>
 </project>

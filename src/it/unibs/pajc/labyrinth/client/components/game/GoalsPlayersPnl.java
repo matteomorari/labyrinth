@@ -1,8 +1,10 @@
 package it.unibs.pajc.labyrinth.client.components.game;
 
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
-import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
+import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Player;
+import it.unibs.pajc.labyrinth.core.enums.MyColors;
+
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -116,7 +118,7 @@ public class GoalsPlayersPnl extends JPanel {
         RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
     // draw background
-    g2.setColor(Color.LIGHT_GRAY);
+    g2.setColor(MyColors.MAIN_BG_COLOR.getColor());
     g2.fillRoundRect(0, 0, getWidth(), getHeight(), CORNER_RADIUS, CORNER_RADIUS);
 
     // Calculate dimensions
@@ -165,11 +167,11 @@ public class GoalsPlayersPnl extends JPanel {
       int playerY =
           currentY - PLAYER_SIZE / 2 - OVAL_Y_ADJUSTMENT; // Align vertically with text center
       g2.drawImage(
-          ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE").getStandingAnimationImage(),
+          ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE").getStandingImage(),
           leftPosition,
           playerY - 10,
           PLAYER_SIZE,
-          PLAYER_SIZE ,
+          PLAYER_SIZE,
           null);
 
       // Draw player text to the right of the oval

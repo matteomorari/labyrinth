@@ -4,10 +4,12 @@ import it.unibs.pajc.labyrinth.client.animation.Animatable;
 import it.unibs.pajc.labyrinth.client.animation.Animator;
 import it.unibs.pajc.labyrinth.client.animation.EasingFunction;
 import it.unibs.pajc.labyrinth.client.components.CardImage;
-import it.unibs.pajc.labyrinth.client.components.RoundedIconButton;
+import it.unibs.pajc.labyrinth.client.components.SvgIconButton;
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
-import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
+import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Card;
+import it.unibs.pajc.labyrinth.core.enums.MyColors;
+import it.unibs.pajc.labyrinth.core.utility.Orientation;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -40,29 +42,32 @@ public class AvailableCardPnl extends JPanel implements Animatable {
   private static final String TITLE_FONT_FAMILY = "Times New Roman";
 
   private LabyrinthController controller;
+  private String availableCardId;
+  private Orientation availableCardOrientation;
   private BufferedImage availableCardImage;
-  private int cardWidth = DEFAULT_CARD_WIDTH;
   private final Font titleFont = new Font(TITLE_FONT_FAMILY, Font.BOLD, TITLE_FONT_SIZE);
   private int panelWidth;
-  private RoundedIconButton rotateButton;
-  private RoundedIconButton skipTurnButton;
+  private SvgIconButton rotateButton;
+  private SvgIconButton skipTurnButton;
   private Animator animator;
   private int animationCardAngle;
   private boolean isRotating = false;
 
   public AvailableCardPnl(LabyrinthController controller) {
     this.controller = controller;
-    availableCardImage = getCorrectCardImage();
+    availableCardId = controller.getAvailableCard().getID();
+    availableCardOrientation = controller.getAvailableCard().getOrientation();
+    availableCardImage = getCardImage();
 
     // Initialize the rotate button
-    rotateButton = new RoundedIconButton("resource\\images\\rotate.svg");
+    rotateButton = new SvgIconButton("resource\\icons\\rotate.svg");
     rotateButton.setButtonSize(50, 0);
     rotateButton.setBorderRadius(40);
     rotateButton.setSvgIconSize(40, 40);
     rotateButton.addActionListener(e -> handleRotationCardBtn());
 
     // Initialize the skip turn button
-    skipTurnButton = new RoundedIconButton("resource\\images\\skip.svg");
+    skipTurnButton = new SvgIconButton("resource\\icons\\skip.svg");
     skipTurnButton.setButtonSize(50, 0);
     skipTurnButton.setBorderRadius(40);
     skipTurnButton.setSvgIconSize(40, 40);
@@ -74,14 +79,7 @@ public class AvailableCardPnl extends JPanel implements Animatable {
 
     // set animation
     animationCardAngle = 0;
-    animator =
-        new Animator(
-            this,
-            1000,
-            EasingFunction.EASE_OUT_BOUNCE,
-            () -> {
-              onAnimationEnded();
-            });
+    animator = new Animator(this, 1000, EasingFunction.EASE_OUT_BOUNCE, this::onAnimationEnded);
   }
 
   private void updatePanelSize(int width) {
@@ -129,7 +127,7 @@ public class AvailableCardPnl extends JPanel implements Animatable {
         RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
     // draw background
-    g2.setColor(Color.LIGHT_GRAY);
+    g2.setColor(MyColors.MAIN_BG_COLOR.getColor());
     g2.fillRoundRect(0, 0, getWidth(), getHeight(), PANEL_CORNER_RADIUS, PANEL_CORNER_RADIUS);
 
     // Draw the title text
@@ -176,17 +174,21 @@ public class AvailableCardPnl extends JPanel implements Animatable {
 
   public void updateCardImage() {
     // Check if we need to recreate the scaled background
-    cardWidth = Math.max(DEFAULT_CARD_WIDTH, panelWidth - CARD_HORIZONTAL_MARGIN);
+    int cardWidth = Math.max(DEFAULT_CARD_WIDTH, panelWidth - CARD_HORIZONTAL_MARGIN);
 
-    // if (controller.getHasCurrentPlayerInserted()) {
-    availableCardImage = getCorrectCardImage();
-    // ImageCntrl.valueOf("CARD_" + controller.getAvailableCard().getType()).getImage();
+    // check if the orientation of the card has changed
+    Card newCard = controller.getAvailableCard();
+    if (availableCardId.equals(newCard.getID())
+        && availableCardOrientation != newCard.getOrientation()) {
+      startCardRotationAnimation();
+    }
+    availableCardId = newCard.getID();
+    availableCardOrientation = newCard.getOrientation();
+
+    availableCardImage = getCardImage();
     availableCardImage = scaleImage(availableCardImage, cardWidth, Integer.MAX_VALUE);
-
-    repaint();
   }
 
-  // TODO: use ImageCntrl method?
   private BufferedImage scaleImage(BufferedImage original, int maxWidth, int maxHeight) {
     int originalWidth = original.getWidth();
     int originalHeight = original.getHeight();
@@ -204,28 +206,20 @@ public class AvailableCardPnl extends JPanel implements Animatable {
       width = (int) (height * aspectRatio);
     }
 
-    BufferedImage scaledImage = new BufferedImage(width, height, original.getType());
-    Graphics2D g2d = scaledImage.createGraphics();
-    g2d.setRenderingHint(
-        RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-    g2d.drawImage(original, 0, 0, width, height, null);
-    g2d.dispose();
-
-    return scaledImage;
+    return ImageCntrl.scaleBufferedImage(original, width, height);
   }
 
-  private BufferedImage getCorrectCardImage() {
+  private BufferedImage getCardImage() {
     Card card = controller.getAvailableCard();
     CardImage cardImage =
         new CardImage(
             ImageCntrl.valueOf("CARD_" + card.getType()), (Graphics2D) this.getGraphics());
-    cardImage.rotate(card.getOrientation().ordinal() * 90 + animationCardAngle);
+    cardImage.rotate(card.getOrientation().ordinal() * 90 + (double) animationCardAngle);
     return cardImage.getImage();
   }
 
   private void handleRotationCardBtn() {
     controller.rotateAvailableCard(1);
-    startCardRotationAnimation();
   }
 
   private void startCardRotationAnimation() {
@@ -236,16 +230,20 @@ public class AvailableCardPnl extends JPanel implements Animatable {
   }
 
   private void handleSkipTurnBtn() {
-    // ! TODO: prevent skip if animation in progress and for bot
+    if (isRotating || controller.getCurrentPlayer().isBot()) {
+      return;
+    }
+
     controller.skipTurn();
   }
 
   @Override
   public void updateAnimation(int[] values) {
     animationCardAngle = values[0];
+    repaint();
   }
 
-  private boolean onAnimationEnded() {
-    return isRotating = false;
+  private void onAnimationEnded() {
+    isRotating = false;
   }
 }

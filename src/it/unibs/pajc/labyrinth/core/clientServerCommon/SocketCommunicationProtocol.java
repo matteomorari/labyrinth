@@ -15,14 +15,14 @@ public class SocketCommunicationProtocol {
   protected PrintWriter outputStream;
   protected HashMap<String, Consumer<LabyrinthEvent>> commandMap;
   protected boolean isRunning = false;
-  private static CopyOnWriteArrayList<SocketCommunicationProtocol> connectedPlayers =
+  private static CopyOnWriteArrayList<SocketCommunicationProtocol> connectedUsers =
       new CopyOnWriteArrayList<>();
   private volatile boolean initialized = false;
 
   public SocketCommunicationProtocol(Socket client) {
     commandMap = new HashMap<>();
     connect(client);
-    connectedPlayers.add(this);
+    connectedUsers.add(this);
   }
 
   public void connect(Socket client) {
@@ -31,12 +31,13 @@ public class SocketCommunicationProtocol {
 
   public void run() {
 
-    try {
-      inputStream = new BufferedReader(new InputStreamReader(remoteHost.getInputStream()));
+    try (BufferedReader in =
+            new BufferedReader(new InputStreamReader(remoteHost.getInputStream()));
+        PrintWriter out = new PrintWriter(remoteHost.getOutputStream(), true)) {
+      this.inputStream = in;
+      this.outputStream = out;
 
-      outputStream = new PrintWriter(remoteHost.getOutputStream(), true);
-
-      System.out.printf("Player collegato\n");
+      System.out.print("Player collegato");
 
       isRunning = true;
       synchronized (this) {
@@ -45,25 +46,33 @@ public class SocketCommunicationProtocol {
       }
       String request;
       while (isRunning && (request = inputStream.readLine()) != null) {
-        System.out.printf("Processing request: %s\n", request);
+        System.out.printf("Processing request: %s%n", request);
 
         LabyrinthEvent e = new LabyrinthEvent(this, request);
 
         Consumer<LabyrinthEvent> commandExe =
             e.getCommand() != null && commandMap.containsKey(e.getCommand())
                 ? commandMap.get(e.getCommand())
-                : commandMap.get("@debug@"); // TODO: ??
+                : null;
 
-        if (commandExe != null) commandExe.accept(e);
-        else System.out.println("comando non riconosciuto");
+        if (commandExe != null) {
+          commandExe.accept(e);
+        } else {
+          System.out.printf("comando non riconosciuto: %s%n", e.getCommand());
+        }
       }
 
-      System.out.printf("Collegamento terminato\n");
-      connectedPlayers.remove(this);
-      close();
     } catch (Exception ex) {
       ex.printStackTrace();
+    } finally {
+      disconnectUser();
+      close();
     }
+  }
+
+  public void disconnectUser() {
+    System.out.print("Collegamento terminato");
+    connectedUsers.remove(this);
   }
 
   public boolean isInitialized() {
@@ -73,8 +82,6 @@ public class SocketCommunicationProtocol {
   private synchronized void close() {
     try {
       isRunning = false;
-      outputStream.close();
-      inputStream.close();
       remoteHost.close();
     } catch (Exception ex) {
       ex.printStackTrace();
@@ -91,11 +98,11 @@ public class SocketCommunicationProtocol {
 
   public synchronized void sendMsg(SocketCommunicationProtocol sender, String msg) {
     if (outputStream != null) {
-      System.out.printf("invio messaggio: %s\n", msg);
+      System.out.printf("invio messaggio: %s%n", msg);
       outputStream.println(msg);
       outputStream.flush();
     } else {
-      System.out.printf("impossibile inviare messaggio, outputStream nullo\n");
+      System.out.print("impossibile inviare messaggio, outputStream nullo");
     }
   }
 
@@ -106,7 +113,15 @@ public class SocketCommunicationProtocol {
     return msg.toString();
   }
 
-  public static CopyOnWriteArrayList<SocketCommunicationProtocol> getConnectedPlayers() {
-    return connectedPlayers;
+  public static CopyOnWriteArrayList<SocketCommunicationProtocol> getConnectedUsers() {
+    return connectedUsers;
+  }
+
+  public HashMap<String, Consumer<LabyrinthEvent>> getCommandMap() {
+    return commandMap;
+  }
+
+  public void addCommand(String command, Consumer<LabyrinthEvent> commandExe) {
+    commandMap.put(command, commandExe);
   }
 }

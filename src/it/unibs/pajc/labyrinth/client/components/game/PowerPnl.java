@@ -1,13 +1,14 @@
 package it.unibs.pajc.labyrinth.client.components.game;
 
-import it.unibs.pajc.labyrinth.client.components.RoundedIconButton;
 import it.unibs.pajc.labyrinth.client.components.SelectionDialog;
+import it.unibs.pajc.labyrinth.client.components.SvgIconButton;
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
-import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
+import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.Goal;
 import it.unibs.pajc.labyrinth.core.Player;
-import it.unibs.pajc.labyrinth.core.PowerType;
+import it.unibs.pajc.labyrinth.core.enums.MyColors;
+import it.unibs.pajc.labyrinth.core.enums.PowerType;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
@@ -28,21 +29,18 @@ public class PowerPnl extends JPanel {
   private static final int BUTTON_TOP_MARGIN = 10;
   private static final int TITLE_FONT_SIZE = 25;
   private static final String TITLE_FONT_FAMILY = "Times New Roman";
-  private static final int POPUP_IMAGE_SIZE = 100;
-  private static final int BUTTON_PADDING = 10;
-  private static final int LINE_THICKNESS = 5;
 
   private LabyrinthController controller;
   private BufferedImage powerImage;
   private int cardWidth = DEFAULT_CARD_WIDTH;
   private final Font titleFont = new Font(TITLE_FONT_FAMILY, Font.BOLD, TITLE_FONT_SIZE);
   private int panelWidth;
-  private RoundedIconButton useButton;
+  private SvgIconButton useButton;
 
   public PowerPnl(LabyrinthController controller) {
     this.controller = controller;
 
-    useButton = new RoundedIconButton("resource\\images\\power.svg");
+    useButton = new SvgIconButton("resource\\icons\\power.svg");
     useButton.setButtonSize(50, 0);
     useButton.setBorderRadius(40);
     useButton.setSvgIconSize(40, 40);
@@ -96,7 +94,7 @@ public class PowerPnl extends JPanel {
         RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
     // draw background
-    g2.setColor(Color.LIGHT_GRAY);
+    g2.setColor(MyColors.MAIN_BG_COLOR.getColor());
     g2.fillRoundRect(0, 0, getWidth(), getHeight(), PANEL_CORNER_RADIUS, PANEL_CORNER_RADIUS);
 
     // Draw the title text
@@ -116,7 +114,7 @@ public class PowerPnl extends JPanel {
     updatePowerImage();
     cardWidth = Math.max(DEFAULT_CARD_WIDTH, panelWidth - CARD_HORIZONTAL_MARGIN);
     // Center the power image
-    int imageY = textY2; // + GOAL_IMAGE_TOP_MARGIN; // Position below the text with some padding
+    int imageY = textY2; // Position below the text with some padding
     if (powerImage != null) {
       int imageX = (getWidth() - powerImage.getWidth()) / 2;
       g2.drawImage(powerImage, imageX, imageY, null);
@@ -141,7 +139,7 @@ public class PowerPnl extends JPanel {
     if (card.getPower() != null) {
       powerImage = ImageCntrl.valueOf(card.getPower().getType().toString()).getImage();
       powerImage = ImageCntrl.scaleBufferedImage(powerImage, cardWidth, cardWidth);
-      if (controller.getHasUsedPower()) {
+      if (controller.isPowerUsed()) {
         // Make the border of the image green
         Graphics2D g2d = powerImage.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -163,13 +161,12 @@ public class PowerPnl extends JPanel {
 
       g2d.dispose();
     }
-    repaint();
   }
 
   private void handleUsePowerBtn() {
     if (controller.getAvailableCard().getPower() != null
-        && !controller.getHasUsedPower()
-        && controller.getHasCurrentPlayerInserted()) {
+        && !controller.isPowerUsed()
+        && controller.isCurrentPlayerInserted()) {
       if (controller.getAvailableCard().getPower().getType() == PowerType.SWAP_POSITION) {
         showSwapPlayerPopup();
       }
@@ -190,15 +187,14 @@ public class PowerPnl extends JPanel {
     for (Player player : controller.getPlayers()) {
       if (!player.equals(currentPlayer)) {
         BufferedImage playerImage =
-            ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE")
-                .getStandingAnimationImage();
+            ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE").getStandingImage();
         items.add(
             new SelectionDialog.SelectionItem(
                 playerImage, () -> controller.setPlayerToSwap(player)));
       }
     }
 
-    SelectionDialog.show(this, "SELECT   PLAYER", items);
+    SelectionDialog.displaySelectionDialog(this, "SELECT   PLAYER", items);
   }
 
   private void showSwapGoalPopup() {
@@ -213,7 +209,7 @@ public class PowerPnl extends JPanel {
       }
     }
 
-    SelectionDialog.show(this, "SELECT   GOAL", items);
+    SelectionDialog.displaySelectionDialog(this, "SELECT   GOAL", items);
   }
 
   private void showSwapSecondGoalPopup() {
@@ -226,6 +222,6 @@ public class PowerPnl extends JPanel {
       items.add(new SelectionDialog.SelectionItem(goalImage, () -> controller.setGoalToSwap(goal)));
     }
 
-    SelectionDialog.show(this, "SELECT   GOAL", items);
+    SelectionDialog.displaySelectionDialog(this, "SELECT   GOAL", items);
   }
 }

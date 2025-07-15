@@ -2,6 +2,7 @@ package it.unibs.pajc.labyrinth.client.components;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -16,19 +17,18 @@ import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.ImageTranscoder;
 
-public class RoundedIconButton extends JButton {
+public class SvgIconButton extends JButton {
   private BufferedImage svgImage;
   private String label;
-  private String svgFilePath; // Store the SVG file path for reloading
+  private String svgFilePath;
   private Color bgColor;
-  // Configurable sizes
   private int iconDiameter = 45;
   private int labelExtraHeight = 15;
 
   // Border radius configuration (default is full circle)
   private int borderRadius = -1; // -1 means circular, any other value sets rounded corner radius
 
-  public RoundedIconButton(String svgFilePath) {
+  public SvgIconButton(String svgFilePath) {
     this.svgFilePath = svgFilePath;
     bgColor = Color.WHITE;
     setPreferredSize(new Dimension(iconDiameter, iconDiameter));
@@ -38,7 +38,7 @@ public class RoundedIconButton extends JButton {
     loadSVG(svgFilePath);
   }
 
-  public RoundedIconButton(String svgFilePath, String label) {
+  public SvgIconButton(String svgFilePath, String label) {
     this(svgFilePath);
     this.label = label;
     // Increase button height to accommodate text.
@@ -55,15 +55,16 @@ public class RoundedIconButton extends JButton {
     repaint();
   }
 
-  /**
-   * Get the current border radius.
-   *
-   * @return the border radius, or -1 if the button is circular
-   */
   public int getBorderRadius() {
     return borderRadius;
   }
 
+  public void setLabelFont(Font font) {
+    setFont(font);
+    repaint();
+  }
+
+  @Override
   public void setLabel(String label) {
     this.label = label;
     // Adjust preferred size based on label presence.
@@ -151,6 +152,8 @@ public class RoundedIconButton extends JButton {
     // If a label is provided, draw it in the area below the icon.
     if (label != null && !label.isEmpty()) {
       g2.setColor(getForeground());
+      g2.setFont(getFont());
+
       FontMetrics fm = g2.getFontMetrics();
       int textWidth = fm.stringWidth(label);
       int textX = (width - textWidth) / 2;
@@ -245,5 +248,18 @@ public class RoundedIconButton extends JButton {
 
   public Color getBgColor() {
     return bgColor;
+  }
+
+  public int getIconDiameter() {
+    return iconDiameter;
+  }
+
+  public String getSvgFilePath() {
+    return svgFilePath;
+  }
+
+  public void setSvgFilePath(String svgFilePath) {
+    this.svgFilePath = svgFilePath;
+    loadSVG(svgFilePath);
   }
 }

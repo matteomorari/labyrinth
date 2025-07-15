@@ -1,29 +1,28 @@
 package it.unibs.pajc.labyrinth.core.lobby;
 
-import it.unibs.pajc.labyrinth.core.BaseModel;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
-import it.unibs.pajc.labyrinth.core.Labyrinth.EnvironmentType;
+import it.unibs.pajc.labyrinth.core.Player;
+import it.unibs.pajc.labyrinth.core.utility.BaseModel;
 
 import java.util.ArrayList;
 
-public class OnlineGameManager extends BaseModel {
+public class LobbyManager extends BaseModel {
   private Lobby selectedLobby;
   private ArrayList<Lobby> availableLobbies;
 
-  public OnlineGameManager() {
+  public LobbyManager() {
     this.selectedLobby = null;
     this.availableLobbies = new ArrayList<>();
   }
 
   public void createLobby(String lobbyName) {
     Lobby newLobby = new Lobby(lobbyName, Labyrinth.EnvironmentType.CLIENT);
-    this.availableLobbies.add(newLobby);
+    getAvailableLobbies().add(newLobby);
   }
 
   public void setAvailableLobbies(ArrayList<Lobby> availableLobbies) {
     this.availableLobbies = availableLobbies;
-    System.out.println("Available lobbies updated.");
-    this.fireChangeListener();
+    fireChangeListener();
   }
 
   public ArrayList<Lobby> getAvailableLobbies() {
@@ -32,7 +31,7 @@ public class OnlineGameManager extends BaseModel {
 
   public void setSelectedLobby(Lobby currentLobby) {
     this.selectedLobby = currentLobby;
-    this.fireChangeListener();
+    fireChangeListener();
   }
 
   public Lobby getSelectedLobby() {
@@ -40,7 +39,28 @@ public class OnlineGameManager extends BaseModel {
   }
 
   public void setGameInProgress() {
-    this.selectedLobby.setGameInProgress(true);
-    this.fireChangeListener();
+    getSelectedLobby().setIsGameInProgress(true);
+    fireChangeListener();
+  }
+
+  public void addPlayerToLobby(Lobby lobby, Player player) {
+    if (lobby != null) {
+      lobby.addPlayer(player);
+      fireChangeListener();
+    }
+  }
+
+  public void startGame() {
+    if (getSelectedLobby() != null) {
+      getSelectedLobby().startGame();
+      fireChangeListener();
+    }
+  }
+
+  public void removePlayerFromSelectedLobby(Player player) {
+    if (getSelectedLobby() != null) {
+      getSelectedLobby().removePlayer(player);
+      fireChangeListener();
+    }
   }
 }

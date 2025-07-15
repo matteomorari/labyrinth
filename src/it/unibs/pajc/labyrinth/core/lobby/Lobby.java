@@ -2,7 +2,7 @@ package it.unibs.pajc.labyrinth.core.lobby;
 
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
-import it.unibs.pajc.labyrinth.core.PlayerColor;
+import it.unibs.pajc.labyrinth.core.Avatar;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.UUID;
@@ -12,17 +12,17 @@ public class Lobby {
   private volatile String lobbyName;
   private ArrayList<Player> playersList;
   private final String LOBBY_ID;
-  private Boolean gameInProgress;
-  private HashSet<PlayerColor> availableColors;
+  private boolean isGameInProgress;
+  private HashSet<Avatar> availableColors;
 
   public Lobby(String lobbyName, Labyrinth.EnvironmentType environmentType) {
     this.playersList = new ArrayList<>();
     this.LOBBY_ID = UUID.randomUUID().toString();
     this.lobbyName = lobbyName;
-    this.gameInProgress = false;
+    this.isGameInProgress = false;
     this.labyrinth = new Labyrinth(7, environmentType);
     this.availableColors = new HashSet<>();
-    availableColors = new HashSet<>(java.util.Arrays.asList(PlayerColor.values()));
+    availableColors = new HashSet<>(java.util.Arrays.asList(Avatar.values()));
   }
 
   public void addPlayer(Player player) {
@@ -33,7 +33,7 @@ public class Lobby {
     if (getPlayers().size() >= Labyrinth.MAX_PLAYERS) {
       throw new IllegalStateException("Lobby is full. Cannot add more players.");
     }
-    if (gameInProgress) {
+    if (isGameInProgress) {
       throw new IllegalStateException("Game is already in progress. Cannot add more players.");
     }
 
@@ -80,7 +80,7 @@ public class Lobby {
       labyrinth.addPlayer(player);
     }
     labyrinth.initGame();
-    gameInProgress = true;
+    isGameInProgress = true;
   }
 
   public int getPlayerCount() {
@@ -94,19 +94,15 @@ public class Lobby {
     return LOBBY_ID;
   }
 
-  public void setGameInProgress(Boolean gameInProgress) {
-    this.gameInProgress = gameInProgress;
+  public void setIsGameInProgress(boolean gameInProgress) {
+    this.isGameInProgress = gameInProgress;
   }
 
-  public Boolean isGameInProgress() {
-    return gameInProgress;
+  public boolean isGameInProgress() {
+    return isGameInProgress;
   }
 
-  public Labyrinth getLabyrinth() {
-    return labyrinth;
-  }
-
-  public void setPlayerColor(Player player, PlayerColor color) {
+  public void setPlayerColor(Player player, Avatar color) {
     if (!getPlayers().contains(player)) {
       throw new IllegalArgumentException("Player not found in the lobby.");
     }
@@ -129,7 +125,7 @@ public class Lobby {
       throw new IllegalArgumentException("Player not found in the lobby.");
     }
 
-    PlayerColor color = getFreeColor();
+    Avatar color = getFreeColor();
     if (color == null) {
       throw new IllegalStateException("No more colors available.");
     }
@@ -137,23 +133,23 @@ public class Lobby {
     setPlayerColor(player, color);
   }
 
-  private PlayerColor getFreeColor() {
+  private Avatar getFreeColor() {
     if (availableColors.isEmpty()) {
       return null; // No more colors available
     }
-    PlayerColor randomColor = availableColors.iterator().next();
+    Avatar randomColor = availableColors.iterator().next();
     availableColors.remove(randomColor);
     return randomColor;
   }
 
-  public HashSet<PlayerColor> getAvailableColors() {
+  public HashSet<Avatar> getAvailableColors() {
     return availableColors;
   }
 
   public void removePlayerColor(Player player) {
     // add the previous color from the available colors
-    if (player.getColor() != null) {
-      availableColors.add(player.getColor());
+    if (player.getAvatarColor() != null) {
+      availableColors.add(player.getAvatarColor());
       player.setColor(null);
     }
   }

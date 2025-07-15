@@ -1,8 +1,9 @@
 package it.unibs.pajc.labyrinth.client.components.game;
 
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
-import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
+import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Player;
+import it.unibs.pajc.labyrinth.core.enums.MyColors;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
@@ -31,7 +32,6 @@ public class CurrentGoalPnl extends JPanel {
   private LabyrinthController controller;
   private ImageCntrl goalCardBgCntrl;
   private BufferedImage currentGoalImage;
-  private int cardWidth = DEFAULT_CARD_WIDTH;
   private final Font titleFont = new Font(TITLE_FONT_FAMILY, Font.BOLD, TITLE_FONT_SIZE);
   private int panelWidth;
 
@@ -85,7 +85,7 @@ public class CurrentGoalPnl extends JPanel {
         RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
     // draw background
-    g2.setColor(Color.LIGHT_GRAY);
+    g2.setColor(MyColors.MAIN_BG_COLOR.getColor());
     g2.fillRoundRect(0, 0, getWidth(), getHeight(), PANEL_CORNER_RADIUS, PANEL_CORNER_RADIUS);
 
     // Draw the title text
@@ -114,11 +114,13 @@ public class CurrentGoalPnl extends JPanel {
 
   public void updateGoalImage() {
     // Check if we need to recreate the scaled background
-    cardWidth = Math.max(DEFAULT_CARD_WIDTH, panelWidth - CARD_HORIZONTAL_MARGIN);
+    int cardWidth = Math.max(DEFAULT_CARD_WIDTH, panelWidth - CARD_HORIZONTAL_MARGIN);
     BufferedImage goalCardBackground =
         scaleImage(goalCardBgCntrl.getImage(), cardWidth, Integer.MAX_VALUE);
 
-    Player player = controller.getCurrentPlayer();
+    // Get the player whose goal we should display using the controller
+    Player player = controller.getPlayerForGoalDisplay();
+
     int goalCardWidth = goalCardBackground.getWidth();
     int goalCardHeight = goalCardBackground.getHeight();
 
@@ -146,15 +148,13 @@ public class CurrentGoalPnl extends JPanel {
       int x = (goalCardWidth - ovalWidth) / 2;
       int y = (goalCardHeight - ovalHeight) / 2;
 
-      g2.setColor(player.getColor().getColor());
+      g2.setColor(player.getAvatarColor().getColor());
       g2.setStroke(new BasicStroke(OVAL_STROKE_WIDTH));
       g2.fillOval(x, y, ovalWidth, ovalHeight);
 
       g2.dispose();
       currentGoalImage = combined;
     }
-
-    repaint();
   }
 
   private BufferedImage scaleImage(BufferedImage original, int maxWidth, int maxHeight) {
@@ -174,9 +174,7 @@ public class CurrentGoalPnl extends JPanel {
       width = (int) (height * aspectRatio);
     }
 
-    BufferedImage scaledImage = ImageCntrl.scaleBufferedImage(original, width, height);
-
-    return scaledImage;
+    return ImageCntrl.scaleBufferedImage(original, width, height);
   }
 
   private BufferedImage createCombinedImage(

@@ -1,7 +1,9 @@
 package it.unibs.pajc.labyrinth.client.components;
 
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
+import it.unibs.pajc.labyrinth.core.enums.MyColors;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -12,8 +14,9 @@ import javax.swing.border.LineBorder;
 /** A reusable dialog for displaying image-based selection options to the user. */
 public class SelectionDialog {
   private static final int POPUP_IMAGE_SIZE = 100;
-  private static final int BUTTON_PADDING = 10;
-  private static final int LINE_THICKNESS = 5;
+  private static final int BORDER_SIZE = 5;
+  private static final int MARGIN_SIZE = 20;
+  private static final int PADDING = 15;
 
   /** Class representing a selectable item in the dialog */
   public static class SelectionItem {
@@ -47,14 +50,22 @@ public class SelectionDialog {
    * @param title The title of the dialog
    * @param items The list of selectable items to display
    */
-  public static void show(Component parent, String title, List<SelectionItem> items) {
+  public static void displaySelectionDialog(
+      Component parent, String title, List<SelectionItem> items) {
     // Create the content panel
-    JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, BUTTON_PADDING, BUTTON_PADDING));
-    // Calculate the width based on number of items
-    // TODO: improve the start dimension of the dialog
-    int panelWidth = POPUP_IMAGE_SIZE * items.size() + (BUTTON_PADDING * 2 * items.size());
-    panel.setPreferredSize(new Dimension(panelWidth, 200));
-    panel.setBackground(Color.LIGHT_GRAY);
+    JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, MARGIN_SIZE, MARGIN_SIZE));
+    // Calculate the width based on number of items, but limit to 5 for initial view
+    int visibleItems = Math.min(items.size(), 5);
+    int buttonTotalSize = POPUP_IMAGE_SIZE + 2 * (BORDER_SIZE + PADDING);
+    int panelWidth =
+        buttonTotalSize * visibleItems + (MARGIN_SIZE * (visibleItems + 1));
+
+    // Calculate the number of rows needed to display all items (max 5 per row)
+    int rows = (int) Math.ceil(items.size() / 5.0);
+    int panelHeight = rows * buttonTotalSize + (MARGIN_SIZE * (rows + 1));
+
+    panel.setPreferredSize(new Dimension(panelWidth, panelHeight));
+    panel.setBackground(MyColors.MAIN_BG_COLOR.getColor());
 
     // Create the dialog
     JDialog dialog = new JDialog((Frame) null, null, true);
@@ -68,24 +79,36 @@ public class SelectionDialog {
           ImageCntrl.scaleBufferedImage(item.getImage(), POPUP_IMAGE_SIZE, POPUP_IMAGE_SIZE);
       JButton button = new JButton(new ImageIcon(scaledImage));
       button.setFocusPainted(false);
-      button.setBackground(Color.LIGHT_GRAY);
-      button.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
+      button.setBackground(MyColors.MAIN_BG_COLOR.getColor());
+      button.setBorder(new LineBorder(Color.WHITE, BORDER_SIZE));
+
+      // Set border: LineBorder outside, EmptyBorder inside for padding
+      button.setBorder(
+          BorderFactory.createCompoundBorder(
+              new LineBorder(Color.WHITE, BORDER_SIZE),
+              BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING)));
 
       button.addMouseListener(
           new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent evt) {
-              button.setBorder(new LineBorder(Color.GREEN, LINE_THICKNESS));
+              button.setBorder(
+                  BorderFactory.createCompoundBorder(
+                      new LineBorder(Color.GREEN, BORDER_SIZE),
+                      BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING)));
             }
 
             @Override
             public void mouseExited(MouseEvent evt) {
-              button.setBorder(new LineBorder(Color.WHITE, BUTTON_PADDING));
+              button.setBorder(
+                  BorderFactory.createCompoundBorder(
+                      new LineBorder(Color.WHITE, BORDER_SIZE),
+                      BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING)));
             }
           });
 
       button.addActionListener(
-          e -> {
+          (ActionEvent e) -> {
             item.getOnSelectAction().run();
             dialog.dispose();
           });
@@ -104,7 +127,7 @@ public class SelectionDialog {
    * @return The complete panel with title and content
    */
   private static JPanel createCustomPanel(JPanel panel, String title) {
-    JLabel messageLabel = new JLabel(title, JLabel.CENTER);
+    JLabel messageLabel = new JLabel(title, SwingConstants.CENTER);
     messageLabel.setFont(new Font("Times New Roman", Font.BOLD, 15));
     JPanel customPanel = new JPanel(new BorderLayout());
     customPanel.add(messageLabel, BorderLayout.NORTH);

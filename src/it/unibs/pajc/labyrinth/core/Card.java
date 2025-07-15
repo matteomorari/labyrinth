@@ -1,5 +1,6 @@
 package it.unibs.pajc.labyrinth.core;
 
+import it.unibs.pajc.labyrinth.core.enums.CardType;
 import it.unibs.pajc.labyrinth.core.utility.Node;
 import it.unibs.pajc.labyrinth.core.utility.Orientation;
 import it.unibs.pajc.labyrinth.core.utility.Position;
@@ -175,5 +176,9 @@ public class Card extends Node {
   @Override
   public int hashCode() {
     return uniqueID != null ? uniqueID.hashCode() : 0;
+  }
+
+  public String getID() {
+    return uniqueID;
   }
 }

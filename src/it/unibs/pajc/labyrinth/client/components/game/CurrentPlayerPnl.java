@@ -1,7 +1,8 @@
 package it.unibs.pajc.labyrinth.client.components.game;
 
 import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
-import it.unibs.pajc.labyrinth.client.controllers.LabyrinthController;
+import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthController;
+import it.unibs.pajc.labyrinth.core.enums.MyColors;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -23,10 +24,8 @@ public class CurrentPlayerPnl extends JPanel {
   // Layout constants
   private static final int CORNER_RADIUS = 20;
   private static final int STARTING_Y = 50;
-  private static final int LINE_HEIGHT = 25;
   private static final int PADDING_X = 10;
   private static final int PADDING_Y = 7;
-  private static final int PLAYER_BOTTOM_SPACING = 20;
   private static final int PLAYER_SIZE = 35;
   private static final int TEXT_OVAL_SPACING = 10;
   private static final int OVAL_Y_ADJUSTMENT = 2;
@@ -105,7 +104,7 @@ public class CurrentPlayerPnl extends JPanel {
         RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
     // draw background
-    g2.setColor(Color.LIGHT_GRAY);
+    g2.setColor(MyColors.MAIN_BG_COLOR.getColor());
     g2.fillRoundRect(0, 0, getWidth(), getHeight(), CORNER_RADIUS, CORNER_RADIUS);
 
     // Calculate dimensions
@@ -134,12 +133,12 @@ public class CurrentPlayerPnl extends JPanel {
       g2.setFont(playerFont.deriveFont(newSize));
       fm = g2.getFontMetrics();
       textWidth = fm.stringWidth(playerText);
-      totalWidth = PLAYER_SIZE  + textWidth;
+      totalWidth = PLAYER_SIZE + textWidth;
     } else {
-      g2.setFont(playerFont.deriveFont((float) PLAYER_FONT_SIZE ));
+      g2.setFont(playerFont.deriveFont((float) PLAYER_FONT_SIZE));
       fm = g2.getFontMetrics();
-      textWidth = fm.stringWidth(playerText) ;
-      totalWidth =  textWidth + PLAYER_SIZE;
+      textWidth = fm.stringWidth(playerText);
+      totalWidth = textWidth + PLAYER_SIZE;
     }
 
     // Calculate left position to center the entire element
@@ -150,7 +149,7 @@ public class CurrentPlayerPnl extends JPanel {
         currentY - PLAYER_SIZE / 2 - OVAL_Y_ADJUSTMENT; // Align vertically with text center
     g2.drawImage(
         ImageCntrl.valueOf(controller.getCurrentPlayer().getColorName() + "_PLAYER_SPRITE")
-            .getStandingAnimationImage(),
+            .getStandingImage(),
         leftPosition + textWidth + TEXT_OVAL_SPACING - PADDING_X,
         playerY - 20,
         PLAYER_SIZE,
@@ -159,8 +158,6 @@ public class CurrentPlayerPnl extends JPanel {
 
     // Draw player text to the right of the image
     g2.setColor(Color.DARK_GRAY);
-    g2.drawString(playerText, leftPosition , currentY - PADDING_Y);
-
-    currentY += LINE_HEIGHT + PLAYER_BOTTOM_SPACING;
+    g2.drawString(playerText, leftPosition, currentY - PADDING_Y);
   }
 }
