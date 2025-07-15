@@ -401,10 +401,9 @@ public class Labyrinth extends BaseModel {
   // if the player can't move, go to the next player immediately
   public void checkIfPlayerCanMove() {
     if (getCardOpenDirection(getPlayerCard(getCurrentPlayer())).isEmpty()) {
-      if (availableCard.getPower() != null) {
-        return;
+      if (availableCard.getPower() == null) {
+        skipTurn();
       }
-      skipTurn();
     }
   }
 
@@ -428,33 +427,33 @@ public class Labyrinth extends BaseModel {
           swapPlayers();
           checkIfPlayerCanMove();
         });
-    powerActions.put(
-        PowerType.DOUBLE_TURN,
-        () -> {
-          hasCurrentPlayerDoubleTurn = true;
-          if (getCardOpenDirection(getPlayerCard(getCurrentPlayer())).isEmpty()) {
-            hasCurrentPlayerDoubleTurn = false;
-            hasCurrentPlayerInserted = false;
-          }
-        });
-    powerActions.put(
-        PowerType.DOUBLE_CARD_INSERTION,
-        () -> {
-          hasCurrentPlayerInserted = false;
-          hasUsedPower = false;
-        });
-    powerActions.put(
-        PowerType.CHOOSE_SECOND_GOAL,
-        () -> {
-          changeGoal();
-          checkIfPlayerCanMove();
-        });
-    powerActions.put(
-        PowerType.CHOOSE_GOAL,
-        () -> {
-          changeGoal();
-          checkIfPlayerCanMove();
-        });
+    // powerActions.put(
+    //     PowerType.DOUBLE_TURN,
+    //     () -> {
+    //       hasCurrentPlayerDoubleTurn = true;
+    //       if (getCardOpenDirection(getPlayerCard(getCurrentPlayer())).isEmpty()) {
+    //         hasCurrentPlayerDoubleTurn = false;
+    //         hasCurrentPlayerInserted = false;
+    //       }
+    //     });
+    // powerActions.put(
+    //     PowerType.DOUBLE_CARD_INSERTION,
+    //     () -> {
+    //       hasCurrentPlayerInserted = false;
+    //       hasUsedPower = false;
+    //     });
+    // powerActions.put(
+    //     PowerType.CHOOSE_SECOND_GOAL,
+    //     () -> {
+    //       changeGoal();
+    //       checkIfPlayerCanMove();
+    //     });
+    // powerActions.put(
+    //     PowerType.CHOOSE_GOAL,
+    //     () -> {
+    //       changeGoal();
+    //       checkIfPlayerCanMove();
+    //     });
   }
 
   public void changeGoal() {
@@ -723,10 +722,6 @@ public class Labyrinth extends BaseModel {
       return;
     }
 
-    Position currentPlayerPosition = currentPlayer.getPosition();
-    System.out.println("Current player position" + currentPlayerPosition);
-    System.out.println("swap player position " + playerToSwap.getPosition());
-
     int swapPlayerRow = playerToSwap.getPosition().getRow();
     int swapPlayerCol = playerToSwap.getPosition().getCol();
     int xCurrent = currentPlayer.getPosition().getRow();
@@ -746,10 +741,6 @@ public class Labyrinth extends BaseModel {
     // Add players to their new cards
     currentPlayerCard.addPlayer(playerToSwap);
     playerToSwapCard.addPlayer(currentPlayer);
-
-    System.out.println("current player position " + currentPlayer.getPosition());
-    System.out.println("swap player position" + playerToSwap.getPosition());
-    setPlayerToSwap(null);
 
     this.fireChangeListener();
   }
