@@ -22,6 +22,7 @@ public class Labyrinth extends BaseModel {
   private static final int GOALS_FOR_PLAYER = 4;
   public static final int MAX_PLAYERS = 4;
   public static final int MIN_PLAYERS = 2;
+  public static final int BOT_SEARCH_DEPTH = 2;
   private transient Random random = new Random();
   private transient BotManager botManager;
   private EnvironmentType environmentType;
@@ -164,7 +165,7 @@ public class Labyrinth extends BaseModel {
       } else if (getEnvironmentType() == EnvironmentType.SERVER) {
         new Thread(
                 () -> {
-                  getBotManager().calcMove(this, 2);
+                  getBotManager().calcMove(this, BOT_SEARCH_DEPTH);
                   if (botMoveListener != null) {
                     botMoveListener.onBotMoveCalc(
                         getBotManager().getBestCardInsertMove(), getBotManager().getBestPosition());
@@ -180,7 +181,7 @@ public class Labyrinth extends BaseModel {
   }
 
   public void startBotPlayerTurn() {
-    getBotManager().calcMove(this, 2);
+    getBotManager().calcMove(this, BOT_SEARCH_DEPTH);
     getBotManager().applyCardInsertion();
   }
 
