@@ -230,6 +230,9 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
             if (currentLobby.getModel().isWaitingForPlayerAnimation()) {
               currentLobby.getModel().setWaitingForPlayerAnimation(false);
               labyrinthModel.playerAnimationEnded();
+              if (labyrinthModel.isGameOver()) {
+                removeLobby(currentLobby);
+              }
             }
           } catch (Exception exc) {
             exc.printStackTrace();
@@ -244,8 +247,8 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
 
             // check if the sender is the current player
             if (sender.player.equals(labyrinthModel.getCurrentPlayer())) {
-              labyrinthModel.skipTurn();
               sendTurnSkippedNotification();
+              labyrinthModel.skipTurn();
             }
           } catch (Exception exc) {
             exc.printStackTrace();
