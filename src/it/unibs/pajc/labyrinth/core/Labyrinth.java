@@ -164,7 +164,7 @@ public class Labyrinth extends BaseModel {
       } else if (getEnvironmentType() == EnvironmentType.SERVER) {
         new Thread(
                 () -> {
-                  getBotManager().calcMove(this, 1, 2);
+                  getBotManager().calcMove(this, 2);
                   if (botMoveListener != null) {
                     botMoveListener.onBotMoveCalc(
                         getBotManager().getBestCardInsertMove(), getBotManager().getBestPosition());
@@ -180,7 +180,7 @@ public class Labyrinth extends BaseModel {
   }
 
   public void startBotPlayerTurn() {
-    getBotManager().calcMove(this, 1, 2);
+    getBotManager().calcMove(this, 2);
     getBotManager().applyCardInsertion();
   }
 
@@ -198,6 +198,7 @@ public class Labyrinth extends BaseModel {
     isGoalFound(getCurrentPlayer());
     setWaitingForPlayerAnimation(false);
     checkIfGameIsOver();
+    System.out.println("player animation ended");
 
     if (isGameOver() || isGameCrashed()) {
       fireChangeListener();
@@ -434,33 +435,33 @@ public class Labyrinth extends BaseModel {
           swapPlayers();
           checkIfPlayerCanMove();
         });
-    // powerActions.put(
-    //     PowerType.DOUBLE_TURN,
-    //     () -> {
-    //       hasCurrentPlayerDoubleTurn = true;
-    //       if (getCardOpenDirection(getPlayerCard(getCurrentPlayer())).isEmpty()) {
-    //         hasCurrentPlayerDoubleTurn = false;
-    //         hasCurrentPlayerInserted = false;
-    //       }
-    //     });
-    // powerActions.put(
-    //     PowerType.DOUBLE_CARD_INSERTION,
-    //     () -> {
-    //       hasCurrentPlayerInserted = false;
-    //       hasUsedPower = false;
-    //     });
-    // powerActions.put(
-    //     PowerType.CHOOSE_SECOND_GOAL,
-    //     () -> {
-    //       changeGoal();
-    //       checkIfPlayerCanMove();
-    //     });
-    // powerActions.put(
-    //     PowerType.CHOOSE_GOAL,
-    //     () -> {
-    //       changeGoal();
-    //       checkIfPlayerCanMove();
-    //     });
+    powerActions.put(
+        PowerType.DOUBLE_TURN,
+        () -> {
+          hasCurrentPlayerDoubleTurn = true;
+          if (getCardOpenDirection(getPlayerCard(getCurrentPlayer())).isEmpty()) {
+            hasCurrentPlayerDoubleTurn = false;
+            hasCurrentPlayerInserted = false;
+          }
+        });
+    powerActions.put(
+        PowerType.DOUBLE_CARD_INSERTION,
+        () -> {
+          hasCurrentPlayerInserted = false;
+          hasUsedPower = false;
+        });
+    powerActions.put(
+        PowerType.CHOOSE_SECOND_GOAL,
+        () -> {
+          changeGoal();
+          checkIfPlayerCanMove();
+        });
+    powerActions.put(
+        PowerType.CHOOSE_GOAL,
+        () -> {
+          changeGoal();
+          checkIfPlayerCanMove();
+        });
   }
 
   public void changeGoal() {

@@ -7,12 +7,12 @@ public class Turn {
   private int depthFromMinDistance = 0;
   // due to inserted card, the goal position may change
   // if the goal does not change, this will be the same as the player's position
-  private Position newGoalPosition; 
+  private Turn previousTurn;
 
-  public Turn(CardInsertMove cardInsertMove, Position playerPosition, Position newGoalPosition) {
+  public Turn(CardInsertMove cardInsertMove, Position playerPosition, Turn previousTurn) {
     this.cardInsertMove = cardInsertMove;
     this.playerPosition = playerPosition;
-    this.newGoalPosition = newGoalPosition;
+    this.previousTurn = previousTurn;
   }
 
   public CardInsertMove getCardInsertMove() {
@@ -47,11 +47,11 @@ public class Turn {
     this.depthFromMinDistance = depthFromMinDistance;
   }
 
-  public Position getNewGoalPosition() {
-    return newGoalPosition;
+  public Turn getPreviousTurn() {
+    return previousTurn;
   }
 
-  public void setNewGoalPosition(Position newGoalPosition) {
-    this.newGoalPosition = newGoalPosition;
+  public void setPreviousTurn(Turn previousTurn) {
+    this.previousTurn = previousTurn;
   }
 }

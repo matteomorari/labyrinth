@@ -4,7 +4,6 @@ import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.enums.MyColors;
-
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -145,8 +144,12 @@ public class GoalsPlayersPnl extends JPanel {
 
     // Find the maximum width of player text
     int maxTextWidth = 0;
+    String goalWord;
+    String playerText;
     for (Player player : players) {
-      String playerText = " " + player.getGoals().size() + " goals left";
+      int goalsCount = player.getGoals().size();
+      goalWord = (goalsCount == 1) ? "obbiettivo" : "obbiettivi";
+      playerText = " " + goalsCount + " " + goalWord + " rimanenti";
       FontMetrics fm = g2.getFontMetrics();
       int textWidth = fm.stringWidth(playerText);
       if (textWidth > maxTextWidth) {
@@ -155,7 +158,9 @@ public class GoalsPlayersPnl extends JPanel {
     }
 
     for (Player player : players) {
-      String playerText = " " + player.getGoals().size() + " goals left";
+      int goalsCount = player.getGoals().size();
+      goalWord = (goalsCount == 1) ? "obbiettivo" : "obbiettivi";
+      playerText = " " + goalsCount + " " + goalWord + " rimanenti";
 
       // Calculate the total width needed (oval + spacing + max text width)
       int totalWidth = PLAYER_SIZE + TEXT_OVAL_SPACING + maxTextWidth;
