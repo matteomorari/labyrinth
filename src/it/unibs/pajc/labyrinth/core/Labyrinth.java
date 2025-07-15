@@ -150,22 +150,29 @@ public class Labyrinth extends BaseModel {
     isGoalFound(getCurrentPlayer());
     System.out.println("Current player: " + this.getCurrentPlayer().getColorName());
 
-    if (this.getCurrentPlayer().isBot()) {
-      // if this class is used in local environment, the bot are handled here as expected
-      if (getEnvironmentType() == EnvironmentType.LOCAL) {
-        startBotPlayerTurn();
-      } else if (getEnvironmentType() == EnvironmentType.SERVER) {
-        // the server must notify the controller to send the bot move to the client
-        // Calculate the bot move but don't apply it yet
-        getBotManager().calcMove();
+    // --- Update the view before bot calculation ---
+    this.fireChangeListener();
 
-        // Notify the controller about the calculated bot move
-        if (botMoveListener != null) {
-          botMoveListener.onBotMoveCalc(
-              getBotManager().getBestCardInsertMove(), getBotManager().getBestPosition());
-          getBotManager().applyCardInsertion();
-          getBotManager().applyPlayerMovement();
-        }
+    if (this.getCurrentPlayer().isBot()) {
+      if (getEnvironmentType() == EnvironmentType.LOCAL) {
+        // Run bot logic in a new thread to avoid blocking the UI
+        new Thread(
+                () -> {
+                  startBotPlayerTurn();
+                })
+            .start();
+      } else if (getEnvironmentType() == EnvironmentType.SERVER) {
+        new Thread(
+                () -> {
+                  getBotManager().calcMove(this, 2);
+                  if (botMoveListener != null) {
+                    botMoveListener.onBotMoveCalc(
+                        getBotManager().getBestCardInsertMove(), getBotManager().getBestPosition());
+                    getBotManager().applyCardInsertion();
+                    getBotManager().applyPlayerMovement();
+                  }
+                })
+            .start();
       }
       // the last case is the class represents a client;
       // in this case it must wait from the server to know the bot move
@@ -173,7 +180,7 @@ public class Labyrinth extends BaseModel {
   }
 
   public void startBotPlayerTurn() {
-    getBotManager().calcMove();
+    getBotManager().calcMove(this, 2);
     getBotManager().applyCardInsertion();
   }
 
@@ -191,6 +198,7 @@ public class Labyrinth extends BaseModel {
     isGoalFound(getCurrentPlayer());
     setWaitingForPlayerAnimation(false);
     checkIfGameIsOver();
+    System.out.println("player animation ended");
 
     if (isGameOver() || isGameCrashed()) {
       fireChangeListener();
@@ -427,33 +435,33 @@ public class Labyrinth extends BaseModel {
           swapPlayers();
           checkIfPlayerCanMove();
         });
-    // powerActions.put(
-    //     PowerType.DOUBLE_TURN,
-    //     () -> {
-    //       hasCurrentPlayerDoubleTurn = true;
-    //       if (getCardOpenDirection(getPlayerCard(getCurrentPlayer())).isEmpty()) {
-    //         hasCurrentPlayerDoubleTurn = false;
-    //         hasCurrentPlayerInserted = false;
-    //       }
-    //     });
-    // powerActions.put(
-    //     PowerType.DOUBLE_CARD_INSERTION,
-    //     () -> {
-    //       hasCurrentPlayerInserted = false;
-    //       hasUsedPower = false;
-    //     });
-    // powerActions.put(
-    //     PowerType.CHOOSE_SECOND_GOAL,
-    //     () -> {
-    //       changeGoal();
-    //       checkIfPlayerCanMove();
-    //     });
-    // powerActions.put(
-    //     PowerType.CHOOSE_GOAL,
-    //     () -> {
-    //       changeGoal();
-    //       checkIfPlayerCanMove();
-    //     });
+    powerActions.put(
+        PowerType.DOUBLE_TURN,
+        () -> {
+          hasCurrentPlayerDoubleTurn = true;
+          if (getCardOpenDirection(getPlayerCard(getCurrentPlayer())).isEmpty()) {
+            hasCurrentPlayerDoubleTurn = false;
+            hasCurrentPlayerInserted = false;
+          }
+        });
+    powerActions.put(
+        PowerType.DOUBLE_CARD_INSERTION,
+        () -> {
+          hasCurrentPlayerInserted = false;
+          hasUsedPower = false;
+        });
+    powerActions.put(
+        PowerType.CHOOSE_SECOND_GOAL,
+        () -> {
+          changeGoal();
+          checkIfPlayerCanMove();
+        });
+    powerActions.put(
+        PowerType.CHOOSE_GOAL,
+        () -> {
+          changeGoal();
+          checkIfPlayerCanMove();
+        });
   }
 
   public void changeGoal() {
