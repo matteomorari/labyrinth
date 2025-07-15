@@ -6,12 +6,16 @@ import it.unibs.pajc.labyrinth.core.utility.Orientation;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import it.unibs.pajc.labyrinth.core.utility.Turn;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class BotManager {
   Labyrinth model;
   CardInsertMove bestCardInsertMove = null;
   Position bestPosition = null;
-  private int nodesVisited = 0; // Counter for debugging
+  private AtomicInteger nodesVisited = new AtomicInteger(0);
+  private AtomicInteger threadsUsed = new AtomicInteger(0);
 
   public BotManager(Labyrinth model) {
     this.model = model;
@@ -42,67 +46,91 @@ public class BotManager {
   }
 
   public Turn calcMove(Labyrinth model, int currentDepth, int maxDepth) {
-    nodesVisited++; // Increment node visit counter
+    ExecutorService executor = Executors.newCachedThreadPool();
+    long startTime = System.currentTimeMillis(); // Start timing
+    Turn result = calcMove(model, currentDepth, maxDepth, executor);
+    long endTime = System.currentTimeMillis(); // End timing
+    System.out.println("Time needed to calcMove: " + (endTime - startTime) + " ms");
+    executor.shutdown();
+    return result;
+  }
+
+  private Turn calcMove(Labyrinth model, int currentDepth, int maxDepth, ExecutorService executor) {
+    nodesVisited.incrementAndGet();
 
     ArrayList<Position> availableCardInsertionPoint = model.getAvailableCardInsertionPoint();
     ArrayList<Turn> parentTurns = new ArrayList<>();
+    List<Future<Turn>> futures = new ArrayList<>();
+
     for (Position cardInsertionPosition : availableCardInsertionPoint) {
       for (int i = 0; i < Orientation.values().length; i++) {
-        Labyrinth modelCopy = LabyrinthGson.createCopy(model);
-        modelCopy.getAvailableCard().rotate(i);
-        modelCopy.insertCard(cardInsertionPosition);
+        final Position cardPosCopy = cardInsertionPosition;
+        final int orientation = i;
+        final Labyrinth modelCopy = LabyrinthGson.createCopy(model);
 
-        Player currentPlayerCopy = modelCopy.getCurrentPlayer();
-        Position currentGoalPosition;
+        futures.add(
+            executor.submit(
+                () -> {
+                  threadsUsed.incrementAndGet();
+                  modelCopy.getAvailableCard().rotate(orientation);
+                  modelCopy.insertCard(cardPosCopy);
 
-        if (currentPlayerCopy.getGoals().isEmpty()) {
-          // if the player has already found all the goals, to win must reach the start position
-          currentGoalPosition = currentPlayerCopy.getStartPosition();
-        } else {
-          currentGoalPosition = currentPlayerCopy.getCurrentGoal().getPosition();
-        }
+                  Player currentPlayerCopy = modelCopy.getCurrentPlayer();
+                  Position currentGoalPosition;
 
-        if (currentGoalPosition.equals(new Position(-1, -1))) {
-          // skip if the goal is on the available card
-          continue;
-        }
-        CardInsertMove move = new CardInsertMove(cardInsertionPosition, i);
+                  if (currentPlayerCopy.getGoals().isEmpty()) {
+                    currentGoalPosition = currentPlayerCopy.getStartPosition();
+                  } else {
+                    currentGoalPosition = currentPlayerCopy.getCurrentGoal().getPosition();
+                  }
 
-        ArrayList<Position> reachablePlayerPositions =
-            modelCopy.findPath(currentPlayerCopy.getPosition(), currentGoalPosition);
+                  if (currentGoalPosition.equals(new Position(-1, -1))) {
+                    return null;
+                  }
+                  CardInsertMove move = new CardInsertMove(cardPosCopy, orientation);
 
-        ArrayList<Turn> turns = new ArrayList<>();
+                  ArrayList<Position> reachablePlayerPositions =
+                      modelCopy.findPath(currentPlayerCopy.getPosition(), currentGoalPosition);
 
-        for (Position newPlayerPosition : reachablePlayerPositions) {
-          nodesVisited++; // Increment for each reachable position considered
-          Turn turn = new Turn(move, newPlayerPosition, currentGoalPosition);
+                  ArrayList<Turn> turns = new ArrayList<>();
 
-          // check if the new position is equals to the goal position
-          if (newPlayerPosition.equals(currentGoalPosition)) {
-            turn.setMinDistanceFromGoalFinded(0);
-            turns.clear();
-            turns.add(turn);
-            break;
-          }
+                  for (Position newPlayerPosition : reachablePlayerPositions) {
+                    nodesVisited.incrementAndGet();
+                    Turn turn = new Turn(move, newPlayerPosition, currentGoalPosition);
 
-          // if it's not the goal position, continue normally
-          turn.setDepthFromMinDistance(currentDepth);
-          turns.add(turn);
+                    if (newPlayerPosition.equals(currentGoalPosition)) {
+                      turn.setMinDistanceFromGoalFinded(0);
+                      turns.clear();
+                      turns.add(turn);
+                      break;
+                    }
 
-          if (currentDepth < maxDepth) {
-            modelCopy.movePlayer(newPlayerPosition.getRow(), newPlayerPosition.getCol());
-            calcMove(modelCopy, currentDepth + 1, maxDepth);
-          }
-        }
+                    turn.setDepthFromMinDistance(currentDepth);
+                    turns.add(turn);
 
-        Turn closestGoalPosition = getNearestGoalTurn(turns, currentGoalPosition);
+                    if (currentDepth < maxDepth) {
+                      modelCopy.movePlayer(newPlayerPosition.getRow(), newPlayerPosition.getCol());
+                      calcMove(modelCopy, currentDepth + 1, maxDepth, executor);
+                    }
+                  }
 
-        parentTurns.add(closestGoalPosition);
+                  return getNearestGoalTurn(turns, currentGoalPosition);
+                }));
+      }
+    }
+
+    for (Future<Turn> future : futures) {
+      try {
+        Turn t = future.get();
+        if (t != null) parentTurns.add(t);
+      } catch (InterruptedException | ExecutionException e) {
+        e.printStackTrace();
       }
     }
 
     Turn bestMove = null;
     for (Turn turn : parentTurns) {
+      if (turn == null) continue;
       int distance = calculateDistance(turn.getPlayerPosition(), turn.getNewGoalPosition());
 
       if (bestMove == null || distance < bestMove.getMinDistanceFromGoalFinded()) {
@@ -112,7 +140,6 @@ public class BotManager {
       }
 
       if (distance == bestMove.getMinDistanceFromGoalFinded()) {
-        // se la migliore distanza è uguale, prendo quella con la profondità minore
         if (turn.getDepthFromMinDistance() < bestMove.getDepthFromMinDistance()) {
           bestMove = turn;
           bestMove.setMinDistanceFromGoalFinded(distance);
@@ -129,11 +156,13 @@ public class BotManager {
             "Searching for: "
                 + getModel().getCurrentPlayer().getCurrentGoal().getType().toString());
       }
+      System.out.println("Nodes visited in calcMove: " + nodesVisited.get());
+      System.out.println("Threads used in calcMove: " + threadsUsed.get());
+      nodesVisited.set(0);
+      threadsUsed.set(0);
+
       setBestCardInsertMove(bestMove.getCardInsertMove());
       setBestPosition(bestMove.getPlayerPosition());
-      System.out.println(
-          "Nodes visited in calcMove: " + nodesVisited); // Print node count for debugging
-      nodesVisited = 0; // Reset for next top-level call
     }
 
     return bestMove;

@@ -150,22 +150,29 @@ public class Labyrinth extends BaseModel {
     isGoalFound(getCurrentPlayer());
     System.out.println("Current player: " + this.getCurrentPlayer().getColorName());
 
-    if (this.getCurrentPlayer().isBot()) {
-      // if this class is used in local environment, the bot are handled here as expected
-      if (getEnvironmentType() == EnvironmentType.LOCAL) {
-        startBotPlayerTurn();
-      } else if (getEnvironmentType() == EnvironmentType.SERVER) {
-        // the server must notify the controller to send the bot move to the client
-        // Calculate the bot move but don't apply it yet
-        getBotManager().calcMove(this, 1, 2);
+    // --- Update the view before bot calculation ---
+    this.fireChangeListener();
 
-        // Notify the controller about the calculated bot move
-        if (botMoveListener != null) {
-          botMoveListener.onBotMoveCalc(
-              getBotManager().getBestCardInsertMove(), getBotManager().getBestPosition());
-          getBotManager().applyCardInsertion();
-          getBotManager().applyPlayerMovement();
-        }
+    if (this.getCurrentPlayer().isBot()) {
+      if (getEnvironmentType() == EnvironmentType.LOCAL) {
+        // Run bot logic in a new thread to avoid blocking the UI
+        new Thread(
+                () -> {
+                  startBotPlayerTurn();
+                })
+            .start();
+      } else if (getEnvironmentType() == EnvironmentType.SERVER) {
+        new Thread(
+                () -> {
+                  getBotManager().calcMove(this, 1, 2);
+                  if (botMoveListener != null) {
+                    botMoveListener.onBotMoveCalc(
+                        getBotManager().getBestCardInsertMove(), getBotManager().getBestPosition());
+                    getBotManager().applyCardInsertion();
+                    getBotManager().applyPlayerMovement();
+                  }
+                })
+            .start();
       }
       // the last case is the class represents a client;
       // in this case it must wait from the server to know the bot move
@@ -173,13 +180,13 @@ public class Labyrinth extends BaseModel {
   }
 
   public void startBotPlayerTurn() {
-    getBotManager().calcMove(this, 1, 1);
+    getBotManager().calcMove(this, 1, 2);
     getBotManager().applyCardInsertion();
   }
 
   public void cardAnimationEnded() {
     System.out.println("card animation ended");
-    if (getCurrentPlayer().isBot()) {
+    if (getCurrentPlayer().isBot() && getEnvironmentType() != EnvironmentType.SERVER) {
       getBotManager().applyPlayerMovement();
     } else {
       checkIfPlayerCanMove();
