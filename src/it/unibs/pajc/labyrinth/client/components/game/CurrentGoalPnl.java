@@ -95,7 +95,7 @@ public class CurrentGoalPnl extends JPanel {
     // Use FontMetrics to center the text properly
     FontMetrics fm = g2.getFontMetrics();
     String line1 = "PROSSIMO";
-    String line2 = "OBBIETTIVO";
+    String line2 = "OBIETTIVO";
 
     int textX1 = (getWidth() - fm.stringWidth(line1)) / 2;
     int textX2 = (getWidth() - fm.stringWidth(line2)) / 2;
