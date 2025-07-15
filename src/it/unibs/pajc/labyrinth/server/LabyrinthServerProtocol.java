@@ -369,7 +369,10 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
     parameters.addProperty("lobbies", lobbyListJson.toString());
 
     msg.add(PARAMETERS_KEY, parameters);
-    sendMsg(this, msg.toString());
+
+    for (SocketCommunicationProtocol playerSocket : getConnectedUsers()) {
+      playerSocket.sendMsg(playerSocket, msg.toString());
+    }
   }
 
   private void sendLobbyStateUpdate(ServerLobby lobby) {

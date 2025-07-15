@@ -179,7 +179,7 @@ public class Labyrinth extends BaseModel {
 
   public void cardAnimationEnded() {
     System.out.println("card animation ended");
-    if (getCurrentPlayer().isBot()) {
+    if (getCurrentPlayer().isBot() && getEnvironmentType() != EnvironmentType.SERVER) {
       getBotManager().applyPlayerMovement();
     } else {
       checkIfPlayerCanMove();
