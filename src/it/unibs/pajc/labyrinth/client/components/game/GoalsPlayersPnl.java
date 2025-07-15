@@ -4,7 +4,6 @@ import it.unibs.pajc.labyrinth.client.controllers.ImageCntrl;
 import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthController;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.enums.MyColors;
-
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -14,6 +13,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
@@ -142,30 +142,30 @@ public class GoalsPlayersPnl extends JPanel {
 
     // Draw player information
     g2.setFont(playerFont);
+    FontMetrics fm = g2.getFontMetrics();
 
-    // Find the maximum width of player text
+    // Collect player texts and find max width
+    List<String> playerTexts = new ArrayList<>(players.size());
     int maxTextWidth = 0;
     for (Player player : players) {
-      String playerText = " " + player.getGoals().size() + " goals left";
-      FontMetrics fm = g2.getFontMetrics();
+      int goalsCount = player.getGoals().size();
+      String playerText = buildPlayerText(goalsCount);
+      playerTexts.add(playerText);
       int textWidth = fm.stringWidth(playerText);
       if (textWidth > maxTextWidth) {
         maxTextWidth = textWidth;
       }
     }
 
-    for (Player player : players) {
-      String playerText = " " + player.getGoals().size() + " goals left";
+    // Draw players and their texts
+    for (int i = 0; i < players.size(); i++) {
+      Player player = players.get(i);
+      String playerText = playerTexts.get(i);
 
-      // Calculate the total width needed (oval + spacing + max text width)
       int totalWidth = PLAYER_SIZE + TEXT_OVAL_SPACING + maxTextWidth;
-
-      // Calculate left position to center the entire element
       int leftPosition = (width - totalWidth) / 2;
+      int playerY = currentY - PLAYER_SIZE / 2 - OVAL_Y_ADJUSTMENT;
 
-      // Draw colored oval at the centered position
-      int playerY =
-          currentY - PLAYER_SIZE / 2 - OVAL_Y_ADJUSTMENT; // Align vertically with text center
       g2.drawImage(
           ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE").getStandingImage(),
           leftPosition,
@@ -174,11 +174,16 @@ public class GoalsPlayersPnl extends JPanel {
           PLAYER_SIZE,
           null);
 
-      // Draw player text to the right of the oval
       g2.setColor(Color.DARK_GRAY);
       g2.drawString(playerText, leftPosition + PLAYER_SIZE + TEXT_OVAL_SPACING, currentY);
 
       currentY += LINE_HEIGHT + PLAYER_BOTTOM_SPACING;
     }
+  }
+
+  private String buildPlayerText(int goalsCount) {
+    String goalWord = (goalsCount == 1) ? "obiettivo" : "obiettivi";
+    String remainingWord = (goalsCount == 1) ? "rimanente" : "rimanenti";
+    return " " + goalsCount + " " + goalWord + " " + remainingWord;
   }
 }
