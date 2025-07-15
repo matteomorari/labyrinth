@@ -157,7 +157,7 @@ public class Labyrinth extends BaseModel {
       } else if (getEnvironmentType() == EnvironmentType.SERVER) {
         // the server must notify the controller to send the bot move to the client
         // Calculate the bot move but don't apply it yet
-        getBotManager().calcMove();
+        getBotManager().calcMove(this, 1, 2);
 
         // Notify the controller about the calculated bot move
         if (botMoveListener != null) {
@@ -173,7 +173,7 @@ public class Labyrinth extends BaseModel {
   }
 
   public void startBotPlayerTurn() {
-    getBotManager().calcMove();
+    getBotManager().calcMove(this, 1, 1);
     getBotManager().applyCardInsertion();
   }
 
