@@ -5,6 +5,7 @@ import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
 import it.unibs.pajc.labyrinth.core.utility.Orientation;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import it.unibs.pajc.labyrinth.core.utility.Turn;
+import it.unibs.pajc.labyrinth.core.utility.TurnGson;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -55,17 +56,18 @@ public class BotManager {
     setBestCardInsertMove(result.getCardInsertMove());
     setBestPosition(result.getPlayerPosition());
 
-    System.out.println(
-        "Best card insert move: " + getBestCardInsertMove().getCardInsertPosition().toString());
-    System.out.println("Best position: " + getBestPosition().toString());
-
-    System.out.println("Time needed to calcMove: " + (endTime - startTime) + " ms");
     if (model.getCurrentPlayer().getGoals().isEmpty()) {
       System.out.println("going at the base!!");
     } else {
       System.out.println(
           "Searching for: " + model.getCurrentPlayer().getCurrentGoal().getType().toString());
     }
+    System.out.println(
+        "Best card insert move: " + getBestCardInsertMove().getCardInsertPosition().toString());
+    System.out.println("Best position: " + getBestPosition().toString());
+    System.out.println("Depth used: " + result.getDepthFromMinDistance());
+
+    System.out.println("Time needed to calcMove: " + (endTime - startTime) + " ms");
     System.out.println("Nodes visited in calcMove: " + nodesVisited.get());
     nodesVisited.set(0);
 
@@ -117,6 +119,7 @@ public class BotManager {
             // this happend only on first iteration
             Turn turn = new Turn(move, currentGoalPosition, null);
             turn.setMinDistanceFromGoalFinded(0);
+            turn.setDepthFromMinDistance(0);
             return turn;
           } else {
             previousTurn.setMinDistanceFromGoalFinded(0);
@@ -136,7 +139,13 @@ public class BotManager {
             // we need to create another copy to avoid ConcurrentModificationException
             Labyrinth finalModelCopy = LabyrinthGson.createCopy(modelCopy);
             futures.add(
-                executor.submit(() -> calcMove(finalModelCopy, currentDepth + 1, maxDepth, turn)));
+                executor.submit(
+                    () ->
+                        calcMove(
+                            finalModelCopy,
+                            currentDepth + 1,
+                            maxDepth,
+                            TurnGson.createCopy(turn))));
           }
 
           if (currentDepth == maxDepth) {
@@ -159,14 +168,10 @@ public class BotManager {
 
     Turn bestTurn = getBestMove(turnsList);
 
-    if (bestTurn == null) {
-      throw new IllegalStateException("No valid moves found in turnsList");
-    }
-
     if (previousTurn == null) {
       // this happens only if maxDepth = 1
       bestTurn.setMinDistanceFromGoalFinded(0);
-      bestTurn.setDepthFromMinDistance(currentDepth);
+      bestTurn.setDepthFromMinDistance(bestTurn.getDepthFromMinDistance());
       return bestTurn;
     }
 
