@@ -132,7 +132,7 @@ public class GamePnl extends JPanel {
     scrollPane.setBorder(BorderFactory.createEmptyBorder());
     scrollPane.setPreferredSize(new Dimension(width, 0));
     scrollPane.setOpaque(false);
-    scrollPane.getViewport().setOpaque(false); 
+    scrollPane.getViewport().setOpaque(false);
 
     // Customize scrollbar appearance
     JScrollBar verticalScrollBar = scrollPane.getVerticalScrollBar();
