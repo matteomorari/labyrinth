@@ -493,7 +493,7 @@ public class Labyrinth extends BaseModel {
 
   public ArrayList<Position> getAvailableCardInsertionPoint() {
     ArrayList<Position> availableCardInsertionPoint = new ArrayList<>();
-    for (int i = 1; i < this.boardSize - 1; i++) {
+    for (int i = 1; i < this.boardSize - 1; i += 2) {
       availableCardInsertionPoint.add(new Position(0, i));
       availableCardInsertionPoint.add(new Position(this.boardSize - 1, i));
       availableCardInsertionPoint.add(new Position(i, 0));

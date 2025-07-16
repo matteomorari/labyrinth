@@ -79,13 +79,11 @@ public class BotManager {
     ArrayList<Turn> turnsList = new ArrayList<>();
 
     for (Position cardInsertionPosition : availableCardInsertionPoint) {
-      for (int i = 0; i < Orientation.values().length; i++) {
-        Position cardPosCopy = cardInsertionPosition;
-        int orientation = i;
+      for (int orientation = 0; orientation < Orientation.values().length; orientation++) {
         Labyrinth modelCopy = LabyrinthGson.createCopy(model);
 
         modelCopy.getAvailableCard().rotate(orientation);
-        modelCopy.insertCard(cardPosCopy);
+        modelCopy.insertCard(cardInsertionPosition);
 
         Player currentPlayerCopy = modelCopy.getCurrentPlayer();
         Position currentGoalPosition;
@@ -100,7 +98,7 @@ public class BotManager {
           continue;
         }
 
-        CardInsertMove move = new CardInsertMove(cardPosCopy, orientation);
+        CardInsertMove move = new CardInsertMove(cardInsertionPosition, orientation);
 
         // the method findPath returns always at least the current player position
         ArrayList<Position> reachablePlayerPositions =
