@@ -59,6 +59,11 @@ public class SvgIconButton extends JButton {
     return borderRadius;
   }
 
+  public void changeBgColor(Color newColor) {
+    this.bgColor = newColor;
+    repaint();
+}
+
   public void setLabelFont(Font font) {
     setFont(font);
     repaint();

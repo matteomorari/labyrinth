@@ -148,6 +148,9 @@ public class Labyrinth extends BaseModel {
     setHasUsedPower(false);
     // in case due to card insertion the player changes position and the goal is found
     // ! TODO: why only the new player and not all? maybe to do on card insert?
+    for (Player player : this.players) {
+      isGoalFound(player);
+    }
     isGoalFound(getCurrentPlayer());
     System.out.println("Current player: " + this.getCurrentPlayer().getColorName());
 
