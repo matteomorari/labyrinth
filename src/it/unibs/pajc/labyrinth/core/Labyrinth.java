@@ -147,14 +147,12 @@ public class Labyrinth extends BaseModel {
     setWaitingForPlayerAnimation(false);
     setHasUsedPower(false);
     // in case due to card insertion the player changes position and the goal is found
-    // ! TODO: why only the new player and not all? maybe to do on card insert?
     for (Player player : this.players) {
       isGoalFound(player);
     }
     isGoalFound(getCurrentPlayer());
     System.out.println("Current player: " + this.getCurrentPlayer().getColorName());
 
-    // --- Update the view before bot calculation ---
     this.fireChangeListener();
 
     if (this.getCurrentPlayer().isBot()) {
@@ -475,11 +473,12 @@ public class Labyrinth extends BaseModel {
   }
 
   public void changeGoal() {
-    System.out.println("goal to change with: " + goalToSwap.getType().toString());
-    if (getCurrentPlayer() == null || getCurrentPlayer().getGoals().size() < 2) {
+    if (goalToSwap == null) {
       return;
     }
-    if (goalToSwap == null) {
+
+    System.out.println("goal to change with: " + goalToSwap.getType().toString());
+    if (getCurrentPlayer() == null || getCurrentPlayer().getGoals().size() < 2) {
       return;
     }
     Iterator<Goal> it = getCurrentPlayer().getGoals().iterator();

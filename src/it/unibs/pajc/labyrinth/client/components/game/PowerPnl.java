@@ -140,15 +140,6 @@ public class PowerPnl extends JPanel {
       powerImage = ImageCntrl.valueOf(card.getPower().getType().toString()).getImage();
       powerImage = ImageCntrl.scaleBufferedImage(powerImage, cardWidth, cardWidth);
       if (controller.isPowerUsed()) {
-        // // Make the border of the image red
-        // Graphics2D g2d = powerImage.createGraphics();
-        // g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        // g2d.setColor(Color.RED);
-        // g2d.setStroke(new BasicStroke(4));
-        // g2d.draw(
-        //     new RoundRectangle2D.Float(
-        //         0, 0, powerImage.getWidth(), powerImage.getHeight(), 100, 100));
-        // g2d.dispose();
         useButton.setBgColor(Color.green);
       }
     } else {
@@ -177,7 +168,6 @@ public class PowerPnl extends JPanel {
       if (controller.getAvailableCard().getPower().getType() == PowerType.CHOOSE_SECOND_GOAL) {
         showSwapSecondGoalPopup();
       }
-      controller.usePower();
     }
   }
 
@@ -191,7 +181,11 @@ public class PowerPnl extends JPanel {
             ImageCntrl.valueOf(player.getColorName() + "_PLAYER_SPRITE").getStandingImage();
         items.add(
             new SelectionDialog.SelectionItem(
-                playerImage, () -> controller.setPlayerToSwap(player)));
+                playerImage,
+                () -> {
+                  controller.setPlayerToSwap(player);
+                  controller.usePower();
+                }));
       }
     }
 
@@ -206,7 +200,12 @@ public class PowerPnl extends JPanel {
       if (!goal.equals(currentGoal)) {
         BufferedImage goalImage = ImageCntrl.valueOf("GOAL_" + goal.getType()).getImage();
         items.add(
-            new SelectionDialog.SelectionItem(goalImage, () -> controller.setGoalToSwap(goal)));
+            new SelectionDialog.SelectionItem(
+                goalImage,
+                () -> {
+                  controller.setGoalToSwap(goal);
+                  controller.usePower();
+                }));
       }
     }
 
@@ -220,7 +219,13 @@ public class PowerPnl extends JPanel {
     for (int i = 0; i < 2 && it.hasNext(); i++) {
       Goal goal = it.next();
       BufferedImage goalImage = ImageCntrl.valueOf("GOAL_" + goal.getType()).getImage();
-      items.add(new SelectionDialog.SelectionItem(goalImage, () -> controller.setGoalToSwap(goal)));
+      items.add(
+          new SelectionDialog.SelectionItem(
+              goalImage,
+              () -> {
+                controller.setGoalToSwap(goal);
+                controller.usePower();
+              }));
     }
 
     SelectionDialog.displaySelectionDialog(this, "SELECT   GOAL", items);
