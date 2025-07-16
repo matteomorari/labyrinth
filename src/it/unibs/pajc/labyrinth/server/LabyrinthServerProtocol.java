@@ -327,10 +327,10 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
 
     msg.add(PARAMETERS_KEY, parameters);
 
-    sendNotificationToLobbyPlayers(msg);
+    sendMessageToLobbyPlayers(msg);
   }
 
-  private void sendNotificationToLobbyPlayers(JsonObject msg) {
+  private void sendMessageToLobbyPlayers(JsonObject msg) {
     for (SocketCommunicationProtocol playerSocket : currentLobby.getPlayersSockets().values()) {
       playerSocket.sendMsg(playerSocket, msg.toString());
     }
@@ -364,6 +364,9 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
     // Using CopyOnWriteArrayList provides thread-safe iteration
     JsonArray lobbyListJson = new JsonArray();
     for (ServerLobby lobby : gameLobbies) {
+      if (lobby.isGameInProgress()) {
+        continue;
+      }
       JsonObject gameLobbyJson = JsonParser.parseString(LobbyGson.toJson(lobby)).getAsJsonObject();
       lobbyListJson.add(gameLobbyJson);
     }
@@ -387,7 +390,7 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
     parameters.addProperty("lobby", LobbyGson.toJson(lobby));
     msg.add(PARAMETERS_KEY, parameters);
 
-    sendNotificationToLobbyPlayers(msg);
+    sendMessageToLobbyPlayers(msg);
   }
 
   public static synchronized boolean addLobby(ServerLobby lobby) {
@@ -424,7 +427,8 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
     parameters.addProperty("labyrinth", LabyrinthGson.toJson(lobby.getModel()));
     msg.add(PARAMETERS_KEY, parameters);
 
-    sendNotificationToLobbyPlayers(msg);
+    sendAvailableLobbies();
+    sendMessageToLobbyPlayers(msg);
   }
 
   private void sendPlayerMoveNotification(int newRow, int newCol) {
@@ -437,7 +441,7 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
 
     msg.add(PARAMETERS_KEY, parameters);
 
-    sendNotificationToLobbyPlayers(msg);
+    sendMessageToLobbyPlayers(msg);
   }
 
   private void sendPlayerCardInsertNotification(int row, int col) {
@@ -450,7 +454,7 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
 
     msg.add(PARAMETERS_KEY, parameters);
 
-    sendNotificationToLobbyPlayers(msg);
+    sendMessageToLobbyPlayers(msg);
   }
 
   private void sendTurnSkippedNotification() {
@@ -458,7 +462,7 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
     msg.addProperty(COMMAND_KEY, "turn_skipped");
 
     msg.add(PARAMETERS_KEY, null);
-    sendNotificationToLobbyPlayers(msg);
+    sendMessageToLobbyPlayers(msg);
   }
 
   private void sendPowerUsedNotification() {
@@ -466,7 +470,7 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
     msg.addProperty(COMMAND_KEY, "power_used");
 
     msg.add(PARAMETERS_KEY, null);
-    sendNotificationToLobbyPlayers(msg);
+    sendMessageToLobbyPlayers(msg);
   }
 
   private void sendPlayerSwapNotification(String playerToSwapId) {
@@ -477,7 +481,7 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
     parameters.addProperty(PLAYER_ID_KEY, playerToSwapId);
 
     msg.add(PARAMETERS_KEY, parameters);
-    sendNotificationToLobbyPlayers(msg);
+    sendMessageToLobbyPlayers(msg);
   }
 
   private void sendGoalSwap(Goal goal) {
@@ -489,7 +493,7 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
     parameters.addProperty("goal_position_col", goal.getPosition().getCol());
 
     msg.add(PARAMETERS_KEY, parameters);
-    sendNotificationToLobbyPlayers(msg);
+    sendMessageToLobbyPlayers(msg);
   }
 
   @Override
@@ -509,7 +513,7 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
     parameters.addProperty("bot_col", futureBotPosition.getCol());
 
     msg.add(PARAMETERS_KEY, parameters);
-    sendNotificationToLobbyPlayers(msg);
+    sendMessageToLobbyPlayers(msg);
   }
 
   @Override
@@ -559,6 +563,6 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
     parameters.addProperty(PLAYER_ID_KEY, id);
 
     msg.add(PARAMETERS_KEY, parameters);
-    sendNotificationToLobbyPlayers(msg);
+    sendMessageToLobbyPlayers(msg);
   }
 }

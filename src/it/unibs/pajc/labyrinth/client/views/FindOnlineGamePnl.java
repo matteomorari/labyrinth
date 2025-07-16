@@ -263,7 +263,8 @@ public class FindOnlineGamePnl extends JPanel {
 
     // if on an update the game is in progress, this means that the game is started and the
     // so we have to switch to the game panel
-    if (currentLobby != null && currentLobby.isGameInProgress()) {
+    JPanel parent = (JPanel) getParent();
+    if (currentLobby != null && currentLobby.isGameInProgress() && parent != null) {
       Labyrinth labyrinthModel = lobbyController.getLabyrinth();
       String localPlayerId = lobbyController.getLocalPlayer().getId();
 
@@ -274,7 +275,6 @@ public class FindOnlineGamePnl extends JPanel {
       labyrinthModel.addChangeListener(e -> gamePanel.update());
 
       // Replace the current panel's content with the game panel
-      JPanel parent = (JPanel) getParent();
       parent.remove(this);
       parent.setLayout(new BorderLayout());
       parent.add(gamePanel, BorderLayout.CENTER);
