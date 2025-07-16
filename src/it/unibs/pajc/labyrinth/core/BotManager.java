@@ -6,6 +6,10 @@ import it.unibs.pajc.labyrinth.core.utility.Orientation;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import it.unibs.pajc.labyrinth.core.utility.Turn;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class BotManager {
@@ -13,6 +17,7 @@ public class BotManager {
   CardInsertMove bestCardInsertMove = null;
   Position bestPosition = null;
   private AtomicInteger nodesVisited = new AtomicInteger(0);
+  private static final ExecutorService executor = Executors.newCachedThreadPool();
 
   public BotManager(Labyrinth model) {
     this.model = model;
@@ -43,9 +48,9 @@ public class BotManager {
   }
 
   public Turn calcMove(Labyrinth model, int maxDepth) {
-    long startTime = System.currentTimeMillis(); // Start timing
+    long startTime = System.currentTimeMillis();
     Turn result = calcMove(model, 1, maxDepth, null);
-    long endTime = System.currentTimeMillis(); // End timing
+    long endTime = System.currentTimeMillis();
 
     setBestCardInsertMove(result.getCardInsertMove());
     setBestPosition(result.getPlayerPosition());
@@ -122,6 +127,7 @@ public class BotManager {
           }
         }
 
+        ArrayList<Future<Turn>> futures = new ArrayList<>();
         for (Position newPlayerPosition : reachablePlayerPositions.reversed()) {
           nodesVisited.incrementAndGet();
           Turn turn = new Turn(move, newPlayerPosition, previousTurn);
@@ -129,15 +135,25 @@ public class BotManager {
 
           if (currentDepth < maxDepth) {
             modelCopy.movePlayer(newPlayerPosition.getRow(), newPlayerPosition.getCol());
-            Turn result = calcMove(modelCopy, currentDepth + 1, maxDepth, turn);
-            turnsList.add(result);
+            // we need to create another copy to avoid ConcurrentModificationException
+            Labyrinth finalModelCopy = LabyrinthGson.createCopy(modelCopy);
+            futures.add(
+                executor.submit(() -> calcMove(finalModelCopy, currentDepth + 1, maxDepth, turn)));
           }
 
           if (currentDepth == maxDepth) {
-            // turn.setNewGoalPosition(currentGoalPosition);
             turn.setMinDistanceFromGoalFinded(
                 calculateDistance(newPlayerPosition, currentGoalPosition));
             turnsList.add(turn);
+          }
+        }
+
+        for (Future<Turn> future : futures) {
+          try {
+            Turn result = future.get();
+            if (result != null) turnsList.add(result);
+          } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
           }
         }
       }
@@ -171,35 +187,16 @@ public class BotManager {
 
       if (bestMove == null || distance < bestMove.getMinDistanceFromGoalFinded()) {
         bestMove = turn;
-        // bestMove.setMinDistanceFromGoalFinded(distance);
-        // bestMove.setDepthFromMinDistance(turn.getDepthFromMinDistance());
       }
 
       if (distance == bestMove.getMinDistanceFromGoalFinded()) {
         if (turn.getDepthFromMinDistance() < bestMove.getDepthFromMinDistance()) {
           bestMove = turn;
-          // bestMove.setMinDistanceFromGoalFinded(distance);
-          // bestMove.setDepthFromMinDistance(turn.getDepthFromMinDistance());
         }
       }
     }
     return bestMove;
   }
-
-  // private Turn getNearestGoalTurn(ArrayList<Turn> turns, Position goalPosition) {
-  //   Turn closestTurn = null;
-  //   int minDistance = Integer.MAX_VALUE;
-
-  //   for (Turn turn : turns) {
-  //     int distance = calculateDistance(turn.getPlayerPosition(), goalPosition);
-  //     if (distance < minDistance) {
-  //       minDistance = distance;
-  //       closestTurn = turn;
-  //     }
-  //   }
-
-  //   return closestTurn;
-  // }
 
   private int calculateDistance(Position p1, Position p2) {
     return Math.abs(p1.row - p2.row) + Math.abs(p1.col - p2.col);
