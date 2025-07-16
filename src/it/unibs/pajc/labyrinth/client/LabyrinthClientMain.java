@@ -68,7 +68,7 @@ public class LabyrinthClientMain {
       tempPnl.add(gamePanel, BorderLayout.CENTER);
       tempPnl.setVisible(true);
       JButton button = new JButton("move bot");
-      tempPnl.add(button, BorderLayout.SOUTH);
+      // tempPnl.add(button, BorderLayout.SOUTH);
       button.addActionListener(e -> labyrinthModel.startBotPlayerTurn());
       frame.add(tempPnl, BorderLayout.CENTER);
     } else {

@@ -80,6 +80,7 @@ public class BotManager {
     ArrayList<Position> availableCardInsertionPoint = model.getAvailableCardInsertionPoint();
     ArrayList<Turn> turnsList = new ArrayList<>();
 
+    ArrayList<Future<Turn>> futures = new ArrayList<>();
     for (Position cardInsertionPosition : availableCardInsertionPoint) {
       for (int orientation = 0; orientation < Orientation.values().length; orientation++) {
         Labyrinth modelCopy = LabyrinthGson.createCopy(model);
@@ -128,7 +129,6 @@ public class BotManager {
           }
         }
 
-        ArrayList<Future<Turn>> futures = new ArrayList<>();
         for (Position newPlayerPosition : reachablePlayerPositions.reversed()) {
           nodesVisited.incrementAndGet();
           Turn turn = new Turn(move, newPlayerPosition, previousTurn);
@@ -138,6 +138,8 @@ public class BotManager {
             modelCopy.movePlayer(newPlayerPosition.getRow(), newPlayerPosition.getCol());
             // we need to create another copy to avoid ConcurrentModificationException
             Labyrinth finalModelCopy = LabyrinthGson.createCopy(modelCopy);
+            // turnsList.add(
+            //     calcMove(finalModelCopy, currentDepth + 1, maxDepth, TurnGson.createCopy(turn)));
             futures.add(
                 executor.submit(
                     () ->
@@ -154,15 +156,15 @@ public class BotManager {
             turnsList.add(turn);
           }
         }
+      }
+    }
 
-        for (Future<Turn> future : futures) {
-          try {
-            Turn result = future.get();
-            if (result != null) turnsList.add(result);
-          } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-          }
-        }
+    for (Future<Turn> future : futures) {
+      try {
+        Turn result = future.get();
+        if (result != null) turnsList.add(result);
+      } catch (InterruptedException | ExecutionException e) {
+        e.printStackTrace();
       }
     }
 
