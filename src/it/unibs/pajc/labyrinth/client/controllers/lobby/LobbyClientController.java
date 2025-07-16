@@ -104,6 +104,7 @@ public class LobbyClientController implements LobbyController {
             Labyrinth labyrinth = LabyrinthGson.fromJson(parsedLabyrinthData.toString());
             labyrinth.setEnvironmentType(Labyrinth.EnvironmentType.CLIENT);
             labyrinth.setBotManager(new BotManager(labyrinth));
+            labyrinth.createPowerActionsMap();
 
             onlineGameManager.getSelectedLobby().setModel(labyrinth);
             onlineGameManager.setGameInProgress();

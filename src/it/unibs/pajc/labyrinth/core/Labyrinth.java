@@ -430,6 +430,12 @@ public class Labyrinth extends BaseModel {
   }
 
   public void createPowerActionsMap() {
+    if (powerActions == null) {
+      powerActions = new HashMap<>();
+    } else {
+      powerActions.clear();
+    }
+
     powerActions.put(
         PowerType.SWAP_POSITION,
         () -> {

@@ -227,6 +227,11 @@ public class LabyrinthClientController implements LabyrinthController {
 
   @Override
   public void setPlayerToSwap(Player player) {
+    if (player == null) {
+      labyrinth.setPlayerToSwap(null);
+      return;
+    }
+
     if (getLocalPlayer().equals(labyrinth.getCurrentPlayer())) {
       JsonObject msg = new JsonObject();
       msg.addProperty(COMMAND_PROPERTY, "set_player_to_swap");
