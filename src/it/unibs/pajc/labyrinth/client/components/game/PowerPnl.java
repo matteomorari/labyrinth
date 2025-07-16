@@ -161,12 +161,12 @@ public class PowerPnl extends JPanel {
         && controller.isCurrentPlayerInserted()) {
       if (controller.getAvailableCard().getPower().getType() == PowerType.SWAP_POSITION) {
         showSwapPlayerPopup();
-      }
-      if (controller.getAvailableCard().getPower().getType() == PowerType.CHOOSE_GOAL) {
+      } else if (controller.getAvailableCard().getPower().getType() == PowerType.CHOOSE_GOAL) {
         showSwapGoalPopup();
-      }
-      if (controller.getAvailableCard().getPower().getType() == PowerType.CHOOSE_SECOND_GOAL) {
+      } else if (controller.getAvailableCard().getPower().getType() == PowerType.CHOOSE_SECOND_GOAL) {
         showSwapSecondGoalPopup();
+      } else {
+        controller.usePower();
       }
     }
   }
