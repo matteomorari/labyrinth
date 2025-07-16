@@ -173,9 +173,6 @@ public class AvailableCardPnl extends JPanel implements Animatable {
   }
 
   public void updateCardImage() {
-    // Check if we need to recreate the scaled background
-    int cardWidth = Math.max(DEFAULT_CARD_WIDTH, panelWidth - CARD_HORIZONTAL_MARGIN);
-
     // check if the orientation of the card has changed
     Card newCard = controller.getAvailableCard();
     if (availableCardId.equals(newCard.getID())
@@ -186,7 +183,6 @@ public class AvailableCardPnl extends JPanel implements Animatable {
     availableCardOrientation = newCard.getOrientation();
 
     availableCardImage = getCardImage();
-    availableCardImage = scaleImage(availableCardImage, cardWidth, Integer.MAX_VALUE);
   }
 
   private BufferedImage scaleImage(BufferedImage original, int maxWidth, int maxHeight) {
@@ -211,10 +207,28 @@ public class AvailableCardPnl extends JPanel implements Animatable {
 
   private BufferedImage getCardImage() {
     Card card = controller.getAvailableCard();
-    CardImage cardImage =
-        new CardImage(
-            ImageCntrl.valueOf("CARD_" + card.getType()), (Graphics2D) this.getGraphics());
-    cardImage.rotate(card.getOrientation().ordinal() * 90 + (double) animationCardAngle);
+    BufferedImage cardBackground = ImageCntrl.valueOf("CARD_" + card.getType()).getImage();
+
+    int cardWidth = Math.max(DEFAULT_CARD_WIDTH, panelWidth - CARD_HORIZONTAL_MARGIN);
+    cardBackground = scaleImage(cardBackground, cardWidth, cardWidth);
+
+    // add card goal
+    if (card.getGoal() != null) {
+      BufferedImage goalImage = ImageCntrl.valueOf("GOAL_" + card.getGoal().getType()).getImage();
+      cardBackground =
+          ImageCntrl.createCombinedImage(
+              cardBackground,
+              goalImage,
+              cardBackground.getWidth(),
+              cardBackground.getHeight(),
+              2,
+              2);
+    }
+
+    CardImage cardImage = new CardImage(cardBackground, (Graphics2D) this.getGraphics());
+    int cardOrientation = card.getOrientation().ordinal() * 90;
+    cardImage.rotate(cardOrientation + (double) animationCardAngle);
+
     return cardImage.getImage();
   }
 

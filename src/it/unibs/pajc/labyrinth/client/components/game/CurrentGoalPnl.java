@@ -130,8 +130,13 @@ public class CurrentGoalPnl extends JPanel {
 
       // Create a combined image
       currentGoalImage =
-          createCombinedImage(
-              goalCardBackground, goalImageCntrl.getImage(), goalCardWidth, goalCardHeight);
+          ImageCntrl.createCombinedImage(
+              goalCardBackground,
+              goalImageCntrl.getImage(),
+              goalCardWidth,
+              goalCardHeight,
+              OVERLAY_WIDTH_DIVISOR,
+              OVERLAY_HEIGHT_DIVISOR);
     } else {
       // Create an image with the background and an oval when goals are empty
       BufferedImage combined =
@@ -175,27 +180,5 @@ public class CurrentGoalPnl extends JPanel {
     }
 
     return ImageCntrl.scaleBufferedImage(original, width, height);
-  }
-
-  private BufferedImage createCombinedImage(
-      BufferedImage background, BufferedImage overlay, int width, int height) {
-    BufferedImage combined = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-    Graphics2D g2 = combined.createGraphics();
-
-    g2.drawImage(background, 0, 0, null);
-
-    // Scale the overlay image
-    int overlayWidth = width / OVERLAY_WIDTH_DIVISOR;
-    int overlayHeight = height / OVERLAY_HEIGHT_DIVISOR;
-    BufferedImage scaledOverlay =
-        ImageCntrl.scaleBufferedImage(overlay, overlayWidth, overlayHeight);
-
-    // Draw the overlay centered
-    int x = (width - overlayWidth) / 2;
-    int y = (height - overlayHeight) / 2;
-    g2.drawImage(scaledOverlay, x, y, null);
-
-    g2.dispose();
-    return combined;
   }
 }
