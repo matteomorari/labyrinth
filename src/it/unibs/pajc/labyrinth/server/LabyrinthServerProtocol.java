@@ -407,6 +407,10 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
       lobby.startGame();
       lobby.getModel().setBotMoveListener(this);
       sendGameStartedMsg();
+      // If the first player is a bot, start its turn immediately
+      if (lobby.getModel().getCurrentPlayer().isBot()) {
+        lobby.getModel().startBotPlayerTurn();
+      }
     }
   }
 

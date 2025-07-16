@@ -155,34 +155,34 @@ public class Labyrinth extends BaseModel {
     this.fireChangeListener();
 
     if (this.getCurrentPlayer().isBot()) {
-      if (getEnvironmentType() == EnvironmentType.LOCAL) {
-        // Run bot logic in a new thread to avoid blocking the UI
-        new Thread(
-                () -> {
-                  startBotPlayerTurn();
-                })
-            .start();
-      } else if (getEnvironmentType() == EnvironmentType.SERVER) {
-        new Thread(
-                () -> {
-                  getBotManager().calcMove(this, BOT_SEARCH_DEPTH);
-                  if (botMoveListener != null) {
-                    botMoveListener.onBotMoveCalc(
-                        getBotManager().getBestCardInsertMove(), getBotManager().getBestPosition());
-                    getBotManager().applyCardInsertion();
-                    getBotManager().applyPlayerMovement();
-                  }
-                })
-            .start();
-      }
-      // the last case is the class represents a client;
-      // in this case it must wait from the server to know the bot move
+      startBotPlayerTurn();
     }
   }
 
   public void startBotPlayerTurn() {
-    getBotManager().calcMove(this, BOT_SEARCH_DEPTH);
-    getBotManager().applyCardInsertion();
+    // Run bot logic in a new thread to avoid blocking the UI
+    if (getEnvironmentType() == EnvironmentType.LOCAL) {
+      new Thread(
+              () -> {
+                getBotManager().calcMove(this, BOT_SEARCH_DEPTH);
+                getBotManager().applyCardInsertion();
+              })
+          .start();
+    } else if (getEnvironmentType() == EnvironmentType.SERVER) {
+      new Thread(
+              () -> {
+                getBotManager().calcMove(this, BOT_SEARCH_DEPTH);
+                if (botMoveListener != null) {
+                  botMoveListener.onBotMoveCalc(
+                      getBotManager().getBestCardInsertMove(), getBotManager().getBestPosition());
+                  getBotManager().applyCardInsertion();
+                  getBotManager().applyPlayerMovement();
+                }
+              })
+          .start();
+    }
+    // the last case is the class represents a client;
+    // in this case it must wait from the server to know the bot move
   }
 
   public void cardAnimationEnded() {
