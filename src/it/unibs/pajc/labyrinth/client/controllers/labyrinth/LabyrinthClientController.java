@@ -329,8 +329,14 @@ public class LabyrinthClientController implements LabyrinthController {
     connectionProtocol.sendMsg(connectionProtocol, msg.toString());
   }
 
+  @Override
   public Labyrinth getLabyrinth() {
     return labyrinth;
+  }
+
+  @Override
+  public void setLabyrinth(Labyrinth labyrinth) {
+    this.labyrinth = labyrinth;
   }
 
   @Override

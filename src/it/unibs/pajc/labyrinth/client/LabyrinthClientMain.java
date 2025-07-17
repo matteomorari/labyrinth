@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
@@ -46,8 +45,6 @@ public class LabyrinthClientMain {
     frame.setLayout(new BorderLayout(10, 10));
 
     // for debug purposes
-    // to create "modelCopy.json" file see LabyrinthGson.createCopy()
-    // TODO: does NOT function
     final boolean LOAD_FROM_FILE = false;
     if (LOAD_FROM_FILE) {
       String deepCopy = "";
@@ -65,12 +62,8 @@ public class LabyrinthClientMain {
 
       GamePnl gamePanel = new GamePnl(controller);
       labyrinthModel.addChangeListener(e -> gamePanel.update());
-      tempPnl.add(gamePanel, BorderLayout.CENTER);
-      tempPnl.setVisible(true);
-      JButton button = new JButton("move bot");
-      // tempPnl.add(button, BorderLayout.SOUTH);
-      button.addActionListener(e -> labyrinthModel.startBotPlayerTurn());
-      frame.add(tempPnl, BorderLayout.CENTER);
+
+      frame.add(gamePanel, BorderLayout.CENTER);
     } else {
       frame.add(new HomePnl(), BorderLayout.CENTER);
     }

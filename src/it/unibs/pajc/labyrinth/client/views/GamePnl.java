@@ -7,6 +7,7 @@ import it.unibs.pajc.labyrinth.client.components.game.CurrentPlayerPnl;
 import it.unibs.pajc.labyrinth.client.components.game.GoalsPlayersPnl;
 import it.unibs.pajc.labyrinth.client.components.game.PowerPnl;
 import it.unibs.pajc.labyrinth.client.controllers.labyrinth.LabyrinthController;
+import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -18,6 +19,7 @@ import java.awt.event.ComponentEvent;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -64,6 +66,9 @@ public class GamePnl extends JPanel {
     add(leftScrollPnl, BorderLayout.WEST);
     add(rightScrollPnl, BorderLayout.EAST);
     add(gameBoardPanel, BorderLayout.CENTER);
+
+    // for debug purposes
+    addSaveGameStatusButton(false);
 
     // Register listener for resizing
     addComponentListener(
@@ -139,6 +144,14 @@ public class GamePnl extends JPanel {
     verticalScrollBar.setPreferredSize(new Dimension(SCROLLBAR_WIDTH, 0));
 
     return scrollPane;
+  }
+
+  private void addSaveGameStatusButton(boolean save) {
+    if (save) {
+      JButton button = new JButton("save status");
+      add(button, BorderLayout.SOUTH);
+      button.addActionListener(e -> LabyrinthGson.saveToFile(controller.getLabyrinth()));
+    }
   }
 
   /** Recalculates the layout based on current component size */

@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import it.unibs.pajc.labyrinth.client.controllers.ClientSocketProtocol;
 import it.unibs.pajc.labyrinth.core.Avatar;
-import it.unibs.pajc.labyrinth.core.BotManager;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.clientServerCommon.LabyrinthEvent;
@@ -103,8 +102,6 @@ public class LobbyClientController implements LobbyController {
 
             Labyrinth labyrinth = LabyrinthGson.fromJson(parsedLabyrinthData.toString());
             labyrinth.setEnvironmentType(Labyrinth.EnvironmentType.CLIENT);
-            labyrinth.setBotManager(new BotManager(labyrinth));
-            labyrinth.createPowerActionsMap();
 
             onlineGameManager.getSelectedLobby().setModel(labyrinth);
             onlineGameManager.setGameInProgress();
