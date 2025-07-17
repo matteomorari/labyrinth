@@ -205,13 +205,16 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
       goalImage.draw(posX + cellSize / 4, posY + cellSize / 4, cellSize / 2, cellSize / 2);
     }
 
-    if (card.getPower() != null) {
-      int powerX = initialXPosition + card.getPower().getPosition().getCol() * cellSize;
-      int powerY = initialYPosition + card.getPower().getPosition().getRow() * cellSize;
+    // ********************************************************************
+    // Uncomment this block to draw an oval to indicate the power position
+    // ********************************************************************
+    // if (card.getPower() != null) {
+    //   int powerX = initialXPosition + card.getPower().getPosition().getCol() * cellSize;
+    //   int powerY = initialYPosition + card.getPower().getPosition().getRow() * cellSize;
 
-      g2.setColor(Color.ORANGE);
-      // g2.fillOval(powerX + cellSize / 3, powerY + cellSize / 3, cellSize / 3, cellSize / 3);
-    }
+    //   g2.setColor(Color.ORANGE);
+    //   g2.fillOval(powerX + cellSize / 3, powerY + cellSize / 3, cellSize / 3, cellSize / 3);
+    // }
   }
 
   private void drawArrows(Graphics2D g2, int i, int j, int initialXPosition, int initialYPosition) {
@@ -252,7 +255,6 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     }
   }
 
-  // ora funziona non so se fa cagare
   private void drawPlayers(Graphics2D g2) {
     int size = Math.min(getWidth(), getHeight());
     int initialXPosition = (getWidth() - size) / 2 + PADDING;

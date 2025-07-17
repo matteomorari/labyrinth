@@ -218,11 +218,15 @@ public class BotManager {
   public void applyPlayerMovement() {
     if (getModel().getCurrentPlayer().getPosition().equals(getBestPosition())) {
       System.out.println("I'm already in the best position");
-      setBestPosition(null);
       getModel().skipTurn();
     } else {
-      getModel().movePlayer(getBestPosition().getRow(), getBestPosition().getCol());
-      setBestPosition(null);
+      boolean playerMoved =
+          getModel().movePlayer(getBestPosition().getRow(), getBestPosition().getCol());
+      if (!playerMoved) {
+        System.out.println("Player could not move to the best position, skipping turn");
+        getModel().skipTurn();
+      }
     }
+    setBestPosition(null);
   }
 }

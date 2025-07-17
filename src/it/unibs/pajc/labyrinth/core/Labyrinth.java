@@ -706,13 +706,13 @@ public class Labyrinth extends BaseModel {
     return row >= 0 && row < this.boardSize && col >= 0 && col < this.boardSize;
   }
 
-  public void movePlayer(int row, int col) {
+  public boolean movePlayer(int row, int col) {
     Player currentPlayer = this.getCurrentPlayer();
     Position currentPosition = currentPlayer.getPosition();
     ArrayList<Position> path = this.findPath(currentPosition, new Position(row, col));
 
     if (!path.contains(new Position(row, col)) || path.size() < 2 || !hasCurrentPlayerInserted) {
-      return;
+      return false;
     }
 
     // remove the player from the previous card
@@ -730,6 +730,8 @@ public class Labyrinth extends BaseModel {
     setWaitingForPlayerAnimation(true);
     this.lastPlayerMovedPath = path;
     this.fireChangeListener();
+
+    return true;
   }
 
   public void swapPlayers() {
