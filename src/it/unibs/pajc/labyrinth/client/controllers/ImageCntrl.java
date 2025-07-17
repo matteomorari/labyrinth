@@ -91,7 +91,6 @@ public enum ImageCntrl {
       System.out.println("invalid sprite sheet");
     }
 
-    // ! TODO: this return an image with not equals border, as a result the image can't be centered
     return image.getSubimage(xGrid * IMAGE_SIZE, yGrid * IMAGE_SIZE, IMAGE_SIZE, IMAGE_SIZE);
   }
 

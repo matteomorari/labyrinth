@@ -128,7 +128,7 @@ public class Labyrinth extends BaseModel {
 
   public void skipTurn() {
     if (hasCurrentPlayerInserted && hasCurrentPlayerDoubleTurn) {
-      // this rappresent the case when the player has used the power to have a double turn
+      // this represent the case when the player has used the power to have a double turn
       // and has insert the card the first time and want to insert the second without
       // change the current position
       setHasCurrentPlayerInserted(false);
@@ -142,7 +142,6 @@ public class Labyrinth extends BaseModel {
 
   private void advanceToNextPlayer() {
     this.players.add(this.players.poll());
-    // TODO: create a method to reset player state
     this.hasCurrentPlayerInserted = false;
     setWaitingForPlayerAnimation(false);
     setHasUsedPower(false);

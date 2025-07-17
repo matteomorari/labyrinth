@@ -119,7 +119,7 @@ public class BotManager {
         // in particular, if the goal is reachable, it will be the first one
         if (reachablePlayerPositions.contains(currentGoalPosition)) {
           if (previousTurn == null) {
-            // this happend only on first iteration
+            // this happens only on first iteration
             Turn turn = new Turn(move, currentGoalPosition, null);
             turn.setMinDistanceFromGoalFinded(0);
             turn.setDepthFromMinDistance(0);
