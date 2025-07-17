@@ -22,6 +22,7 @@ public class Labyrinth extends BaseModel {
   private static final int GOALS_FOR_PLAYER = 4;
   public static final int MAX_PLAYERS = 4;
   public static final int MIN_PLAYERS = 2;
+  public static final int BOT_SEARCH_DEPTH = 2;
   private transient Random random = new Random();
   private transient BotManager botManager;
   private EnvironmentType environmentType;
@@ -146,42 +147,43 @@ public class Labyrinth extends BaseModel {
     setWaitingForPlayerAnimation(false);
     setHasUsedPower(false);
     // in case due to card insertion the player changes position and the goal is found
-    // ! TODO: why only the new player and not all? maybe to do on card insert?
+    for (Player player : this.players) {
+      isGoalFound(player);
+    }
     isGoalFound(getCurrentPlayer());
     System.out.println("Current player: " + this.getCurrentPlayer().getColorName());
 
-    // --- Update the view before bot calculation ---
     this.fireChangeListener();
 
     if (this.getCurrentPlayer().isBot()) {
-      if (getEnvironmentType() == EnvironmentType.LOCAL) {
-        // Run bot logic in a new thread to avoid blocking the UI
-        new Thread(
-                () -> {
-                  startBotPlayerTurn();
-                })
-            .start();
-      } else if (getEnvironmentType() == EnvironmentType.SERVER) {
-        new Thread(
-                () -> {
-                  getBotManager().calcMove(this, 2);
-                  if (botMoveListener != null) {
-                    botMoveListener.onBotMoveCalc(
-                        getBotManager().getBestCardInsertMove(), getBotManager().getBestPosition());
-                    getBotManager().applyCardInsertion();
-                    getBotManager().applyPlayerMovement();
-                  }
-                })
-            .start();
-      }
-      // the last case is the class represents a client;
-      // in this case it must wait from the server to know the bot move
+      startBotPlayerTurn();
     }
   }
 
   public void startBotPlayerTurn() {
-    getBotManager().calcMove(this, 2);
-    getBotManager().applyCardInsertion();
+    // Run bot logic in a new thread to avoid blocking the UI
+    if (getEnvironmentType() == EnvironmentType.LOCAL) {
+      new Thread(
+              () -> {
+                getBotManager().calcMove(this, BOT_SEARCH_DEPTH);
+                getBotManager().applyCardInsertion();
+              })
+          .start();
+    } else if (getEnvironmentType() == EnvironmentType.SERVER) {
+      new Thread(
+              () -> {
+                getBotManager().calcMove(this, BOT_SEARCH_DEPTH);
+                if (botMoveListener != null) {
+                  botMoveListener.onBotMoveCalc(
+                      getBotManager().getBestCardInsertMove(), getBotManager().getBestPosition());
+                  getBotManager().applyCardInsertion();
+                  getBotManager().applyPlayerMovement();
+                }
+              })
+          .start();
+    }
+    // the last case is the class represents a client;
+    // in this case it must wait from the server to know the bot move
   }
 
   public void cardAnimationEnded() {
@@ -429,6 +431,12 @@ public class Labyrinth extends BaseModel {
   }
 
   public void createPowerActionsMap() {
+    if (powerActions == null) {
+      powerActions = new HashMap<>();
+    } else {
+      powerActions.clear();
+    }
+
     powerActions.put(
         PowerType.SWAP_POSITION,
         () -> {
@@ -465,11 +473,12 @@ public class Labyrinth extends BaseModel {
   }
 
   public void changeGoal() {
-    System.out.println("goal to change with: " + goalToSwap.getType().toString());
-    if (getCurrentPlayer() == null || getCurrentPlayer().getGoals().size() < 2) {
+    if (goalToSwap == null) {
       return;
     }
-    if (goalToSwap == null) {
+
+    System.out.println("goal to change with: " + goalToSwap.getType().toString());
+    if (getCurrentPlayer() == null || getCurrentPlayer().getGoals().size() < 2) {
       return;
     }
     Iterator<Goal> it = getCurrentPlayer().getGoals().iterator();
@@ -486,7 +495,7 @@ public class Labyrinth extends BaseModel {
 
   public ArrayList<Position> getAvailableCardInsertionPoint() {
     ArrayList<Position> availableCardInsertionPoint = new ArrayList<>();
-    for (int i = 1; i < this.boardSize - 1; i++) {
+    for (int i = 1; i < this.boardSize - 1; i += 2) {
       availableCardInsertionPoint.add(new Position(0, i));
       availableCardInsertionPoint.add(new Position(this.boardSize - 1, i));
       availableCardInsertionPoint.add(new Position(i, 0));

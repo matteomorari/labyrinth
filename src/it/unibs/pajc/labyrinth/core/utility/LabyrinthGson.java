@@ -2,7 +2,7 @@ package it.unibs.pajc.labyrinth.core.utility;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
+import it.unibs.pajc.labyrinth.core.BotManager;
 import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.Goal;
 import it.unibs.pajc.labyrinth.core.Labyrinth;
@@ -12,7 +12,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class LabyrinthGson {
-  private static final Gson gson = new GsonBuilder().registerTypeAdapter(Color.class, new ColorAdapter()).create();
+  private static final Gson gson =
+      new GsonBuilder().registerTypeAdapter(Color.class, new ColorAdapter()).create();
 
   public static Gson getGson() {
     return gson;
@@ -55,11 +56,13 @@ public class LabyrinthGson {
             if (playerGoal.getType().equals(boardGoal.getType())) {
               modelCopy.getBoard().get(i).get(j).setGoal(playerGoal);
             }
-
           }
         }
       }
     }
+
+    modelCopy.setBotManager(new BotManager(modelCopy));
+    modelCopy.createPowerActionsMap();
     return modelCopy;
   }
 
@@ -67,14 +70,15 @@ public class LabyrinthGson {
     String json = gson.toJson(model);
     Labyrinth modelCopy = fromJson(json);
 
-    boolean saveToFile = false;
-    if (saveToFile) {
-      try (FileWriter writer = new FileWriter("modelCopy.json")) {
-        writer.write(json);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
     return modelCopy;
+  }
+
+  public static void saveToFile(Labyrinth model) {
+    String json = gson.toJson(model);
+    try (FileWriter writer = new FileWriter("modelCopy.json")) {
+      writer.write(json);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 }

@@ -69,6 +69,8 @@ public class FindOnlineGamePnl extends JPanel {
   }
 
   private void navigateToHome() {
+    lobbyController.removePlayerFromSelectedLobby(lobbyController.getLocalPlayer());
+
     JPanel parent = (JPanel) getParent();
     parent.removeAll();
     parent.add(new HomePnl(), BorderLayout.CENTER);
@@ -164,7 +166,7 @@ public class FindOnlineGamePnl extends JPanel {
     }
     panel.add(label, BorderLayout.WEST);
 
-    SvgIconButton icon = new SvgIconButton("resource\\icons\\rotate.svg");
+    SvgIconButton icon = new SvgIconButton("resource\\icons\\groups.svg");
     icon.setBorderRadius(-1);
     icon.setButtonSize(LOBBY_LIST_ICON_SIZE, LOBBY_LIST_ICON_SIZE);
     icon.setSvgIconSize(LOBBY_LIST_ICON_SIZE, LOBBY_LIST_ICON_SIZE);
@@ -263,7 +265,8 @@ public class FindOnlineGamePnl extends JPanel {
 
     // if on an update the game is in progress, this means that the game is started and the
     // so we have to switch to the game panel
-    if (currentLobby != null && currentLobby.isGameInProgress()) {
+    JPanel parent = (JPanel) getParent();
+    if (currentLobby != null && currentLobby.isGameInProgress() && parent != null) {
       Labyrinth labyrinthModel = lobbyController.getLabyrinth();
       String localPlayerId = lobbyController.getLocalPlayer().getId();
 
@@ -274,7 +277,6 @@ public class FindOnlineGamePnl extends JPanel {
       labyrinthModel.addChangeListener(e -> gamePanel.update());
 
       // Replace the current panel's content with the game panel
-      JPanel parent = (JPanel) getParent();
       parent.remove(this);
       parent.setLayout(new BorderLayout());
       parent.add(gamePanel, BorderLayout.CENTER);

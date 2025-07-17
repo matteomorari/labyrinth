@@ -118,27 +118,45 @@ public enum ImageCntrl {
     return getSprite(1, 0);
   }
 
-  public BufferedImage rotateImage(double angle) {
+  public static BufferedImage rotateImage(BufferedImage image, double angle) {
+    int w = image.getWidth();
+    int h = image.getHeight();
+
+    // Calculate the new dimensions to fit the rotated image
     double radians = Math.toRadians(angle);
     double sin = Math.abs(Math.sin(radians));
     double cos = Math.abs(Math.cos(radians));
-    int w = image.getWidth();
-    int h = image.getHeight();
-    int newWidth = (int) Math.floor(w * cos + h * sin);
-    int newHeight = (int) Math.floor(h * cos + w * sin);
+    int newW = (int) Math.floor(w * cos + h * sin);
+    int newH = (int) Math.floor(h * cos + w * sin);
 
-    BufferedImage rotatedImage =
-        new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
-    Graphics2D g2d = rotatedImage.createGraphics();
+    // Rotate on a larger canvas
+    BufferedImage tempImage = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g2d = tempImage.createGraphics();
     g2d.setComposite(AlphaComposite.Src);
+
     AffineTransform at = new AffineTransform();
-    at.translate((newWidth - w) / 2, (newHeight - h) / 2);
-    at.rotate(radians, w / 2, h / 2);
+    at.translate((newW - w) / 2.0, (newH - h) / 2.0);
+    at.rotate(radians, w / 2.0, h / 2.0);
     g2d.setTransform(at);
     g2d.drawImage(image, 0, 0, null);
     g2d.dispose();
 
-    return rotatedImage;
+    // Scale down if needed to fit inside original canvas
+    double scale = Math.min((double) w / newW, (double) h / newH);
+
+    BufferedImage finalImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g = finalImage.createGraphics();
+    g.setComposite(AlphaComposite.Src);
+
+    int drawW = (int) (newW * scale);
+    int drawH = (int) (newH * scale);
+    int x = (w - drawW) / 2;
+    int y = (h - drawH) / 2;
+
+    g.drawImage(tempImage, x, y, drawW, drawH, null);
+    g.dispose();
+
+    return finalImage;
   }
 
   /**
@@ -178,5 +196,32 @@ public enum ImageCntrl {
 
   public BufferedImage scaleBufferedImage(int targetWidth, int targetHeight) {
     return scaleBufferedImage(image, targetWidth, targetHeight);
+  }
+
+  public static BufferedImage createCombinedImage(
+      BufferedImage background,
+      BufferedImage overlay,
+      int width,
+      int height,
+      int overlayWidthDivisor,
+      int overlayHeightDivisor) {
+    BufferedImage combined = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g2 = combined.createGraphics();
+
+    g2.drawImage(background, 0, 0, null);
+
+    // Scale the overlay image
+    int overlayWidth = width / overlayWidthDivisor;
+    int overlayHeight = height / overlayHeightDivisor;
+    BufferedImage scaledOverlay =
+        ImageCntrl.scaleBufferedImage(overlay, overlayWidth, overlayHeight);
+
+    // Draw the overlay centered
+    int x = (width - overlayWidth) / 2;
+    int y = (height - overlayHeight) / 2;
+    g2.drawImage(scaledOverlay, x, y, null);
+
+    g2.dispose();
+    return combined;
   }
 }

@@ -7,15 +7,13 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 public class CardImage implements Animatable {
-  private ImageCntrl imageCntrl;
   Graphics2D g2;
   private Image image;
   private int posX;
   private int posY;
 
-  public CardImage(ImageCntrl imageCntrl, Graphics2D g2) {
-    this.imageCntrl = imageCntrl;
-    this.image = imageCntrl.getImage();
+  public CardImage(BufferedImage image, Graphics2D g2) {
+    this.image = image;
     this.g2 = g2;
   }
 
@@ -37,7 +35,7 @@ public class CardImage implements Animatable {
   }
 
   public CardImage rotate(double angle) {
-    this.image = imageCntrl.rotateImage(angle);
+    this.image = ImageCntrl.rotateImage((BufferedImage) this.image, angle);
     return this;
   }
 

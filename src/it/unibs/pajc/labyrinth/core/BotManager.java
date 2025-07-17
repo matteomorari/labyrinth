@@ -5,7 +5,12 @@ import it.unibs.pajc.labyrinth.core.utility.LabyrinthGson;
 import it.unibs.pajc.labyrinth.core.utility.Orientation;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import it.unibs.pajc.labyrinth.core.utility.Turn;
+import it.unibs.pajc.labyrinth.core.utility.TurnGson;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class BotManager {
@@ -13,6 +18,7 @@ public class BotManager {
   CardInsertMove bestCardInsertMove = null;
   Position bestPosition = null;
   private AtomicInteger nodesVisited = new AtomicInteger(0);
+  private static final ExecutorService executor = Executors.newCachedThreadPool();
 
   public BotManager(Labyrinth model) {
     this.model = model;
@@ -43,24 +49,25 @@ public class BotManager {
   }
 
   public Turn calcMove(Labyrinth model, int maxDepth) {
-    long startTime = System.currentTimeMillis(); // Start timing
+    long startTime = System.currentTimeMillis();
     Turn result = calcMove(model, 1, maxDepth, null);
-    long endTime = System.currentTimeMillis(); // End timing
+    long endTime = System.currentTimeMillis();
 
     setBestCardInsertMove(result.getCardInsertMove());
     setBestPosition(result.getPlayerPosition());
 
-    System.out.println(
-        "Best card insert move: " + getBestCardInsertMove().getCardInsertPosition().toString());
-    System.out.println("Best position: " + getBestPosition().toString());
-
-    System.out.println("Time needed to calcMove: " + (endTime - startTime) + " ms");
     if (model.getCurrentPlayer().getGoals().isEmpty()) {
       System.out.println("going at the base!!");
     } else {
       System.out.println(
           "Searching for: " + model.getCurrentPlayer().getCurrentGoal().getType().toString());
     }
+    System.out.println(
+        "Best card insert move: " + getBestCardInsertMove().getCardInsertPosition().toString());
+    System.out.println("Best position: " + getBestPosition().toString());
+    System.out.println("Depth used: " + result.getDepthFromMinDistance());
+
+    System.out.println("Time needed to calcMove: " + (endTime - startTime) + " ms");
     System.out.println("Nodes visited in calcMove: " + nodesVisited.get());
     nodesVisited.set(0);
 
@@ -73,14 +80,13 @@ public class BotManager {
     ArrayList<Position> availableCardInsertionPoint = model.getAvailableCardInsertionPoint();
     ArrayList<Turn> turnsList = new ArrayList<>();
 
+    ArrayList<Future<Turn>> futures = new ArrayList<>();
     for (Position cardInsertionPosition : availableCardInsertionPoint) {
-      for (int i = 0; i < Orientation.values().length; i++) {
-        Position cardPosCopy = cardInsertionPosition;
-        int orientation = i;
+      for (int orientation = 0; orientation < Orientation.values().length; orientation++) {
         Labyrinth modelCopy = LabyrinthGson.createCopy(model);
 
         modelCopy.getAvailableCard().rotate(orientation);
-        modelCopy.insertCard(cardPosCopy);
+        modelCopy.insertCard(cardInsertionPosition);
 
         Player currentPlayerCopy = modelCopy.getCurrentPlayer();
         Position currentGoalPosition;
@@ -95,7 +101,7 @@ public class BotManager {
           continue;
         }
 
-        CardInsertMove move = new CardInsertMove(cardPosCopy, orientation);
+        CardInsertMove move = new CardInsertMove(cardInsertionPosition, orientation);
 
         // the method findPath returns always at least the current player position
         ArrayList<Position> reachablePlayerPositions =
@@ -114,6 +120,7 @@ public class BotManager {
             // this happend only on first iteration
             Turn turn = new Turn(move, currentGoalPosition, null);
             turn.setMinDistanceFromGoalFinded(0);
+            turn.setDepthFromMinDistance(0);
             return turn;
           } else {
             previousTurn.setMinDistanceFromGoalFinded(0);
@@ -129,12 +136,21 @@ public class BotManager {
 
           if (currentDepth < maxDepth) {
             modelCopy.movePlayer(newPlayerPosition.getRow(), newPlayerPosition.getCol());
-            Turn result = calcMove(modelCopy, currentDepth + 1, maxDepth, turn);
-            turnsList.add(result);
+            // we need to create another copy to avoid ConcurrentModificationException
+            Labyrinth finalModelCopy = LabyrinthGson.createCopy(modelCopy);
+            // turnsList.add(
+            //     calcMove(finalModelCopy, currentDepth + 1, maxDepth, TurnGson.createCopy(turn)));
+            futures.add(
+                executor.submit(
+                    () ->
+                        calcMove(
+                            finalModelCopy,
+                            currentDepth + 1,
+                            maxDepth,
+                            TurnGson.createCopy(turn))));
           }
 
           if (currentDepth == maxDepth) {
-            // turn.setNewGoalPosition(currentGoalPosition);
             turn.setMinDistanceFromGoalFinded(
                 calculateDistance(newPlayerPosition, currentGoalPosition));
             turnsList.add(turn);
@@ -143,16 +159,21 @@ public class BotManager {
       }
     }
 
-    Turn bestTurn = getBestMove(turnsList);
-
-    if (bestTurn == null) {
-      throw new IllegalStateException("No valid moves found in turnsList");
+    for (Future<Turn> future : futures) {
+      try {
+        Turn result = future.get();
+        if (result != null) turnsList.add(result);
+      } catch (InterruptedException | ExecutionException e) {
+        e.printStackTrace();
+      }
     }
+
+    Turn bestTurn = getBestMove(turnsList);
 
     if (previousTurn == null) {
       // this happens only if maxDepth = 1
       bestTurn.setMinDistanceFromGoalFinded(0);
-      bestTurn.setDepthFromMinDistance(currentDepth);
+      bestTurn.setDepthFromMinDistance(bestTurn.getDepthFromMinDistance());
       return bestTurn;
     }
 
@@ -171,35 +192,16 @@ public class BotManager {
 
       if (bestMove == null || distance < bestMove.getMinDistanceFromGoalFinded()) {
         bestMove = turn;
-        // bestMove.setMinDistanceFromGoalFinded(distance);
-        // bestMove.setDepthFromMinDistance(turn.getDepthFromMinDistance());
       }
 
       if (distance == bestMove.getMinDistanceFromGoalFinded()) {
         if (turn.getDepthFromMinDistance() < bestMove.getDepthFromMinDistance()) {
           bestMove = turn;
-          // bestMove.setMinDistanceFromGoalFinded(distance);
-          // bestMove.setDepthFromMinDistance(turn.getDepthFromMinDistance());
         }
       }
     }
     return bestMove;
   }
-
-  // private Turn getNearestGoalTurn(ArrayList<Turn> turns, Position goalPosition) {
-  //   Turn closestTurn = null;
-  //   int minDistance = Integer.MAX_VALUE;
-
-  //   for (Turn turn : turns) {
-  //     int distance = calculateDistance(turn.getPlayerPosition(), goalPosition);
-  //     if (distance < minDistance) {
-  //       minDistance = distance;
-  //       closestTurn = turn;
-  //     }
-  //   }
-
-  //   return closestTurn;
-  // }
 
   private int calculateDistance(Position p1, Position p2) {
     return Math.abs(p1.row - p2.row) + Math.abs(p1.col - p2.col);

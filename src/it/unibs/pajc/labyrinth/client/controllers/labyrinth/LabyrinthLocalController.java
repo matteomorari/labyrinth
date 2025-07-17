@@ -15,6 +15,16 @@ public class LabyrinthLocalController implements LabyrinthController {
     this.labyrinth = model;
   }
 
+  @Override
+  public Labyrinth getLabyrinth() {
+    return labyrinth;
+  }
+
+  @Override
+  public void setLabyrinth(Labyrinth labyrinth) {
+    this.labyrinth = labyrinth;
+  }
+
   public int getBoardSize() {
     return labyrinth.getBoardSize();
   }

@@ -196,12 +196,12 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
 
     ImageCntrl imageCntrl = ImageCntrl.valueOf("CARD_" + card.getType().name());
     int angles = card.getOrientation().ordinal() * 90;
-    CardImage cardImage = new CardImage(imageCntrl, g2).rotate(angles);
+    CardImage cardImage = new CardImage(imageCntrl.getImage(), g2).rotate(angles);
     cardImage.draw(posX, posY, cellSize, cellSize);
 
     if (card.getGoal() != null) {
       ImageCntrl goalImageCntrl = ImageCntrl.valueOf("GOAL_" + card.getGoal().getType().name());
-      CardImage goalImage = new CardImage(goalImageCntrl, g2).rotate(angles);
+      CardImage goalImage = new CardImage(goalImageCntrl.getImage(), g2).rotate(angles);
       goalImage.draw(posX + cellSize / 4, posY + cellSize / 4, cellSize / 2, cellSize / 2);
     }
 
@@ -210,7 +210,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
       int powerY = initialYPosition + card.getPower().getPosition().getRow() * cellSize;
 
       g2.setColor(Color.ORANGE);
-      g2.fillOval(powerX + cellSize / 3, powerY + cellSize / 3, cellSize / 3, cellSize / 3);
+      // g2.fillOval(powerX + cellSize / 3, powerY + cellSize / 3, cellSize / 3, cellSize / 3);
     }
   }
 

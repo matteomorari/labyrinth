@@ -2,12 +2,17 @@ package it.unibs.pajc.labyrinth.client.controllers.labyrinth;
 
 import it.unibs.pajc.labyrinth.core.Card;
 import it.unibs.pajc.labyrinth.core.Goal;
+import it.unibs.pajc.labyrinth.core.Labyrinth;
 import it.unibs.pajc.labyrinth.core.Player;
 import it.unibs.pajc.labyrinth.core.utility.Position;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 
 public interface LabyrinthController {
+  Labyrinth getLabyrinth();
+
+  void setLabyrinth(Labyrinth labyrinth);
+
   int getBoardSize();
 
   ArrayList<ArrayList<Card>> getBoard();
