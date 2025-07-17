@@ -25,39 +25,29 @@ public class LabyrinthGson {
 
   public static Labyrinth fromJson(String json) {
     Labyrinth modelCopy = gson.fromJson(json, Labyrinth.class);
-    // we need the goal class to be the same instance in the board and in the player
-    // and the player card list the same instance of the model players
-    for (int i = 0; i < modelCopy.getBoardSize(); i++) {
-      for (int j = 0; j < modelCopy.getBoardSize(); j++) {
-        Card card = modelCopy.getBoard().get(i).get(j);
-        card.getPlayers().clear();
 
-        for (Player player : modelCopy.getPlayers()) {
-          // do the player staff
-          if (player.getPosition().equals(card.getPosition())) {
-            card.addPlayer(player);
-          }
+    for (Player player : modelCopy.getPlayers()) {
+      Position playerPosition = player.getPosition();
+      Card playerCard =
+          modelCopy.getBoard().get(playerPosition.getRow()).get(playerPosition.getCol());
+      playerCard.getPlayers().clear();
+      playerCard.addPlayer(player);
 
-          // do the goal staff
-          for (Goal playerGoal : player.getGoals()) {
+      for (Goal currentGoal : player.getGoals()) {
+        Position currentGoalPosition = currentGoal.getPosition();
 
-            if (modelCopy.getAvailableCard().getGoal() != null) {
-              if (playerGoal.getType().equals(modelCopy.getAvailableCard().getGoal().getType())) {
-                modelCopy.getAvailableCard().setGoal(playerGoal);
-              }
-              continue;
-            }
-
-            Goal boardGoal = card.getGoal();
-            if (boardGoal == null) {
-              continue;
-            }
-
-            if (playerGoal.getType().equals(boardGoal.getType())) {
-              modelCopy.getBoard().get(i).get(j).setGoal(playerGoal);
-            }
-          }
+        if (currentGoalPosition.equals(new Position(-1, -1))) {
+          Card goalCard = modelCopy.getAvailableCard();
+          goalCard.setGoal(currentGoal);
+          continue;
         }
+
+        Card goalCard =
+            modelCopy
+                .getBoard()
+                .get(currentGoalPosition.getRow())
+                .get(currentGoalPosition.getCol());
+        goalCard.setGoal(currentGoal);
       }
     }
 

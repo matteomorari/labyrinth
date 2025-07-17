@@ -49,7 +49,7 @@ public class BotManager {
   }
 
   public Turn calcMove(Labyrinth model, int maxDepth) {
-    LabyrinthGson.saveToFile(model);
+    // LabyrinthGson.saveToFile(model);
 
     long startTime = System.currentTimeMillis();
     Turn result = calcMove(model, 1, maxDepth, null);
