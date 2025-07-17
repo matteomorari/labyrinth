@@ -75,7 +75,7 @@ public class LabyrinthGson {
 
   public static void saveToFile(Labyrinth model) {
     String json = gson.toJson(model);
-    try (FileWriter writer = new FileWriter("modelCopy.json")) {
+    try (FileWriter writer = new FileWriter("modelCopy" + System.currentTimeMillis() + ".json")) {
       writer.write(json);
     } catch (IOException e) {
       e.printStackTrace();
