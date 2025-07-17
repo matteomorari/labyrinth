@@ -69,6 +69,8 @@ public class FindOnlineGamePnl extends JPanel {
   }
 
   private void navigateToHome() {
+    lobbyController.removePlayerFromSelectedLobby(lobbyController.getLocalPlayer());
+
     JPanel parent = (JPanel) getParent();
     parent.removeAll();
     parent.add(new HomePnl(), BorderLayout.CENTER);
@@ -164,7 +166,7 @@ public class FindOnlineGamePnl extends JPanel {
     }
     panel.add(label, BorderLayout.WEST);
 
-    SvgIconButton icon = new SvgIconButton("resource\\icons\\rotate.svg");
+    SvgIconButton icon = new SvgIconButton("resource\\icons\\groups.svg");
     icon.setBorderRadius(-1);
     icon.setButtonSize(LOBBY_LIST_ICON_SIZE, LOBBY_LIST_ICON_SIZE);
     icon.setSvgIconSize(LOBBY_LIST_ICON_SIZE, LOBBY_LIST_ICON_SIZE);

@@ -86,6 +86,7 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
               currentLobby = getLobbyById(lobbyId);
               currentLobby.addPlayer(player, this);
               // send the new player message to all players in the lobby
+              sendAvailableLobbies();
               sendLobbyStateUpdate(this.currentLobby);
             } finally {
               lobbyOperationsLock.unlock();
@@ -102,6 +103,7 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
             newBot.setIsReadyToPlay(true);
             newBot.setIsBot(true);
             currentLobby.addPlayer(newBot);
+            sendAvailableLobbies();
             sendLobbyStateUpdate(currentLobby);
           } catch (Exception exc) {
             exc.printStackTrace();
@@ -118,6 +120,7 @@ public class LabyrinthServerProtocol extends SocketCommunicationProtocol
             }
             currentLobby.removePlayer(playerToRemove);
             sendLobbyStateUpdate(currentLobby);
+            sendAvailableLobbies();
           } catch (Exception exc) {
             exc.printStackTrace();
           }

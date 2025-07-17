@@ -210,7 +210,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
       int powerY = initialYPosition + card.getPower().getPosition().getRow() * cellSize;
 
       g2.setColor(Color.ORANGE);
-      g2.fillOval(powerX + cellSize / 3, powerY + cellSize / 3, cellSize / 3, cellSize / 3);
+      // g2.fillOval(powerX + cellSize / 3, powerY + cellSize / 3, cellSize / 3, cellSize / 3);
     }
   }
 
