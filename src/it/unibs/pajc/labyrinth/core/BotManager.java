@@ -121,11 +121,11 @@ public class BotManager {
           if (previousTurn == null) {
             // this happens only on first iteration
             Turn turn = new Turn(move, currentGoalPosition, null);
-            turn.setMinDistanceFromGoalFinded(0);
+            turn.setMinDistanceFromGoalFound(0);
             turn.setDepthFromMinDistance(0);
             return turn;
           } else {
-            previousTurn.setMinDistanceFromGoalFinded(0);
+            previousTurn.setMinDistanceFromGoalFound(0);
             previousTurn.setDepthFromMinDistance(currentDepth);
             return previousTurn;
           }
@@ -153,7 +153,7 @@ public class BotManager {
           }
 
           if (currentDepth == maxDepth) {
-            turn.setMinDistanceFromGoalFinded(
+            turn.setMinDistanceFromGoalFound(
                 calculateDistance(newPlayerPosition, currentGoalPosition));
             turnsList.add(turn);
           }
@@ -174,13 +174,13 @@ public class BotManager {
 
     if (previousTurn == null) {
       // this happens only if maxDepth = 1
-      bestTurn.setMinDistanceFromGoalFinded(0);
+      bestTurn.setMinDistanceFromGoalFound(0);
       bestTurn.setDepthFromMinDistance(bestTurn.getDepthFromMinDistance());
       return bestTurn;
     }
 
     Turn previousBestTurn = bestTurn.getPreviousTurn();
-    previousBestTurn.setMinDistanceFromGoalFinded(bestTurn.getMinDistanceFromGoalFinded());
+    previousBestTurn.setMinDistanceFromGoalFound(bestTurn.getMinDistanceFromGoalFound());
     previousBestTurn.setDepthFromMinDistance(bestTurn.getDepthFromMinDistance());
 
     return previousBestTurn;
@@ -190,13 +190,13 @@ public class BotManager {
     Turn bestMove = null;
     for (Turn turn : turnsList) {
       if (turn == null) continue;
-      int distance = turn.getMinDistanceFromGoalFinded();
+      int distance = turn.getMinDistanceFromGoalFound();
 
-      if (bestMove == null || distance < bestMove.getMinDistanceFromGoalFinded()) {
+      if (bestMove == null || distance < bestMove.getMinDistanceFromGoalFound()) {
         bestMove = turn;
       }
 
-      if (distance == bestMove.getMinDistanceFromGoalFinded()) {
+      if (distance == bestMove.getMinDistanceFromGoalFound()) {
         if (turn.getDepthFromMinDistance() < bestMove.getDepthFromMinDistance()) {
           bestMove = turn;
         }

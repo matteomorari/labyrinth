@@ -293,7 +293,7 @@ public class BoardPnl extends JPanel implements MouseListener, Animatable {
     }
   }
 
-  // iterates through the imagearray
+  // iterates through the image array
   private int frameCount = 0;
 
   public BufferedImage playerAnimation(BufferedImage[] frames) {

@@ -3,7 +3,7 @@ package it.unibs.pajc.labyrinth.core.utility;
 public class Turn {
   private CardInsertMove cardInsertMove;
   private Position playerPosition;
-  private int minDistanceFromGoalFinded = Integer.MAX_VALUE;
+  private int minDistanceFromGoalFound = Integer.MAX_VALUE;
   private int depthFromMinDistance = 0;
   // due to inserted card, the goal position may change
   // if the goal does not change, this will be the same as the player's position
@@ -31,16 +31,16 @@ public class Turn {
     this.playerPosition = playerPosition;
   }
 
-  public int getMinDistanceFromGoalFinded() {
-    return minDistanceFromGoalFinded;
+  public int getMinDistanceFromGoalFound() {
+    return minDistanceFromGoalFound;
   }
 
   public int getDepthFromMinDistance() {
     return depthFromMinDistance;
   }
 
-  public void setMinDistanceFromGoalFinded(int minDistanceFromGoalFinded) {
-    this.minDistanceFromGoalFinded = minDistanceFromGoalFinded;
+  public void setMinDistanceFromGoalFound(int minDistanceToGoalFound) {
+    this.minDistanceFromGoalFound = minDistanceToGoalFound;
   }
 
   public void setDepthFromMinDistance(int depthFromMinDistance) {
