@@ -1,7 +1,10 @@
 # Labyrinth
 
+> Project created for the "Programmazione Avanzata Java e C" *(Advanced Java and C Programming)* exam of the Degree in Computer Science and Engineering at the University of Brescia (UniBS), in collaboration with [Tafa Hamit](https://github.com/tafah).
 
 This is a Java-based implementation of the classic Labyrinth board game. Players navigate a maze, collect treasures, and try to be the first to return to their starting position. This version includes features for both local and online multiplayer gameplay.
+
+![Game Example](/resource/readme/game.gif)
 
 ## Features
 
